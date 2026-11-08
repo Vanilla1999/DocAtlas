@@ -1,0 +1,521 @@
+{
+  "arm": "A",
+  "task": "V-M4",
+  "status": "CAPTURED",
+  "provider_requests": 4,
+  "provider_requests_by_kind": {
+    "primary": 4
+  },
+  "session_ids": [
+    "ses_e45bad56bffexTGEqK22N6jFev"
+  ],
+  "session_ids_count": 1,
+  "requests_with_usage": 4,
+  "usage": {
+    "input": 8108,
+    "output": 236,
+    "cached": 4992,
+    "cache_write": 0,
+    "reasoning": 11,
+    "uncached": 3116
+  },
+  "usage_coverage_complete": true,
+  "provider_records": [
+    {
+      "id": "resp_01169fabe92b06ac016af0327bb19487d2a6021b3c76bd8a51",
+      "usage": {
+        "input_tokens": 1464,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0
+        },
+        "output_tokens": 25,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 1489,
+        "attribution": {
+          "items": {
+            "fc_01169fabe92b06ac016af0327caf0887d297e17f0f995153d4": {
+              "input_tokens": 2,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 25
+            },
+            "msg_01169fabe92b06ac016af0327bb1c087d2bbd33c087b2dcc2c": {
+              "input_tokens": 22,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 22,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            }
+          },
+          "request_fields": {
+            "instructions": {
+              "input_tokens": 808,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "tools": {
+              "input_tokens": 632,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "resp_01169fabe92b06ac016af0327db78087d290167174c9f835ec",
+      "usage": {
+        "input_tokens": 1777,
+        "input_tokens_details": {
+          "cached_tokens": 1280,
+          "cache_write_tokens": 0
+        },
+        "output_tokens": 61,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 1838,
+        "attribution": {
+          "items": {
+            "fc_01169fabe92b06ac016af0327caf0887d297e17f0f995153d4": {
+              "input_tokens": 27,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_01169fabe92b06ac016af0327db7b087d2a8cd401f45d0502c": {
+              "input_tokens": 286,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 286,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "fc_01169fabe92b06ac016af0327e682887d2ad64829ab98f997a": {
+              "input_tokens": 2,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 61
+            },
+            "msg_01169fabe92b06ac016af0327bb1c087d2bbd33c087b2dcc2c": {
+              "input_tokens": 22,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 22,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            }
+          },
+          "request_fields": {
+            "instructions": {
+              "input_tokens": 808,
+              "cached_tokens": 648,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "tools": {
+              "input_tokens": 632,
+              "cached_tokens": 632,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "resp_01169fabe92b06ac016af03283877087d2ac8285c75c881fbf",
+      "usage": {
+        "input_tokens": 2199,
+        "input_tokens_details": {
+          "cached_tokens": 1664,
+          "cache_write_tokens": 0
+        },
+        "output_tokens": 110,
+        "output_tokens_details": {
+          "reasoning_tokens": 11
+        },
+        "total_tokens": 2309,
+        "attribution": {
+          "items": {
+            "fc_01169fabe92b06ac016af0327caf0887d297e17f0f995153d4": {
+              "input_tokens": 27,
+              "cached_tokens": 27,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_01169fabe92b06ac016af0327db7b087d2a8cd401f45d0502c": {
+              "input_tokens": 286,
+              "cached_tokens": 175,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 286,
+                  "cached_tokens": 175,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "fc_01169fabe92b06ac016af0327e682887d2ad64829ab98f997a": {
+              "input_tokens": 63,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_01169fabe92b06ac016af0328387a087d2ae1ddbd2fa4fda74": {
+              "input_tokens": 359,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 359,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "fc_01169fabe92b06ac016af03287714c87d2a890c188bd5bc26e": {
+              "input_tokens": 0,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 99
+            },
+            "msg_01169fabe92b06ac016af0327bb1c087d2bbd33c087b2dcc2c": {
+              "input_tokens": 22,
+              "cached_tokens": 22,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 22,
+                  "cached_tokens": 22,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "rs_01169fabe92b06ac016af03284521087d2bd6c7b1bb018a52d": {
+              "input_tokens": 2,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 11
+            }
+          },
+          "request_fields": {
+            "instructions": {
+              "input_tokens": 808,
+              "cached_tokens": 808,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "tools": {
+              "input_tokens": 632,
+              "cached_tokens": 632,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "resp_01169fabe92b06ac016af03289376087d2ae21523135669fbb",
+      "usage": {
+        "input_tokens": 2668,
+        "input_tokens_details": {
+          "cached_tokens": 2048,
+          "cache_write_tokens": 0
+        },
+        "output_tokens": 40,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 2708,
+        "attribution": {
+          "items": {
+            "fc_01169fabe92b06ac016af0327caf0887d297e17f0f995153d4": {
+              "input_tokens": 27,
+              "cached_tokens": 27,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_01169fabe92b06ac016af0327db7b087d2a8cd401f45d0502c": {
+              "input_tokens": 286,
+              "cached_tokens": 286,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 286,
+                  "cached_tokens": 286,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "fc_01169fabe92b06ac016af0327e682887d2ad64829ab98f997a": {
+              "input_tokens": 63,
+              "cached_tokens": 63,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_01169fabe92b06ac016af0328387a087d2ae1ddbd2fa4fda74": {
+              "input_tokens": 359,
+              "cached_tokens": 210,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 359,
+                  "cached_tokens": 210,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "fc_01169fabe92b06ac016af03287714c87d2a890c188bd5bc26e": {
+              "input_tokens": 99,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_01169fabe92b06ac016af03289379087d2b831234b8c9e8a38": {
+              "input_tokens": 357,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 357,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "msg_01169fabe92b06ac016af0327bb1c087d2bbd33c087b2dcc2c": {
+              "input_tokens": 22,
+              "cached_tokens": 22,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 22,
+                  "cached_tokens": 22,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "msg_01169fabe92b06ac016af0328a044087d2a42967b61f462ac0": {
+              "input_tokens": 2,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 40,
+              "content": [
+                {
+                  "input_tokens": 2,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 40
+                }
+              ]
+            },
+            "rs_01169fabe92b06ac016af03284521087d2bd6c7b1bb018a52d": {
+              "input_tokens": 13,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            }
+          },
+          "request_fields": {
+            "instructions": {
+              "input_tokens": 808,
+              "cached_tokens": 808,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "tools": {
+              "input_tokens": 632,
+              "cached_tokens": 632,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            }
+          }
+        }
+      }
+    }
+  ],
+  "retries": 0,
+  "capture_errors": [],
+  "first_provider_monotonic_ns": 1981113954,
+  "first_provider_language_hints": [],
+  "first_provider_wall_time_ms": 1794126459312,
+  "original_question_in_first_request": true,
+  "status_observations": [
+    {
+      "arguments": {
+        "action": "project",
+        "include_language": true
+      },
+      "request_monotonic_ns": 6552466835497,
+      "response_monotonic_ns": 6552637774154,
+      "request_wall_time_ns": 1794126460946800837,
+      "response_wall_time_ns": 1794126461117739254,
+      "payload": {
+        "action": "project",
+        "delivery_configuration": {
+          "compact_text": true,
+          "minilm_model_dir": null,
+          "text_fallback": true
+        },
+        "documentation_language": {
+          "basis": "catalog_declaration",
+          "catalog_sha256": "ea941adf3feaf2f191d989853ddd97efca77fc4a112d3c99a3ea5cfacefd7927",
+          "hint_only": true,
+          "languages": [
+            "en"
+          ],
+          "scope": "project",
+          "snapshot_sha256": "f0e7b14f913ddbe80d4020f2c761ff51baca1767a2f9853ac10578313082094e",
+          "source_count": 6,
+          "status": "declared",
+          "unknown_sources": 0
+        },
+        "project": {
+          "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project"
+        },
+        "project_binding": {
+          "project_id": "local:c5969289883c68fd089528a8f5015c377d73028660f327d1fe3599210ca4545e",
+          "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project",
+          "workspace_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/locations/A/V-M4"
+        },
+        "tool": "docs_status"
+      }
+    }
+  ],
+  "host_preflight_verified": null,
+  "host_hint_binding_verified": null,
+  "host_timestamp_order_verified": null,
+  "host_timestamp_reason": null,
+  "model_tool_calls": {
+    "docatlas_docs_status": 1,
+    "docatlas_get_docs_context": 2
+  },
+  "actual_mcp_calls": {
+    "docs_status": 1,
+    "get_docs_context": 2
+  },
+  "mcp_missing_responses": 0,
+  "qwen_receipts": [
+    {
+      "request_id": 3,
+      "context_quality": {
+        "reasons": [
+          "coverage_unverified"
+        ],
+        "status": "unavailable"
+      },
+      "metrics": null,
+      "minimal_context": null,
+      "source_selection": {
+        "calibration_scope": "selected_units_before_link_expansion",
+        "calibration_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+        "calibration_status": "empirical",
+        "candidate_units": 21,
+        "closure": {
+          "coverage": "unverified",
+          "delivered_spans": 0,
+          "incomplete_dependencies": [],
+          "reference_expansion": {
+            "added_spans": 0,
+            "examined_references": 0,
+            "followed_references": 0,
+            "max_hops": 1,
+            "pending_references": 0,
+            "recipe": "one-hop-v1",
+            "satisfied_references": 0
+          },
+          "selected_units": 0
+        },
+        "delivered_rows": 0,
+        "model_pairs": 21,
+        "policy": "complete_calibrated_context_v1",
+        "scan_complete": true,
+        "selected_units": 0
+      },
+      "reason_code": "no_relevant_source_context"
+    },
+    {
+      "request_id": 4,
+      "context_quality": {
+        "reasons": [
+          "coverage_unverified"
+        ],
+        "status": "unavailable"
+      },
+      "metrics": null,
+      "minimal_context": null,
+      "source_selection": {
+        "calibration_scope": "selected_units_before_link_expansion",
+        "calibration_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+        "calibration_status": "empirical",
+        "candidate_units": 21,
+        "closure": {
+          "coverage": "unverified",
+          "delivered_spans": 0,
+          "incomplete_dependencies": [],
+          "reference_expansion": {
+            "added_spans": 0,
+            "examined_references": 0,
+            "followed_references": 0,
+            "max_hops": 1,
+            "pending_references": 0,
+            "recipe": "one-hop-v1",
+            "satisfied_references": 0
+          },
+          "selected_units": 0
+        },
+        "delivered_rows": 0,
+        "model_pairs": 21,
+        "policy": "complete_calibrated_context_v1",
+        "scan_complete": true,
+        "selected_units": 0
+      },
+      "reason_code": "no_relevant_source_context"
+    }
+  ],
+  "qwen_pairs": 42,
+  "answer": "Не удалось найти в документации подтверждение температуры охлаждения, обязательной для всех общих приборов обсерватории. Это не доказывает, что такого требования нет.",
+  "answer_quality": "NOT_GRADED",
+  "source_facts_quality": "NOT_GRADED",
+  "timing_boundary": "wall-v2: Python time.time_ns versus JS Date.now, same-host epoch clock; JS millisecond resolution, wall-clock steps not excluded. Monotonic clocks are process-local only. Legacy Python wall time is never reconstructed. Not remote arrival."
+}

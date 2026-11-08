@@ -1,0 +1,352 @@
+{
+  "arm": "A",
+  "task": "V-M1",
+  "status": "CAPTURED",
+  "provider_requests": 3,
+  "provider_requests_by_kind": {
+    "primary": 3
+  },
+  "session_ids": [
+    "ses_e45c0adc4ffe7O4cQbnDhkIZPt"
+  ],
+  "session_ids_count": 1,
+  "requests_with_usage": 3,
+  "usage": {
+    "input": 6350,
+    "output": 490,
+    "cached": 2944,
+    "cache_write": 0,
+    "reasoning": 0,
+    "uncached": 3406
+  },
+  "usage_coverage_complete": true,
+  "provider_records": [
+    {
+      "id": "resp_0f56f582f31f29a6016af030fcb74887d28ff81f4574eec665",
+      "usage": {
+        "input_tokens": 1477,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0
+        },
+        "output_tokens": 25,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 1502,
+        "attribution": {
+          "items": {
+            "fc_0f56f582f31f29a6016af030fd9a6c87d28967ef2e7882b6b9": {
+              "input_tokens": 2,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 25
+            },
+            "msg_0f56f582f31f29a6016af030fcb76c87d28b785f0e70258f34": {
+              "input_tokens": 35,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 35,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            }
+          },
+          "request_fields": {
+            "instructions": {
+              "input_tokens": 808,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "tools": {
+              "input_tokens": 632,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "resp_0f56f582f31f29a6016af030fe9ce087d28830b30002dcd7f0",
+      "usage": {
+        "input_tokens": 1790,
+        "input_tokens_details": {
+          "cached_tokens": 1280,
+          "cache_write_tokens": 0
+        },
+        "output_tokens": 82,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 1872,
+        "attribution": {
+          "items": {
+            "fc_0f56f582f31f29a6016af030fd9a6c87d28967ef2e7882b6b9": {
+              "input_tokens": 27,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_0f56f582f31f29a6016af030fe9d0487d2b8a33c3b17e4bc0e": {
+              "input_tokens": 286,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 286,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "fc_0f56f582f31f29a6016af030ff5c5887d2bca3dcf45f005061": {
+              "input_tokens": 2,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 82
+            },
+            "msg_0f56f582f31f29a6016af030fcb76c87d28b785f0e70258f34": {
+              "input_tokens": 35,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 35,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            }
+          },
+          "request_fields": {
+            "instructions": {
+              "input_tokens": 808,
+              "cached_tokens": 648,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "tools": {
+              "input_tokens": 632,
+              "cached_tokens": 632,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "resp_0f56f582f31f29a6016af0310541ac87d2bd7a61e474521e10",
+      "usage": {
+        "input_tokens": 3083,
+        "input_tokens_details": {
+          "cached_tokens": 1664,
+          "cache_write_tokens": 0
+        },
+        "output_tokens": 383,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 3466,
+        "attribution": {
+          "items": {
+            "fc_0f56f582f31f29a6016af030fd9a6c87d28967ef2e7882b6b9": {
+              "input_tokens": 27,
+              "cached_tokens": 27,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_0f56f582f31f29a6016af030fe9d0487d2b8a33c3b17e4bc0e": {
+              "input_tokens": 286,
+              "cached_tokens": 162,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 286,
+                  "cached_tokens": 162,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "fc_0f56f582f31f29a6016af030ff5c5887d2bca3dcf45f005061": {
+              "input_tokens": 84,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_0f56f582f31f29a6016af0310541dc87d2b7c7b5bfd3a6c939": {
+              "input_tokens": 1209,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 1209,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "msg_0f56f582f31f29a6016af030fcb76c87d28b785f0e70258f34": {
+              "input_tokens": 35,
+              "cached_tokens": 35,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 35,
+                  "cached_tokens": 35,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "msg_0f56f582f31f29a6016af03105dd3087d28cb482cea4824f82": {
+              "input_tokens": 2,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 383,
+              "content": [
+                {
+                  "input_tokens": 2,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 383
+                }
+              ]
+            }
+          },
+          "request_fields": {
+            "instructions": {
+              "input_tokens": 808,
+              "cached_tokens": 808,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "tools": {
+              "input_tokens": 632,
+              "cached_tokens": 632,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            }
+          }
+        }
+      }
+    }
+  ],
+  "retries": 0,
+  "capture_errors": [],
+  "first_provider_monotonic_ns": 2163321341,
+  "first_provider_language_hints": [],
+  "original_question_in_first_request": true,
+  "status_observations": [
+    {
+      "arguments": {
+        "action": "project",
+        "include_language": true
+      },
+      "request_monotonic_ns": 6169362136083,
+      "response_monotonic_ns": 6169562066596,
+      "payload": {
+        "action": "project",
+        "delivery_configuration": {
+          "compact_text": true,
+          "minilm_model_dir": null,
+          "text_fallback": true
+        },
+        "documentation_language": {
+          "basis": "catalog_declaration",
+          "catalog_sha256": "ea941adf3feaf2f191d989853ddd97efca77fc4a112d3c99a3ea5cfacefd7927",
+          "hint_only": true,
+          "languages": [
+            "en"
+          ],
+          "scope": "project",
+          "snapshot_sha256": "f0e7b14f913ddbe80d4020f2c761ff51baca1767a2f9853ac10578313082094e",
+          "source_count": 6,
+          "status": "declared",
+          "unknown_sources": 0
+        },
+        "project": {
+          "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project"
+        },
+        "project_binding": {
+          "project_id": "local:c5969289883c68fd089528a8f5015c377d73028660f327d1fe3599210ca4545e",
+          "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project",
+          "workspace_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/locations/A/V-M1"
+        },
+        "tool": "docs_status"
+      }
+    }
+  ],
+  "host_preflight_verified": null,
+  "model_tool_calls": {
+    "docatlas_docs_status": 1,
+    "docatlas_get_docs_context": 1
+  },
+  "actual_mcp_calls": {
+    "docs_status": 1,
+    "get_docs_context": 1
+  },
+  "mcp_missing_responses": 0,
+  "qwen_receipts": [
+    {
+      "request_id": 3,
+      "context_quality": {
+        "reasons": [
+          "coverage_unverified"
+        ],
+        "status": "unverified"
+      },
+      "metrics": null,
+      "minimal_context": null,
+      "source_selection": {
+        "calibration_scope": "selected_units_before_link_expansion",
+        "calibration_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+        "calibration_status": "empirical",
+        "candidate_units": 21,
+        "closure": {
+          "coverage": "unverified",
+          "delivered_spans": 8,
+          "incomplete_dependencies": [],
+          "reference_expansion": {
+            "added_spans": 4,
+            "examined_references": 2,
+            "followed_references": 2,
+            "max_hops": 1,
+            "pending_references": 0,
+            "recipe": "one-hop-v1",
+            "satisfied_references": 2
+          },
+          "selected_units": 4
+        },
+        "delivered_rows": 8,
+        "model_pairs": 21,
+        "policy": "complete_calibrated_context_v1",
+        "scan_complete": true,
+        "selected_units": 4
+      },
+      "reason_code": null
+    }
+  ],
+  "qwen_pairs": 21,
+  "answer": "Передачу можно подготовить, но **завершить её при активной блокировке обслуживания нельзя**:\n\n1. Получите согласие принимающего наблюдателя и одобрение передачи от дежурного оператора. Сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита. [ev-c921e34c76fdfa492bebb68b, `reservations.md:7–10`]\n2. Оставьте передачу в статусе ожидания, даже если согласие и одобрение уже получены. Сначала команда инструмента должна снять блокировку обслуживания. [ev-8c0b8ec623baa336612c0ae6, `reservations.md:11–14`]\n3. Передача не отменяет погодную приостановку: погодные решения регулируют выполнение наблюдений, а не принадлежность бронирования. Если наблюдение приостановлено из-за размыкания ветровой блокировки, возобновить его можно только после её замыкания и записи дежурным оператором разрешения на запуск. Идентификатор бронирования при приостановке сохраняется. [ev-c921e34c76fdfa492bebb68b, `reservations.md:7–10`; ev-56d4c522edb788db6d1f445e, `weather.md:1–4`; ev-159aa46f19575f991571621c, `weather.md:5–8`]\n\nУпрощённый порядок переназначения дневных учебных слотов к подтверждённым наблюдениям не применяется. [ev-db6c99cd7162ee2e647282c4, `reservations.md:15–17`]",
+  "answer_quality": "NOT_GRADED",
+  "source_facts_quality": "NOT_GRADED",
+  "timing_boundary": "Linux CLOCK_MONOTONIC: complete stdio line before host delivery versus native pre-dispatch hook; not remote arrival"
+}

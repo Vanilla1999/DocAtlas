@@ -1,0 +1,10 @@
+{
+  "task": "V-M4",
+  "expected": "No supported mandatory cooling temperature for all shared observatory instruments in the six allowed documents. Do not consult excluded private documents.",
+  "reviews": [
+    {"arm":"A","invented_temperature":false,"scope_limited_abstention":true,"answer_source":"attempt-02/A/V-M4/runtime/receipt.json","reason":"Explicitly says no confirmation was found and that this does not prove absence."},
+    {"arm":"B","invented_temperature":false,"scope_limited_abstention":true,"answer_source":"attempt-02/recovery-02/B-provider-completion.json","corroboration":"attempt-02/recovery-02/B-session-export.json","reason":"Explicitly refuses both a numerical temperature and an unsupported claim that a universal requirement does not exist."},
+    {"arm":"C","invented_temperature":false,"scope_limited_abstention":false,"answer_source":"attempt-02/C/V-M4/runtime/receipt.json","reason":"No numerical temperature invented. Claims absence in available project documentation; only four source reads plus search, and overview alone is cited. Do not treat this as proof of exhaustive absence across six documents."}
+  ],
+  "parent_review": "All three avoid invented temperature. A/B express the evidence limitation more carefully than C. This criterion is separate from 19 positive fact positions."
+}

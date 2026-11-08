@@ -1,0 +1,261 @@
+{
+  "session": "ses_e45ba8e12ffemMNVd4DWE6CSaC",
+  "final_response_id": "resp_0c584dbfad1ba2a4016af03298b1b487d28bc21b10b3883777",
+  "final_response_status": "completed",
+  "answer": "Не удалось найти в доступной документации подтверждение температуры охлаждения, обязательной для всех общих приборов обсерватории. Поэтому назвать такую температуру или утверждать, что единого требования нет, нельзя.",
+  "provider_records": [
+    {
+      "id": "resp_0c584dbfad1ba2a4016af0328e31e087d2aaf65907a22342cc",
+      "usage": {
+        "input_tokens": 1570,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0
+        },
+        "output_tokens": 60,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 1630,
+        "attribution": {
+          "items": {
+            "fc_0c584dbfad1ba2a4016af0328efca887d29cc0580e14eca819": {
+              "input_tokens": 2,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 60
+            },
+            "msg_0c584dbfad1ba2a4016af0328e320487d2aee3566daacd60a0": {
+              "input_tokens": 22,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 22,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            }
+          },
+          "request_fields": {
+            "instructions": {
+              "input_tokens": 914,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "tools": {
+              "input_tokens": 632,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "resp_0c584dbfad1ba2a4016af03294190c87d2bb603c3b4d02ac0f",
+      "usage": {
+        "input_tokens": 1997,
+        "input_tokens_details": {
+          "cached_tokens": 1408,
+          "cache_write_tokens": 0
+        },
+        "output_tokens": 104,
+        "output_tokens_details": {
+          "reasoning_tokens": 11
+        },
+        "total_tokens": 2101,
+        "attribution": {
+          "items": {
+            "fc_0c584dbfad1ba2a4016af0328efca887d29cc0580e14eca819": {
+              "input_tokens": 62,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_0c584dbfad1ba2a4016af03294193487d2aa344aaf78b8db20": {
+              "input_tokens": 365,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 365,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "fc_0c584dbfad1ba2a4016af0329696d487d2931bdad004948de6": {
+              "input_tokens": 0,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 93
+            },
+            "msg_0c584dbfad1ba2a4016af0328e320487d2aee3566daacd60a0": {
+              "input_tokens": 22,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 22,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "rs_0c584dbfad1ba2a4016af032949e5487d28a41f47b4d44de3c": {
+              "input_tokens": 2,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 11
+            }
+          },
+          "request_fields": {
+            "instructions": {
+              "input_tokens": 914,
+              "cached_tokens": 776,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "tools": {
+              "input_tokens": 632,
+              "cached_tokens": 632,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "resp_0c584dbfad1ba2a4016af03298b1b487d28bc21b10b3883777",
+      "usage": {
+        "input_tokens": 2461,
+        "input_tokens_details": {
+          "cached_tokens": 1792,
+          "cache_write_tokens": 0
+        },
+        "output_tokens": 48,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 2509,
+        "attribution": {
+          "items": {
+            "fc_0c584dbfad1ba2a4016af0328efca887d29cc0580e14eca819": {
+              "input_tokens": 62,
+              "cached_tokens": 62,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_0c584dbfad1ba2a4016af03294193487d2aa344aaf78b8db20": {
+              "input_tokens": 365,
+              "cached_tokens": 162,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 365,
+                  "cached_tokens": 162,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "fc_0c584dbfad1ba2a4016af0329696d487d2931bdad004948de6": {
+              "input_tokens": 93,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_0c584dbfad1ba2a4016af03298b1e087d2859f315a98b15924": {
+              "input_tokens": 358,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 358,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "msg_0c584dbfad1ba2a4016af0328e320487d2aee3566daacd60a0": {
+              "input_tokens": 22,
+              "cached_tokens": 22,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 22,
+                  "cached_tokens": 22,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "msg_0c584dbfad1ba2a4016af0329948a887d2a09e4c99dc7e387b": {
+              "input_tokens": 2,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 48,
+              "content": [
+                {
+                  "input_tokens": 2,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 48
+                }
+              ]
+            },
+            "rs_0c584dbfad1ba2a4016af032949e5487d28a41f47b4d44de3c": {
+              "input_tokens": 13,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            }
+          },
+          "request_fields": {
+            "instructions": {
+              "input_tokens": 914,
+              "cached_tokens": 914,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "tools": {
+              "input_tokens": 632,
+              "cached_tokens": 632,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            }
+          }
+        }
+      }
+    }
+  ],
+  "usage": {
+    "input": 6028,
+    "output": 212,
+    "cached": 3200,
+    "cache_write": 0,
+    "reasoning": 11,
+    "uncached": 2828
+  },
+  "cli_answer": "",
+  "cli_capture_complete": false,
+  "runtime_receipt_present": false,
+  "transport_exit_status": null,
+  "host_preflight_verified": true,
+  "boundary": "Answer and all three usage records recovered from actual completed provider bodies; not a synthesized CLI/runtime receipt"
+}

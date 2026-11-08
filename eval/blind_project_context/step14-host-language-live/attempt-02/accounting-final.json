@@ -1,0 +1,4472 @@
+[
+  {
+    "arm": "A",
+    "task": "V-M1",
+    "status": "CAPTURED",
+    "provider_requests": 3,
+    "provider_requests_by_kind": {
+      "primary": 3
+    },
+    "session_ids": [
+      "ses_e45c0adc4ffe7O4cQbnDhkIZPt"
+    ],
+    "session_ids_count": 1,
+    "requests_with_usage": 3,
+    "usage": {
+      "input": 6350,
+      "output": 490,
+      "cached": 2944,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 3406
+    },
+    "usage_coverage_complete": true,
+    "provider_records": [
+      {
+        "id": "resp_0f56f582f31f29a6016af030fcb74887d28ff81f4574eec665",
+        "usage": {
+          "input_tokens": 1477,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 25,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1502,
+          "attribution": {
+            "items": {
+              "fc_0f56f582f31f29a6016af030fd9a6c87d28967ef2e7882b6b9": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 25
+              },
+              "msg_0f56f582f31f29a6016af030fcb76c87d28b785f0e70258f34": {
+                "input_tokens": 35,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 35,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 808,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 632,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_0f56f582f31f29a6016af030fe9ce087d28830b30002dcd7f0",
+        "usage": {
+          "input_tokens": 1790,
+          "input_tokens_details": {
+            "cached_tokens": 1280,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 82,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1872,
+          "attribution": {
+            "items": {
+              "fc_0f56f582f31f29a6016af030fd9a6c87d28967ef2e7882b6b9": {
+                "input_tokens": 27,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0f56f582f31f29a6016af030fe9d0487d2b8a33c3b17e4bc0e": {
+                "input_tokens": 286,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 286,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0f56f582f31f29a6016af030ff5c5887d2bca3dcf45f005061": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 82
+              },
+              "msg_0f56f582f31f29a6016af030fcb76c87d28b785f0e70258f34": {
+                "input_tokens": 35,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 35,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 808,
+                "cached_tokens": 648,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 632,
+                "cached_tokens": 632,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_0f56f582f31f29a6016af0310541ac87d2bd7a61e474521e10",
+        "usage": {
+          "input_tokens": 3083,
+          "input_tokens_details": {
+            "cached_tokens": 1664,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 383,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 3466,
+          "attribution": {
+            "items": {
+              "fc_0f56f582f31f29a6016af030fd9a6c87d28967ef2e7882b6b9": {
+                "input_tokens": 27,
+                "cached_tokens": 27,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0f56f582f31f29a6016af030fe9d0487d2b8a33c3b17e4bc0e": {
+                "input_tokens": 286,
+                "cached_tokens": 162,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 286,
+                    "cached_tokens": 162,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0f56f582f31f29a6016af030ff5c5887d2bca3dcf45f005061": {
+                "input_tokens": 84,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0f56f582f31f29a6016af0310541dc87d2b7c7b5bfd3a6c939": {
+                "input_tokens": 1209,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 1209,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_0f56f582f31f29a6016af030fcb76c87d28b785f0e70258f34": {
+                "input_tokens": 35,
+                "cached_tokens": 35,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 35,
+                    "cached_tokens": 35,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_0f56f582f31f29a6016af03105dd3087d28cb482cea4824f82": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 383,
+                "content": [
+                  {
+                    "input_tokens": 2,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 383
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 808,
+                "cached_tokens": 808,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 632,
+                "cached_tokens": 632,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      }
+    ],
+    "retries": 0,
+    "capture_errors": [],
+    "first_provider_monotonic_ns": 2163321341,
+    "first_provider_language_hints": [],
+    "first_provider_wall_time_ms": null,
+    "original_question_in_first_request": true,
+    "status_observations": [
+      {
+        "arguments": {
+          "action": "project",
+          "include_language": true
+        },
+        "request_monotonic_ns": 6169362136083,
+        "response_monotonic_ns": 6169562066596,
+        "request_wall_time_ns": null,
+        "response_wall_time_ns": null,
+        "payload": {
+          "action": "project",
+          "delivery_configuration": {
+            "compact_text": true,
+            "minilm_model_dir": null,
+            "text_fallback": true
+          },
+          "documentation_language": {
+            "basis": "catalog_declaration",
+            "catalog_sha256": "ea941adf3feaf2f191d989853ddd97efca77fc4a112d3c99a3ea5cfacefd7927",
+            "hint_only": true,
+            "languages": [
+              "en"
+            ],
+            "scope": "project",
+            "snapshot_sha256": "f0e7b14f913ddbe80d4020f2c761ff51baca1767a2f9853ac10578313082094e",
+            "source_count": 6,
+            "status": "declared",
+            "unknown_sources": 0
+          },
+          "project": {
+            "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project"
+          },
+          "project_binding": {
+            "project_id": "local:c5969289883c68fd089528a8f5015c377d73028660f327d1fe3599210ca4545e",
+            "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project",
+            "workspace_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/locations/A/V-M1"
+          },
+          "tool": "docs_status"
+        }
+      }
+    ],
+    "host_preflight_verified": null,
+    "host_hint_binding_verified": null,
+    "host_timestamp_order_verified": null,
+    "host_timestamp_reason": null,
+    "model_tool_calls": {
+      "docatlas_docs_status": 1,
+      "docatlas_get_docs_context": 1
+    },
+    "actual_mcp_calls": {
+      "docs_status": 1,
+      "get_docs_context": 1
+    },
+    "mcp_missing_responses": 0,
+    "qwen_receipts": [
+      {
+        "request_id": 3,
+        "context_quality": {
+          "reasons": [
+            "coverage_unverified"
+          ],
+          "status": "unverified"
+        },
+        "metrics": null,
+        "minimal_context": null,
+        "source_selection": {
+          "calibration_scope": "selected_units_before_link_expansion",
+          "calibration_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+          "calibration_status": "empirical",
+          "candidate_units": 21,
+          "closure": {
+            "coverage": "unverified",
+            "delivered_spans": 8,
+            "incomplete_dependencies": [],
+            "reference_expansion": {
+              "added_spans": 4,
+              "examined_references": 2,
+              "followed_references": 2,
+              "max_hops": 1,
+              "pending_references": 0,
+              "recipe": "one-hop-v1",
+              "satisfied_references": 2
+            },
+            "selected_units": 4
+          },
+          "delivered_rows": 8,
+          "model_pairs": 21,
+          "policy": "complete_calibrated_context_v1",
+          "scan_complete": true,
+          "selected_units": 4
+        },
+        "reason_code": null
+      }
+    ],
+    "qwen_pairs": 21,
+    "answer": "Передачу можно подготовить, но **завершить её при активной блокировке обслуживания нельзя**:\n\n1. Получите согласие принимающего наблюдателя и одобрение передачи от дежурного оператора. Сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита. [ev-c921e34c76fdfa492bebb68b, `reservations.md:7–10`]\n2. Оставьте передачу в статусе ожидания, даже если согласие и одобрение уже получены. Сначала команда инструмента должна снять блокировку обслуживания. [ev-8c0b8ec623baa336612c0ae6, `reservations.md:11–14`]\n3. Передача не отменяет погодную приостановку: погодные решения регулируют выполнение наблюдений, а не принадлежность бронирования. Если наблюдение приостановлено из-за размыкания ветровой блокировки, возобновить его можно только после её замыкания и записи дежурным оператором разрешения на запуск. Идентификатор бронирования при приостановке сохраняется. [ev-c921e34c76fdfa492bebb68b, `reservations.md:7–10`; ev-56d4c522edb788db6d1f445e, `weather.md:1–4`; ev-159aa46f19575f991571621c, `weather.md:5–8`]\n\nУпрощённый порядок переназначения дневных учебных слотов к подтверждённым наблюдениям не применяется. [ev-db6c99cd7162ee2e647282c4, `reservations.md:15–17`]",
+    "answer_quality": "NOT_GRADED",
+    "source_facts_quality": "NOT_GRADED",
+    "timing_boundary": "wall-v2: Python time.time_ns versus JS Date.now, same-host epoch clock; JS millisecond resolution, wall-clock steps not excluded. Monotonic clocks are process-local only. Legacy Python wall time is never reconstructed. Not remote arrival."
+  },
+  {
+    "arm": "B",
+    "task": "V-M1",
+    "status": "CAPTURED",
+    "provider_requests": 2,
+    "provider_requests_by_kind": {
+      "primary": 2
+    },
+    "session_ids": [
+      "ses_e45c06208ffeOJTSog2Sw3tigt"
+    ],
+    "session_ids_count": 1,
+    "requests_with_usage": 2,
+    "usage": {
+      "input": 4454,
+      "output": 489,
+      "cached": 1408,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 3046
+    },
+    "usage_coverage_complete": true,
+    "provider_records": [
+      {
+        "id": "resp_0b5538720dc8a568016af03110516887d2966a29a146f12ba0",
+        "usage": {
+          "input_tokens": 1581,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 76,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1657,
+          "attribution": {
+            "items": {
+              "fc_0b5538720dc8a568016af03111304887d2ae1f1428b566449c": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 76
+              },
+              "msg_0b5538720dc8a568016af03110518c87d2b754aa4283825958": {
+                "input_tokens": 35,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 35,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 912,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 632,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_0b5538720dc8a568016af03116f51487d2acc95a0f8ddf65d1",
+        "usage": {
+          "input_tokens": 2873,
+          "input_tokens_details": {
+            "cached_tokens": 1408,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 413,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 3286,
+          "attribution": {
+            "items": {
+              "fc_0b5538720dc8a568016af03111304887d2ae1f1428b566449c": {
+                "input_tokens": 78,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0b5538720dc8a568016af03116f53087d29ba5420c1500f5f8": {
+                "input_tokens": 1214,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 1214,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_0b5538720dc8a568016af03110518c87d2b754aa4283825958": {
+                "input_tokens": 35,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 35,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_0b5538720dc8a568016af03117999887d2a6aae2a7351e6177": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 413,
+                "content": [
+                  {
+                    "input_tokens": 2,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 413
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 912,
+                "cached_tokens": 776,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 632,
+                "cached_tokens": 632,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      }
+    ],
+    "retries": 0,
+    "capture_errors": [],
+    "first_provider_monotonic_ns": 2385541437,
+    "first_provider_language_hints": [
+      {
+        "status": "declared",
+        "languages": [
+          "en"
+        ],
+        "scope": "project",
+        "prompt_id": "262029b96f221333",
+        "hint_only": true
+      }
+    ],
+    "first_provider_wall_time_ms": null,
+    "original_question_in_first_request": true,
+    "status_observations": [
+      {
+        "arguments": {
+          "action": "project",
+          "include_language": true,
+          "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project"
+        },
+        "request_monotonic_ns": 6186788375433,
+        "response_monotonic_ns": 6186959866926,
+        "request_wall_time_ns": null,
+        "response_wall_time_ns": null,
+        "payload": {
+          "action": "project",
+          "delivery_configuration": {
+            "compact_text": true,
+            "minilm_model_dir": null,
+            "text_fallback": true
+          },
+          "documentation_language": {
+            "basis": "catalog_declaration",
+            "catalog_sha256": "ea941adf3feaf2f191d989853ddd97efca77fc4a112d3c99a3ea5cfacefd7927",
+            "hint_only": true,
+            "languages": [
+              "en"
+            ],
+            "scope": "project",
+            "snapshot_sha256": "f0e7b14f913ddbe80d4020f2c761ff51baca1767a2f9853ac10578313082094e",
+            "source_count": 6,
+            "status": "declared",
+            "unknown_sources": 0
+          },
+          "project": {
+            "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project"
+          },
+          "project_binding": {
+            "project_id": "local:c5969289883c68fd089528a8f5015c377d73028660f327d1fe3599210ca4545e",
+            "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project",
+            "workspace_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/locations/B/V-M1"
+          },
+          "tool": "docs_status"
+        }
+      }
+    ],
+    "host_preflight_verified": null,
+    "host_hint_binding_verified": true,
+    "host_timestamp_order_verified": null,
+    "host_timestamp_reason": "legacy_cross_process_clock_mismatch_no_python_wall_capture",
+    "model_tool_calls": {
+      "docatlas_get_docs_context": 1
+    },
+    "actual_mcp_calls": {
+      "docs_status": 1,
+      "get_docs_context": 1
+    },
+    "mcp_missing_responses": 0,
+    "qwen_receipts": [
+      {
+        "request_id": 3,
+        "context_quality": {
+          "reasons": [
+            "coverage_unverified"
+          ],
+          "status": "unverified"
+        },
+        "metrics": null,
+        "minimal_context": null,
+        "source_selection": {
+          "calibration_scope": "selected_units_before_link_expansion",
+          "calibration_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+          "calibration_status": "empirical",
+          "candidate_units": 21,
+          "closure": {
+            "coverage": "unverified",
+            "delivered_spans": 8,
+            "incomplete_dependencies": [],
+            "reference_expansion": {
+              "added_spans": 4,
+              "examined_references": 2,
+              "followed_references": 2,
+              "max_hops": 1,
+              "pending_references": 0,
+              "recipe": "one-hop-v1",
+              "satisfied_references": 2
+            },
+            "selected_units": 4
+          },
+          "delivered_rows": 8,
+          "model_pairs": 21,
+          "policy": "complete_calibrated_context_v1",
+          "scan_complete": true,
+          "selected_units": 4
+        },
+        "reason_code": null
+      }
+    ],
+    "qwen_pairs": 21,
+    "answer": "Передача возможна, но при активной блокировке обслуживания её нужно оставить **в ожидании**, даже если согласия уже получены.\n\n1. Получите согласие принимающего наблюдателя и одобрение передачи от дежурного оператора.\n2. Сохраните исходный идентификатор бронирования и укажите обоих наблюдателей в журнале аудита.\n3. Не завершайте передачу, пока команда инструмента не снимет блокировку обслуживания. Обновление календаря блокировку не снимает. [ev-c921e34c76fdfa492bebb68b, `reservations.md:7–10`; ev-8c0b8ec623baa336612c0ae6, `reservations.md:11–14`; ev-af3fb3da8c27448bc32cb3fd, `calendar.md:5–8`]\n\n**Погодная приостановка при передаче не меняется:** погодные решения регулируют выполнение наблюдений, а не владение бронированием. Если наружные наблюдения приостановлены из-за размыкания ветровой блокировки, возобновить их можно только после её замыкания и регистрации дежурным оператором разрешения на запуск. Идентификатор бронирования при приостановке сохраняется. [ev-c921e34c76fdfa492bebb68b, `reservations.md:7–10`; ev-56d4c522edb788db6d1f445e, `weather.md:1–4`; ev-159aa46f19575f991571621c, `weather.md:5–8`]\n\nУпрощённое переназначение инструктором для дневных учебных слотов к подтверждённым наблюдениям не применяется. [ev-db6c99cd7162ee2e647282c4, `reservations.md:15–17`]",
+    "answer_quality": "NOT_GRADED",
+    "source_facts_quality": "NOT_GRADED",
+    "timing_boundary": "wall-v2: Python time.time_ns versus JS Date.now, same-host epoch clock; JS millisecond resolution, wall-clock steps not excluded. Monotonic clocks are process-local only. Legacy Python wall time is never reconstructed. Not remote arrival."
+  },
+  {
+    "arm": "C",
+    "task": "V-M1",
+    "status": "CAPTURED",
+    "provider_requests": 3,
+    "provider_requests_by_kind": {
+      "primary": 3
+    },
+    "session_ids": [
+      "ses_e45bc487effeZvmguKSpYLQCHi"
+    ],
+    "session_ids_count": 1,
+    "requests_with_usage": 3,
+    "usage": {
+      "input": 5818,
+      "output": 769,
+      "cached": 1152,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 4666
+    },
+    "usage_coverage_complete": true,
+    "provider_records": [
+      {
+        "id": "resp_0e130663e5ae60e9016af0321be29c87d2a2484442a5ca639c",
+        "usage": {
+          "input_tokens": 1258,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 123,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1381,
+          "attribution": {
+            "items": {
+              "fc_0e130663e5ae60e9016af0321cad2487d2ba775fa16e650ca5": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 79
+              },
+              "fc_0e130663e5ae60e9016af0321e8c6887d28d7a94a60440b381": {
+                "input_tokens": 0,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 44
+              },
+              "msg_0e130663e5ae60e9016af0321be2bc87d2873081df82616f94": {
+                "input_tokens": 35,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 35,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 752,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 469,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_0e130663e5ae60e9016af0321f070487d29800f52540533033",
+        "usage": {
+          "input_tokens": 1597,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 235,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1832,
+          "attribution": {
+            "items": {
+              "fc_0e130663e5ae60e9016af0321cad2487d2ba775fa16e650ca5": {
+                "input_tokens": 81,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0e130663e5ae60e9016af0321e8c6887d28d7a94a60440b381": {
+                "input_tokens": 44,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0e130663e5ae60e9016af0321f072c87d297c3a69d7b67ddbb": {
+                "input_tokens": 202,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 202,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0e130663e5ae60e9016af0321f072c87d2b15f6e3808591d13": {
+                "input_tokens": 12,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 12,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0e130663e5ae60e9016af0321fcd9c87d2919925c750242c85": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 56
+              },
+              "fc_0e130663e5ae60e9016af03223ba4887d2a744175f8f979332": {
+                "input_tokens": 0,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 36
+              },
+              "fc_0e130663e5ae60e9016af03223ba4887d2aac21f10722d4995": {
+                "input_tokens": 0,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 35
+              },
+              "fc_0e130663e5ae60e9016af03223ba4887d2aed7c41a4dd3feef": {
+                "input_tokens": 0,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 36
+              },
+              "fc_0e130663e5ae60e9016af03223ba4887d2beb0ea8df6f223fe": {
+                "input_tokens": 0,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 35
+              },
+              "fc_0e130663e5ae60e9016af03223ba4c87d2921dffce55e0a5d3": {
+                "input_tokens": 0,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 37
+              },
+              "msg_0e130663e5ae60e9016af0321be2bc87d2873081df82616f94": {
+                "input_tokens": 35,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 35,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 752,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 469,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_0e130663e5ae60e9016af03224417087d2b99c0693e565b6fd",
+        "usage": {
+          "input_tokens": 2963,
+          "input_tokens_details": {
+            "cached_tokens": 1152,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 411,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 3374,
+          "attribution": {
+            "items": {
+              "fc_0e130663e5ae60e9016af0321cad2487d2ba775fa16e650ca5": {
+                "input_tokens": 81,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0e130663e5ae60e9016af0321e8c6887d28d7a94a60440b381": {
+                "input_tokens": 44,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0e130663e5ae60e9016af0321f072c87d297c3a69d7b67ddbb": {
+                "input_tokens": 202,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 202,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0e130663e5ae60e9016af0321f072c87d2b15f6e3808591d13": {
+                "input_tokens": 12,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 12,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0e130663e5ae60e9016af0321fcd9c87d2919925c750242c85": {
+                "input_tokens": 58,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0e130663e5ae60e9016af03223ba4887d2a744175f8f979332": {
+                "input_tokens": 36,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0e130663e5ae60e9016af03223ba4887d2aac21f10722d4995": {
+                "input_tokens": 35,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0e130663e5ae60e9016af03223ba4887d2aed7c41a4dd3feef": {
+                "input_tokens": 36,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0e130663e5ae60e9016af03223ba4887d2beb0ea8df6f223fe": {
+                "input_tokens": 35,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0e130663e5ae60e9016af03223ba4c87d2921dffce55e0a5d3": {
+                "input_tokens": 37,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0e130663e5ae60e9016af03224419887d286a1016f2301ec28": {
+                "input_tokens": 162,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 162,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0e130663e5ae60e9016af03224419887d2943320c800c43115": {
+                "input_tokens": 178,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 178,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0e130663e5ae60e9016af03224419887d2a9512e6785b220d2": {
+                "input_tokens": 193,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 193,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0e130663e5ae60e9016af03224419887d2aa3f2a40b466adc2": {
+                "input_tokens": 163,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 163,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0e130663e5ae60e9016af03224419887d2afdef1ce7c4a003f": {
+                "input_tokens": 191,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 191,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0e130663e5ae60e9016af03224419887d2b1f25f37e39681b3": {
+                "input_tokens": 242,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 242,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_0e130663e5ae60e9016af0321be2bc87d2873081df82616f94": {
+                "input_tokens": 35,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 35,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_0e130663e5ae60e9016af03224b6b487d2903f77d9be5a7068": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 411,
+                "content": [
+                  {
+                    "input_tokens": 2,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 411
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 752,
+                "cached_tokens": 683,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 469,
+                "cached_tokens": 469,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      }
+    ],
+    "retries": 0,
+    "capture_errors": [],
+    "first_provider_monotonic_ns": 1329696879,
+    "first_provider_language_hints": [],
+    "first_provider_wall_time_ms": 1794126363650,
+    "original_question_in_first_request": true,
+    "status_observations": [],
+    "host_preflight_verified": null,
+    "host_hint_binding_verified": null,
+    "host_timestamp_order_verified": null,
+    "host_timestamp_reason": null,
+    "model_tool_calls": {
+      "grep": 1,
+      "glob": 1,
+      "read": 6
+    },
+    "actual_mcp_calls": {},
+    "mcp_missing_responses": 0,
+    "qwen_receipts": [],
+    "qwen_pairs": null,
+    "answer": "Для подтверждённого ночного наблюдения на общем инструменте порядок такой:\n\n1. Получите согласие принимающего наблюдателя и одобрение дежурного оператора.\n2. Пока действует блокировка обслуживания, **оставьте передачу в ожидании**, даже если оба согласия уже получены. Сначала блокировку должна снять команда инструмента.\n3. При передаче сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита. Погодная приостановка при передаче не изменяется. [reservations.md, строки 1–13](reservations.md#transfer)\n\nПогодное решение управляет **выполнением**, а не принадлежностью бронирования. Если наружные наблюдения приостановлены из-за размыкания ветровой блокировки, возобновить их можно только после её замыкания и регистрации разрешения на перезапуск дежурным оператором. Благоприятный прогноз сам по себе не разрешает перезапуск. [weather.md, строки 1–7, 13–15](weather.md#suspension)\n\nИсключение: инструмент, **явно классифицированный как находящийся в помещении**, может продолжать работу во время ветровой приостановки, если его собственные защитные блокировки замкнуты. Изображение закрытой крыши в календаре такой классификации не подтверждает. [weather.md, строки 9–11](weather.md#indoor-instrument)\n\nКалендарь служит только представлением состояния: его обновление не снимает блокировку обслуживания и не разрешает выполнение. Упрощённая передача дневного учебного слота инструктором к подтверждённому наблюдению не применяется. [calendar.md, строки 1–7](calendar.md#colours); [reservations.md, строки 15–17](reservations.md#training-slots)",
+    "answer_quality": "NOT_GRADED",
+    "source_facts_quality": "NOT_GRADED",
+    "timing_boundary": "wall-v2: Python time.time_ns versus JS Date.now, same-host epoch clock; JS millisecond resolution, wall-clock steps not excluded. Monotonic clocks are process-local only. Legacy Python wall time is never reconstructed. Not remote arrival."
+  },
+  {
+    "arm": "A",
+    "task": "V-M2",
+    "status": "CAPTURED",
+    "provider_requests": 3,
+    "provider_requests_by_kind": {
+      "primary": 3
+    },
+    "session_ids": [
+      "ses_e45bc01c8ffel5iV2uPqoMjlAH"
+    ],
+    "session_ids_count": 1,
+    "requests_with_usage": 3,
+    "usage": {
+      "input": 5843,
+      "output": 264,
+      "cached": 2944,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 2899
+    },
+    "usage_coverage_complete": true,
+    "provider_records": [
+      {
+        "id": "resp_06a58d75a554a29f016af0322ec49087d2b637b69212e75c3c",
+        "usage": {
+          "input_tokens": 1465,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 25,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1490,
+          "attribution": {
+            "items": {
+              "fc_06a58d75a554a29f016af0322f8df887d28df4dbe623f5afc2": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 25
+              },
+              "msg_06a58d75a554a29f016af0322ec4ac87d295a72e0d7f422ba2": {
+                "input_tokens": 23,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 23,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 808,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 632,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_06a58d75a554a29f016af032309d5087d2a8ca6cbc4c33154e",
+        "usage": {
+          "input_tokens": 1778,
+          "input_tokens_details": {
+            "cached_tokens": 1280,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 43,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1821,
+          "attribution": {
+            "items": {
+              "fc_06a58d75a554a29f016af0322f8df887d28df4dbe623f5afc2": {
+                "input_tokens": 27,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_06a58d75a554a29f016af032309d7087d28ad50c2c637d4529": {
+                "input_tokens": 286,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 286,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_06a58d75a554a29f016af03231abf087d28f6e5f403c53e41e": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 43
+              },
+              "msg_06a58d75a554a29f016af0322ec4ac87d295a72e0d7f422ba2": {
+                "input_tokens": 23,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 23,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 808,
+                "cached_tokens": 648,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 632,
+                "cached_tokens": 632,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_06a58d75a554a29f016af03236775c87d29fd8af9e6c71a22f",
+        "usage": {
+          "input_tokens": 2600,
+          "input_tokens_details": {
+            "cached_tokens": 1664,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 196,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 2796,
+          "attribution": {
+            "items": {
+              "fc_06a58d75a554a29f016af0322f8df887d28df4dbe623f5afc2": {
+                "input_tokens": 27,
+                "cached_tokens": 27,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_06a58d75a554a29f016af032309d7087d28ad50c2c637d4529": {
+                "input_tokens": 286,
+                "cached_tokens": 174,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 286,
+                    "cached_tokens": 174,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_06a58d75a554a29f016af03231abf087d28f6e5f403c53e41e": {
+                "input_tokens": 45,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_06a58d75a554a29f016af03236778487d28dc85c0eb2a07b8c": {
+                "input_tokens": 777,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 777,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_06a58d75a554a29f016af0322ec4ac87d295a72e0d7f422ba2": {
+                "input_tokens": 23,
+                "cached_tokens": 23,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 23,
+                    "cached_tokens": 23,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_06a58d75a554a29f016af03236ecd087d2b7d18b3277e24a24": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 196,
+                "content": [
+                  {
+                    "input_tokens": 2,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 196
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 808,
+                "cached_tokens": 808,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 632,
+                "cached_tokens": 632,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      }
+    ],
+    "retries": 0,
+    "capture_errors": [],
+    "first_provider_monotonic_ns": 2028354546,
+    "first_provider_language_hints": [],
+    "first_provider_wall_time_ms": 1794126382461,
+    "original_question_in_first_request": true,
+    "status_observations": [
+      {
+        "arguments": {
+          "action": "project",
+          "include_language": true
+        },
+        "request_monotonic_ns": 6475329899382,
+        "response_monotonic_ns": 6475503257767,
+        "request_wall_time_ns": 1794126383809864879,
+        "response_wall_time_ns": 1794126383983222847,
+        "payload": {
+          "action": "project",
+          "delivery_configuration": {
+            "compact_text": true,
+            "minilm_model_dir": null,
+            "text_fallback": true
+          },
+          "documentation_language": {
+            "basis": "catalog_declaration",
+            "catalog_sha256": "ea941adf3feaf2f191d989853ddd97efca77fc4a112d3c99a3ea5cfacefd7927",
+            "hint_only": true,
+            "languages": [
+              "en"
+            ],
+            "scope": "project",
+            "snapshot_sha256": "f0e7b14f913ddbe80d4020f2c761ff51baca1767a2f9853ac10578313082094e",
+            "source_count": 6,
+            "status": "declared",
+            "unknown_sources": 0
+          },
+          "project": {
+            "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project"
+          },
+          "project_binding": {
+            "project_id": "local:c5969289883c68fd089528a8f5015c377d73028660f327d1fe3599210ca4545e",
+            "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project",
+            "workspace_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/locations/A/V-M2"
+          },
+          "tool": "docs_status"
+        }
+      }
+    ],
+    "host_preflight_verified": null,
+    "host_hint_binding_verified": null,
+    "host_timestamp_order_verified": null,
+    "host_timestamp_reason": null,
+    "model_tool_calls": {
+      "docatlas_docs_status": 1,
+      "docatlas_get_docs_context": 1
+    },
+    "actual_mcp_calls": {
+      "docs_status": 1,
+      "get_docs_context": 1
+    },
+    "mcp_missing_responses": 0,
+    "qwen_receipts": [
+      {
+        "request_id": 3,
+        "context_quality": {
+          "reasons": [
+            "coverage_unverified"
+          ],
+          "status": "unverified"
+        },
+        "metrics": null,
+        "minimal_context": null,
+        "source_selection": {
+          "calibration_scope": "selected_units_before_link_expansion",
+          "calibration_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+          "calibration_status": "empirical",
+          "candidate_units": 21,
+          "closure": {
+            "coverage": "unverified",
+            "delivered_spans": 4,
+            "incomplete_dependencies": [],
+            "reference_expansion": {
+              "added_spans": 0,
+              "examined_references": 0,
+              "followed_references": 0,
+              "max_hops": 1,
+              "pending_references": 0,
+              "recipe": "one-hop-v1",
+              "satisfied_references": 0
+            },
+            "selected_units": 4
+          },
+          "delivered_rows": 4,
+          "model_pairs": 21,
+          "policy": "complete_calibrated_context_v1",
+          "scan_complete": true,
+          "selected_units": 4
+        },
+        "reason_code": null
+      }
+    ],
+    "qwen_pairs": 21,
+    "answer": "- **Stop:** Suspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during the suspension. [ev-159aa46f19575f991571621c, `weather.md:5–8`]\n- **Restart:** Resume only after the interlock closes **and** the duty operator records restart approval. A favourable forecast cannot authorize a restart. [ev-159aa46f19575f991571621c, `weather.md:5–8`; ev-d7ad6e3c0ae0215b63ed8bb6, `weather.md:13–15`]\n- **Indoor instrument:** It may continue during a wind suspension if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish indoor classification. [ev-0999a181d992f67ebae5ac73, `weather.md:9–12`]",
+    "answer_quality": "NOT_GRADED",
+    "source_facts_quality": "NOT_GRADED",
+    "timing_boundary": "wall-v2: Python time.time_ns versus JS Date.now, same-host epoch clock; JS millisecond resolution, wall-clock steps not excluded. Monotonic clocks are process-local only. Legacy Python wall time is never reconstructed. Not remote arrival."
+  },
+  {
+    "arm": "B",
+    "task": "V-M2",
+    "status": "CAPTURED",
+    "provider_requests": 2,
+    "provider_requests_by_kind": {
+      "primary": 2
+    },
+    "session_ids": [
+      "ses_e45bbc7d8ffe1rohtEeagnCMkB"
+    ],
+    "session_ids_count": 1,
+    "requests_with_usage": 2,
+    "usage": {
+      "input": 3960,
+      "output": 233,
+      "cached": 1408,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 2552
+    },
+    "usage_coverage_complete": true,
+    "provider_records": [
+      {
+        "id": "resp_0f4a911bdbf07a53016af0323dd7bc87d2949dec6f241fe1bc",
+        "usage": {
+          "input_tokens": 1569,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 43,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1612,
+          "attribution": {
+            "items": {
+              "fc_0f4a911bdbf07a53016af0323f6aec87d2858228418c041e5a": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 43
+              },
+              "msg_0f4a911bdbf07a53016af0323dd7e087d29b52afc68950e3af": {
+                "input_tokens": 23,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 23,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 912,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 632,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_0f4a911bdbf07a53016af032442a6487d2914eb91ac81c33f8",
+        "usage": {
+          "input_tokens": 2391,
+          "input_tokens_details": {
+            "cached_tokens": 1408,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 190,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 2581,
+          "attribution": {
+            "items": {
+              "fc_0f4a911bdbf07a53016af0323f6aec87d2858228418c041e5a": {
+                "input_tokens": 45,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0f4a911bdbf07a53016af032442a9887d290f27a9b2a202b4e": {
+                "input_tokens": 777,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 777,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_0f4a911bdbf07a53016af0323dd7e087d29b52afc68950e3af": {
+                "input_tokens": 23,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 23,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_0f4a911bdbf07a53016af03244dcd087d29ec00832228eb04c": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 190,
+                "content": [
+                  {
+                    "input_tokens": 2,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 190
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 912,
+                "cached_tokens": 776,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 632,
+                "cached_tokens": 632,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      }
+    ],
+    "retries": 0,
+    "capture_errors": [],
+    "first_provider_monotonic_ns": 2351291663,
+    "first_provider_language_hints": [
+      {
+        "status": "declared",
+        "languages": [
+          "en"
+        ],
+        "scope": "project",
+        "prompt_id": "832290b335ffcfa4",
+        "hint_only": true
+      }
+    ],
+    "first_provider_wall_time_ms": 1794126397598,
+    "original_question_in_first_request": true,
+    "status_observations": [
+      {
+        "arguments": {
+          "action": "project",
+          "include_language": true,
+          "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project"
+        },
+        "request_monotonic_ns": 6488353665514,
+        "response_monotonic_ns": 6488524773079,
+        "request_wall_time_ns": 1794126396833630640,
+        "response_wall_time_ns": 1794126397004738285,
+        "payload": {
+          "action": "project",
+          "delivery_configuration": {
+            "compact_text": true,
+            "minilm_model_dir": null,
+            "text_fallback": true
+          },
+          "documentation_language": {
+            "basis": "catalog_declaration",
+            "catalog_sha256": "ea941adf3feaf2f191d989853ddd97efca77fc4a112d3c99a3ea5cfacefd7927",
+            "hint_only": true,
+            "languages": [
+              "en"
+            ],
+            "scope": "project",
+            "snapshot_sha256": "f0e7b14f913ddbe80d4020f2c761ff51baca1767a2f9853ac10578313082094e",
+            "source_count": 6,
+            "status": "declared",
+            "unknown_sources": 0
+          },
+          "project": {
+            "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project"
+          },
+          "project_binding": {
+            "project_id": "local:c5969289883c68fd089528a8f5015c377d73028660f327d1fe3599210ca4545e",
+            "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project",
+            "workspace_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/locations/B/V-M2"
+          },
+          "tool": "docs_status"
+        }
+      }
+    ],
+    "host_preflight_verified": true,
+    "host_hint_binding_verified": true,
+    "host_timestamp_order_verified": true,
+    "host_timestamp_reason": null,
+    "model_tool_calls": {
+      "docatlas_get_docs_context": 1
+    },
+    "actual_mcp_calls": {
+      "docs_status": 1,
+      "get_docs_context": 1
+    },
+    "mcp_missing_responses": 0,
+    "qwen_receipts": [
+      {
+        "request_id": 3,
+        "context_quality": {
+          "reasons": [
+            "coverage_unverified"
+          ],
+          "status": "unverified"
+        },
+        "metrics": null,
+        "minimal_context": null,
+        "source_selection": {
+          "calibration_scope": "selected_units_before_link_expansion",
+          "calibration_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+          "calibration_status": "empirical",
+          "candidate_units": 21,
+          "closure": {
+            "coverage": "unverified",
+            "delivered_spans": 4,
+            "incomplete_dependencies": [],
+            "reference_expansion": {
+              "added_spans": 0,
+              "examined_references": 0,
+              "followed_references": 0,
+              "max_hops": 1,
+              "pending_references": 0,
+              "recipe": "one-hop-v1",
+              "satisfied_references": 0
+            },
+            "selected_units": 4
+          },
+          "delivered_rows": 4,
+          "model_pairs": 21,
+          "policy": "complete_calibrated_context_v1",
+          "scan_complete": true,
+          "selected_units": 4
+        },
+        "reason_code": null
+      }
+    ],
+    "qwen_pairs": 21,
+    "answer": "- **Stop outdoor observations** when the wind interlock opens. Preserve reservation identifiers during the suspension. [ev-159aa46f19575f991571621c, `weather.md:5–8`]\n- **Restart only after** the interlock closes and the duty operator records a restart approval. A favourable forecast alone cannot authorize a restart. [ev-159aa46f19575f991571621c, `weather.md:5–8`; ev-d7ad6e3c0ae0215b63ed8bb6, `weather.md:13–15`]\n- **An indoor instrument may continue** if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish that classification. [ev-0999a181d992f67ebae5ac73, `weather.md:9–12`]",
+    "answer_quality": "NOT_GRADED",
+    "source_facts_quality": "NOT_GRADED",
+    "timing_boundary": "wall-v2: Python time.time_ns versus JS Date.now, same-host epoch clock; JS millisecond resolution, wall-clock steps not excluded. Monotonic clocks are process-local only. Legacy Python wall time is never reconstructed. Not remote arrival."
+  },
+  {
+    "arm": "C",
+    "task": "V-M2",
+    "status": "CAPTURED",
+    "provider_requests": 3,
+    "provider_requests_by_kind": {
+      "primary": 3
+    },
+    "session_ids": [
+      "ses_e45bb9207ffetX0R6ZrwlyV97Z"
+    ],
+    "session_ids_count": 1,
+    "requests_with_usage": 3,
+    "usage": {
+      "input": 4364,
+      "output": 217,
+      "cached": 1280,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 3084
+    },
+    "usage_coverage_complete": true,
+    "provider_records": [
+      {
+        "id": "resp_0a80fcb940c0901a016af0324a3cd087d29cf910a5f5338655",
+        "usage": {
+          "input_tokens": 1246,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 51,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1297,
+          "attribution": {
+            "items": {
+              "fc_0a80fcb940c0901a016af0324aef7887d2a720cd650e55ec09": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 51
+              },
+              "msg_0a80fcb940c0901a016af0324a3cfc87d287bf8bf3defd814d": {
+                "input_tokens": 23,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 23,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 752,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 469,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_0a80fcb940c0901a016af0324c225c87d286024ad0b17d9100",
+        "usage": {
+          "input_tokens": 1442,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 39,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1481,
+          "attribution": {
+            "items": {
+              "fc_0a80fcb940c0901a016af0324aef7887d2a720cd650e55ec09": {
+                "input_tokens": 53,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0a80fcb940c0901a016af0324c227887d29d36625783d934de": {
+                "input_tokens": 143,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 143,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0a80fcb940c0901a016af0324cd1c487d2a05d0f364c69ca2d": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 39
+              },
+              "msg_0a80fcb940c0901a016af0324a3cfc87d287bf8bf3defd814d": {
+                "input_tokens": 23,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 23,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 752,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 469,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_0a80fcb940c0901a016af0324db97c87d28856f6780c9e3afd",
+        "usage": {
+          "input_tokens": 1676,
+          "input_tokens_details": {
+            "cached_tokens": 1280,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 127,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1803,
+          "attribution": {
+            "items": {
+              "fc_0a80fcb940c0901a016af0324aef7887d2a720cd650e55ec09": {
+                "input_tokens": 53,
+                "cached_tokens": 36,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0a80fcb940c0901a016af0324c227887d29d36625783d934de": {
+                "input_tokens": 143,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 143,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0a80fcb940c0901a016af0324cd1c487d2a05d0f364c69ca2d": {
+                "input_tokens": 41,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0a80fcb940c0901a016af0324db99c87d297a3ecab5e65fa13": {
+                "input_tokens": 193,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 193,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_0a80fcb940c0901a016af0324a3cfc87d287bf8bf3defd814d": {
+                "input_tokens": 23,
+                "cached_tokens": 23,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 23,
+                    "cached_tokens": 23,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_0a80fcb940c0901a016af0324e303087d2a8fe8e1815c30568": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 127,
+                "content": [
+                  {
+                    "input_tokens": 2,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 127
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 752,
+                "cached_tokens": 752,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 469,
+                "cached_tokens": 469,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      }
+    ],
+    "retries": 0,
+    "capture_errors": [],
+    "first_provider_monotonic_ns": 1017497858,
+    "first_provider_language_hints": [],
+    "first_provider_wall_time_ms": 1794126410048,
+    "original_question_in_first_request": true,
+    "status_observations": [],
+    "host_preflight_verified": null,
+    "host_hint_binding_verified": null,
+    "host_timestamp_order_verified": null,
+    "host_timestamp_reason": null,
+    "model_tool_calls": {
+      "grep": 1,
+      "read": 1
+    },
+    "actual_mcp_calls": {},
+    "mcp_missing_responses": 0,
+    "qwen_receipts": [],
+    "qwen_pairs": null,
+    "answer": "- **Stop outdoor observations** when the wind interlock opens. Preserve reservation identifiers during the suspension. (`weather.md`, lines 3–7)\n- **Restart only after** the interlock closes **and** the duty operator records restart approval. A favourable forecast cannot authorize a restart. (`weather.md`, lines 7, 13–15)\n- **An indoor instrument may continue** during the wind suspension if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish indoor classification. (`weather.md`, lines 9–11)",
+    "answer_quality": "NOT_GRADED",
+    "source_facts_quality": "NOT_GRADED",
+    "timing_boundary": "wall-v2: Python time.time_ns versus JS Date.now, same-host epoch clock; JS millisecond resolution, wall-clock steps not excluded. Monotonic clocks are process-local only. Legacy Python wall time is never reconstructed. Not remote arrival."
+  },
+  {
+    "arm": "A",
+    "task": "V-M3",
+    "status": "CAPTURED",
+    "provider_requests": 3,
+    "provider_requests_by_kind": {
+      "primary": 3
+    },
+    "session_ids": [
+      "ses_e45bb73dfffey7VxfQ3aa6AXz5"
+    ],
+    "session_ids_count": 1,
+    "requests_with_usage": 3,
+    "usage": {
+      "input": 6041,
+      "output": 255,
+      "cached": 1664,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 4377
+    },
+    "usage_coverage_complete": true,
+    "provider_records": [
+      {
+        "id": "resp_084b4ca3bbedbd65016af03252f68c87d286644ebae29085cd",
+        "usage": {
+          "input_tokens": 1465,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 25,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1490,
+          "attribution": {
+            "items": {
+              "fc_084b4ca3bbedbd65016af03253bf9c87d2880c75753a35f661": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 25
+              },
+              "msg_084b4ca3bbedbd65016af03252f6b087d2811d94ae2861f7a3": {
+                "input_tokens": 23,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 23,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 808,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 632,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_084b4ca3bbedbd65016af03254b2fc87d2a6690f8fb1ed9348",
+        "usage": {
+          "input_tokens": 1778,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 43,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1821,
+          "attribution": {
+            "items": {
+              "fc_084b4ca3bbedbd65016af03253bf9c87d2880c75753a35f661": {
+                "input_tokens": 27,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_084b4ca3bbedbd65016af03254b32887d285aac9899bee8811": {
+                "input_tokens": 286,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 286,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_084b4ca3bbedbd65016af03255564087d2b8268515f764a803": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 43
+              },
+              "msg_084b4ca3bbedbd65016af03252f6b087d2811d94ae2861f7a3": {
+                "input_tokens": 23,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 23,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 808,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 632,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_084b4ca3bbedbd65016af0325a308087d2a69d184633dc7e61",
+        "usage": {
+          "input_tokens": 2798,
+          "input_tokens_details": {
+            "cached_tokens": 1664,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 187,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 2985,
+          "attribution": {
+            "items": {
+              "fc_084b4ca3bbedbd65016af03253bf9c87d2880c75753a35f661": {
+                "input_tokens": 27,
+                "cached_tokens": 27,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_084b4ca3bbedbd65016af03254b32887d285aac9899bee8811": {
+                "input_tokens": 286,
+                "cached_tokens": 174,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 286,
+                    "cached_tokens": 174,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_084b4ca3bbedbd65016af03255564087d2b8268515f764a803": {
+                "input_tokens": 45,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_084b4ca3bbedbd65016af0325a30a487d28272a9f357001a25": {
+                "input_tokens": 975,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 975,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_084b4ca3bbedbd65016af03252f6b087d2811d94ae2861f7a3": {
+                "input_tokens": 23,
+                "cached_tokens": 23,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 23,
+                    "cached_tokens": 23,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_084b4ca3bbedbd65016af0325a9a6487d280ad5159263a8ef2": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 187,
+                "content": [
+                  {
+                    "input_tokens": 2,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 187
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 808,
+                "cached_tokens": 808,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 632,
+                "cached_tokens": 632,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      }
+    ],
+    "retries": 0,
+    "capture_errors": [],
+    "first_provider_monotonic_ns": 1984096275,
+    "first_provider_language_hints": [],
+    "first_provider_wall_time_ms": 1794126418743,
+    "original_question_in_first_request": true,
+    "status_observations": [
+      {
+        "arguments": {
+          "action": "project",
+          "include_language": true
+        },
+        "request_monotonic_ns": 6511506338851,
+        "response_monotonic_ns": 6511673925879,
+        "request_wall_time_ns": 1794126419986304143,
+        "response_wall_time_ns": 1794126420153891114,
+        "payload": {
+          "action": "project",
+          "delivery_configuration": {
+            "compact_text": true,
+            "minilm_model_dir": null,
+            "text_fallback": true
+          },
+          "documentation_language": {
+            "basis": "catalog_declaration",
+            "catalog_sha256": "ea941adf3feaf2f191d989853ddd97efca77fc4a112d3c99a3ea5cfacefd7927",
+            "hint_only": true,
+            "languages": [
+              "en"
+            ],
+            "scope": "project",
+            "snapshot_sha256": "f0e7b14f913ddbe80d4020f2c761ff51baca1767a2f9853ac10578313082094e",
+            "source_count": 6,
+            "status": "declared",
+            "unknown_sources": 0
+          },
+          "project": {
+            "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project"
+          },
+          "project_binding": {
+            "project_id": "local:c5969289883c68fd089528a8f5015c377d73028660f327d1fe3599210ca4545e",
+            "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project",
+            "workspace_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/locations/A/V-M3"
+          },
+          "tool": "docs_status"
+        }
+      }
+    ],
+    "host_preflight_verified": null,
+    "host_hint_binding_verified": null,
+    "host_timestamp_order_verified": null,
+    "host_timestamp_reason": null,
+    "model_tool_calls": {
+      "docatlas_docs_status": 1,
+      "docatlas_get_docs_context": 1
+    },
+    "actual_mcp_calls": {
+      "docs_status": 1,
+      "get_docs_context": 1
+    },
+    "mcp_missing_responses": 0,
+    "qwen_receipts": [
+      {
+        "request_id": 3,
+        "context_quality": {
+          "reasons": [
+            "coverage_unverified"
+          ],
+          "status": "unverified"
+        },
+        "metrics": null,
+        "minimal_context": null,
+        "source_selection": {
+          "calibration_scope": "selected_units_before_link_expansion",
+          "calibration_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+          "calibration_status": "empirical",
+          "candidate_units": 21,
+          "closure": {
+            "coverage": "unverified",
+            "delivered_spans": 6,
+            "incomplete_dependencies": [],
+            "reference_expansion": {
+              "added_spans": 0,
+              "examined_references": 0,
+              "followed_references": 0,
+              "max_hops": 1,
+              "pending_references": 0,
+              "recipe": "one-hop-v1",
+              "satisfied_references": 0
+            },
+            "selected_units": 5
+          },
+          "delivered_rows": 6,
+          "model_pairs": 21,
+          "policy": "complete_calibrated_context_v1",
+          "scan_complete": true,
+          "selected_units": 5
+        },
+        "reason_code": null
+      }
+    ],
+    "qwen_pairs": 21,
+    "answer": "If the absolute offset between instrument time and the observatory reference **exceeds two seconds**, the gateway must:\n\n1. Pause schedule execution and notify the duty operator.\n2. Keep queued reservations unchanged.\n3. Resume only after **two consecutive reference checks** report an offset within two seconds. [ev-7ff924db065d30bda70fa508, `clock.md:5–8`]\n\nIf the reference clock is unavailable, execution must remain paused; a local clock reading alone cannot satisfy either recovery check. [ev-7431ef82d2347181ffe5f433, `clock.md:9–12`]\n\nThe retired prototype’s behavior—clearing pending reservations and restarting on the first local clock sample—must not be used for the current gateway. [ev-74eb9cba956360994f654dbe, `architecture.md:9–11`]",
+    "answer_quality": "NOT_GRADED",
+    "source_facts_quality": "NOT_GRADED",
+    "timing_boundary": "wall-v2: Python time.time_ns versus JS Date.now, same-host epoch clock; JS millisecond resolution, wall-clock steps not excluded. Monotonic clocks are process-local only. Legacy Python wall time is never reconstructed. Not remote arrival."
+  },
+  {
+    "arm": "B",
+    "task": "V-M3",
+    "status": "CAPTURED",
+    "provider_requests": 2,
+    "provider_requests_by_kind": {
+      "primary": 2
+    },
+    "session_ids": [
+      "ses_e45bb3c9bffeQhPCb9j4NrkpE0"
+    ],
+    "session_ids_count": 1,
+    "requests_with_usage": 2,
+    "usage": {
+      "input": 4162,
+      "output": 216,
+      "cached": 1408,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 2754
+    },
+    "usage_coverage_complete": true,
+    "provider_records": [
+      {
+        "id": "resp_0b63a50a2ed1c022016af03262172887d28c66dada2aaf6878",
+        "usage": {
+          "input_tokens": 1571,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 43,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1614,
+          "attribution": {
+            "items": {
+              "fc_0b63a50a2ed1c022016af0326305d487d2b926b53e8bcad365": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 43
+              },
+              "msg_0b63a50a2ed1c022016af03262174887d28a208a8ee744fbb8": {
+                "input_tokens": 23,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 23,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 914,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 632,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_0b63a50a2ed1c022016af03267f0cc87d2958c551e2b68d8b6",
+        "usage": {
+          "input_tokens": 2591,
+          "input_tokens_details": {
+            "cached_tokens": 1408,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 173,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 2764,
+          "attribution": {
+            "items": {
+              "fc_0b63a50a2ed1c022016af0326305d487d2b926b53e8bcad365": {
+                "input_tokens": 45,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0b63a50a2ed1c022016af03267f0f087d2b8e9efc60f4a3d9b": {
+                "input_tokens": 975,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 975,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_0b63a50a2ed1c022016af03262174887d28a208a8ee744fbb8": {
+                "input_tokens": 23,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 23,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_0b63a50a2ed1c022016af032689b7887d2a8cc70ed98d7b708": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 173,
+                "content": [
+                  {
+                    "input_tokens": 2,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 173
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 914,
+                "cached_tokens": 776,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 632,
+                "cached_tokens": 632,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      }
+    ],
+    "retries": 0,
+    "capture_errors": [],
+    "first_provider_monotonic_ns": 2848074325,
+    "first_provider_language_hints": [
+      {
+        "status": "declared",
+        "languages": [
+          "en"
+        ],
+        "scope": "project",
+        "prompt_id": "046beadc6f13c40e",
+        "hint_only": true
+      }
+    ],
+    "first_provider_wall_time_ms": 1794126433763,
+    "original_question_in_first_request": true,
+    "status_observations": [
+      {
+        "arguments": {
+          "action": "project",
+          "include_language": true,
+          "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project"
+        },
+        "request_monotonic_ns": 6524002207044,
+        "response_monotonic_ns": 6524175122359,
+        "request_wall_time_ns": 1794126432482172506,
+        "response_wall_time_ns": 1794126432655087431,
+        "payload": {
+          "action": "project",
+          "delivery_configuration": {
+            "compact_text": true,
+            "minilm_model_dir": null,
+            "text_fallback": true
+          },
+          "documentation_language": {
+            "basis": "catalog_declaration",
+            "catalog_sha256": "ea941adf3feaf2f191d989853ddd97efca77fc4a112d3c99a3ea5cfacefd7927",
+            "hint_only": true,
+            "languages": [
+              "en"
+            ],
+            "scope": "project",
+            "snapshot_sha256": "f0e7b14f913ddbe80d4020f2c761ff51baca1767a2f9853ac10578313082094e",
+            "source_count": 6,
+            "status": "declared",
+            "unknown_sources": 0
+          },
+          "project": {
+            "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project"
+          },
+          "project_binding": {
+            "project_id": "local:c5969289883c68fd089528a8f5015c377d73028660f327d1fe3599210ca4545e",
+            "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project",
+            "workspace_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/locations/B/V-M3"
+          },
+          "tool": "docs_status"
+        }
+      }
+    ],
+    "host_preflight_verified": true,
+    "host_hint_binding_verified": true,
+    "host_timestamp_order_verified": true,
+    "host_timestamp_reason": null,
+    "model_tool_calls": {
+      "docatlas_get_docs_context": 1
+    },
+    "actual_mcp_calls": {
+      "docs_status": 1,
+      "get_docs_context": 1
+    },
+    "mcp_missing_responses": 0,
+    "qwen_receipts": [
+      {
+        "request_id": 3,
+        "context_quality": {
+          "reasons": [
+            "coverage_unverified"
+          ],
+          "status": "unverified"
+        },
+        "metrics": null,
+        "minimal_context": null,
+        "source_selection": {
+          "calibration_scope": "selected_units_before_link_expansion",
+          "calibration_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+          "calibration_status": "empirical",
+          "candidate_units": 21,
+          "closure": {
+            "coverage": "unverified",
+            "delivered_spans": 6,
+            "incomplete_dependencies": [],
+            "reference_expansion": {
+              "added_spans": 0,
+              "examined_references": 0,
+              "followed_references": 0,
+              "max_hops": 1,
+              "pending_references": 0,
+              "recipe": "one-hop-v1",
+              "satisfied_references": 0
+            },
+            "selected_units": 5
+          },
+          "delivered_rows": 6,
+          "model_pairs": 21,
+          "policy": "complete_calibrated_context_v1",
+          "scan_complete": true,
+          "selected_units": 5
+        },
+        "reason_code": null
+      }
+    ],
+    "qwen_pairs": 21,
+    "answer": "If the gateway’s **absolute clock offset exceeds two seconds**, it must pause schedule execution, notify the duty operator, and leave queued reservations unchanged. It may resume only after **two consecutive reference-clock checks** each report an offset within two seconds. [ev-7ff924db065d30bda70fa508, `clock.md:5–8`]\n\nIf the reference clock is unavailable, the gateway must remain paused: a local clock reading alone cannot satisfy either recovery check. [ev-7431ef82d2347181ffe5f433, `clock.md:9–12`] It must not use the retired prototype’s recovery behavior of clearing pending reservations and restarting on the first local clock sample. [ev-74eb9cba956360994f654dbe, `architecture.md:9–11`]",
+    "answer_quality": "NOT_GRADED",
+    "source_facts_quality": "NOT_GRADED",
+    "timing_boundary": "wall-v2: Python time.time_ns versus JS Date.now, same-host epoch clock; JS millisecond resolution, wall-clock steps not excluded. Monotonic clocks are process-local only. Legacy Python wall time is never reconstructed. Not remote arrival."
+  },
+  {
+    "arm": "C",
+    "task": "V-M3",
+    "status": "CAPTURED",
+    "provider_requests": 4,
+    "provider_requests_by_kind": {
+      "primary": 4
+    },
+    "session_ids": [
+      "ses_e45bb0789ffelJTV1vd6oe0Fk6"
+    ],
+    "session_ids_count": 1,
+    "requests_with_usage": 4,
+    "usage": {
+      "input": 6076,
+      "output": 404,
+      "cached": 3712,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 2364
+    },
+    "usage_coverage_complete": true,
+    "provider_records": [
+      {
+        "id": "resp_0f6f6c21e6e0b0f3016af0326dbf2087d2be4cac6a4702e912",
+        "usage": {
+          "input_tokens": 1246,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 48,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1294,
+          "attribution": {
+            "items": {
+              "fc_0f6f6c21e6e0b0f3016af0326ea79087d29e3048ddea1b7302": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 48
+              },
+              "msg_0f6f6c21e6e0b0f3016af0326dbf4887d2b511cb0414ae53c8": {
+                "input_tokens": 23,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 23,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 752,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 469,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_0f6f6c21e6e0b0f3016af0326fc21087d2a1fca5e29db00d6c",
+        "usage": {
+          "input_tokens": 1308,
+          "input_tokens_details": {
+            "cached_tokens": 1152,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 51,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1359,
+          "attribution": {
+            "items": {
+              "fc_0f6f6c21e6e0b0f3016af0326ea79087d29e3048ddea1b7302": {
+                "input_tokens": 50,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0f6f6c21e6e0b0f3016af0326fc23c87d292a63a7ea8308fa0": {
+                "input_tokens": 12,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 12,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0f6f6c21e6e0b0f3016af032709ab087d28cc3295599a351a3": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 51
+              },
+              "msg_0f6f6c21e6e0b0f3016af0326dbf4887d2b511cb0414ae53c8": {
+                "input_tokens": 23,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 23,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 752,
+                "cached_tokens": 683,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 469,
+                "cached_tokens": 469,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_0f6f6c21e6e0b0f3016af03271c1b887d2a5194969396981b4",
+        "usage": {
+          "input_tokens": 1487,
+          "input_tokens_details": {
+            "cached_tokens": 1152,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 125,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1612,
+          "attribution": {
+            "items": {
+              "fc_0f6f6c21e6e0b0f3016af0326ea79087d29e3048ddea1b7302": {
+                "input_tokens": 50,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0f6f6c21e6e0b0f3016af0326fc23c87d292a63a7ea8308fa0": {
+                "input_tokens": 12,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 12,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0f6f6c21e6e0b0f3016af032709ab087d28cc3295599a351a3": {
+                "input_tokens": 53,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0f6f6c21e6e0b0f3016af03271c1d887d2b795ff5c73a383d4": {
+                "input_tokens": 126,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 126,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0f6f6c21e6e0b0f3016af0327290cc87d29031f94098e96e1c": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 55
+              },
+              "fc_0f6f6c21e6e0b0f3016af0327482a887d281891ff5c4dfe8b1": {
+                "input_tokens": 0,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 34
+              },
+              "fc_0f6f6c21e6e0b0f3016af0327482a887d2962e4d51f057abe6": {
+                "input_tokens": 0,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 36
+              },
+              "msg_0f6f6c21e6e0b0f3016af0326dbf4887d2b511cb0414ae53c8": {
+                "input_tokens": 23,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 23,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 752,
+                "cached_tokens": 683,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 469,
+                "cached_tokens": 469,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_0f6f6c21e6e0b0f3016af03275107487d2887ed64cdeb06b9b",
+        "usage": {
+          "input_tokens": 2035,
+          "input_tokens_details": {
+            "cached_tokens": 1408,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 180,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 2215,
+          "attribution": {
+            "items": {
+              "fc_0f6f6c21e6e0b0f3016af0326ea79087d29e3048ddea1b7302": {
+                "input_tokens": 50,
+                "cached_tokens": 50,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0f6f6c21e6e0b0f3016af0326fc23c87d292a63a7ea8308fa0": {
+                "input_tokens": 12,
+                "cached_tokens": 12,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 12,
+                    "cached_tokens": 12,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0f6f6c21e6e0b0f3016af032709ab087d28cc3295599a351a3": {
+                "input_tokens": 53,
+                "cached_tokens": 53,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0f6f6c21e6e0b0f3016af03271c1d887d2b795ff5c73a383d4": {
+                "input_tokens": 126,
+                "cached_tokens": 49,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 126,
+                    "cached_tokens": 49,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0f6f6c21e6e0b0f3016af0327290cc87d29031f94098e96e1c": {
+                "input_tokens": 57,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0f6f6c21e6e0b0f3016af0327482a887d281891ff5c4dfe8b1": {
+                "input_tokens": 34,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0f6f6c21e6e0b0f3016af0327482a887d2962e4d51f057abe6": {
+                "input_tokens": 36,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0f6f6c21e6e0b0f3016af03275109887d2934ce61ea562b890": {
+                "input_tokens": 191,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 191,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0f6f6c21e6e0b0f3016af03275109887d29e422f08258230ad": {
+                "input_tokens": 67,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 67,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0f6f6c21e6e0b0f3016af03275109887d2a7045616e2c23a63": {
+                "input_tokens": 163,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 163,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_0f6f6c21e6e0b0f3016af0326dbf4887d2b511cb0414ae53c8": {
+                "input_tokens": 23,
+                "cached_tokens": 23,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 23,
+                    "cached_tokens": 23,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_0f6f6c21e6e0b0f3016af03275c4b087d2b6ac3fb03515d648": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 180,
+                "content": [
+                  {
+                    "input_tokens": 2,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 180
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 752,
+                "cached_tokens": 752,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 469,
+                "cached_tokens": 469,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      }
+    ],
+    "retries": 0,
+    "capture_errors": [],
+    "first_provider_monotonic_ns": 1013461265,
+    "first_provider_language_hints": [],
+    "first_provider_wall_time_ms": 1794126445513,
+    "original_question_in_first_request": true,
+    "status_observations": [],
+    "host_preflight_verified": null,
+    "host_hint_binding_verified": null,
+    "host_timestamp_order_verified": null,
+    "host_timestamp_reason": null,
+    "model_tool_calls": {
+      "grep": 2,
+      "read": 3
+    },
+    "actual_mcp_calls": {},
+    "mcp_missing_responses": 0,
+    "qwen_receipts": [],
+    "qwen_pairs": null,
+    "answer": "If the absolute offset between instrument time and the observatory reference **exceeds two seconds**, the gateway must pause schedule execution, notify the duty operator, and leave queued reservations unchanged. It may resume only after **two consecutive reference checks** each report an offset within two seconds. [clock.md:3–7](clock.md#L3-L7)\n\nIf the reference clock is unavailable, execution must remain paused: a local clock reading alone cannot satisfy either recovery check. [clock.md:9–11](clock.md#L9-L11)\n\nThe gateway must not use the retired prototype’s recovery behavior of clearing pending reservations or restarting on the first local clock sample. A planner may compute a plan while execution is suspended, but that plan does not bypass the clock check or a weather interlock. [architecture.md:5–11](architecture.md#L5-L11)",
+    "answer_quality": "NOT_GRADED",
+    "source_facts_quality": "NOT_GRADED",
+    "timing_boundary": "wall-v2: Python time.time_ns versus JS Date.now, same-host epoch clock; JS millisecond resolution, wall-clock steps not excluded. Monotonic clocks are process-local only. Legacy Python wall time is never reconstructed. Not remote arrival."
+  },
+  {
+    "arm": "A",
+    "task": "V-M4",
+    "status": "CAPTURED",
+    "provider_requests": 4,
+    "provider_requests_by_kind": {
+      "primary": 4
+    },
+    "session_ids": [
+      "ses_e45bad56bffexTGEqK22N6jFev"
+    ],
+    "session_ids_count": 1,
+    "requests_with_usage": 4,
+    "usage": {
+      "input": 8108,
+      "output": 236,
+      "cached": 4992,
+      "cache_write": 0,
+      "reasoning": 11,
+      "uncached": 3116
+    },
+    "usage_coverage_complete": true,
+    "provider_records": [
+      {
+        "id": "resp_01169fabe92b06ac016af0327bb19487d2a6021b3c76bd8a51",
+        "usage": {
+          "input_tokens": 1464,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 25,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1489,
+          "attribution": {
+            "items": {
+              "fc_01169fabe92b06ac016af0327caf0887d297e17f0f995153d4": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 25
+              },
+              "msg_01169fabe92b06ac016af0327bb1c087d2bbd33c087b2dcc2c": {
+                "input_tokens": 22,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 22,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 808,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 632,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_01169fabe92b06ac016af0327db78087d290167174c9f835ec",
+        "usage": {
+          "input_tokens": 1777,
+          "input_tokens_details": {
+            "cached_tokens": 1280,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 61,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1838,
+          "attribution": {
+            "items": {
+              "fc_01169fabe92b06ac016af0327caf0887d297e17f0f995153d4": {
+                "input_tokens": 27,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_01169fabe92b06ac016af0327db7b087d2a8cd401f45d0502c": {
+                "input_tokens": 286,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 286,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_01169fabe92b06ac016af0327e682887d2ad64829ab98f997a": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 61
+              },
+              "msg_01169fabe92b06ac016af0327bb1c087d2bbd33c087b2dcc2c": {
+                "input_tokens": 22,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 22,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 808,
+                "cached_tokens": 648,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 632,
+                "cached_tokens": 632,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_01169fabe92b06ac016af03283877087d2ac8285c75c881fbf",
+        "usage": {
+          "input_tokens": 2199,
+          "input_tokens_details": {
+            "cached_tokens": 1664,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 110,
+          "output_tokens_details": {
+            "reasoning_tokens": 11
+          },
+          "total_tokens": 2309,
+          "attribution": {
+            "items": {
+              "fc_01169fabe92b06ac016af0327caf0887d297e17f0f995153d4": {
+                "input_tokens": 27,
+                "cached_tokens": 27,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_01169fabe92b06ac016af0327db7b087d2a8cd401f45d0502c": {
+                "input_tokens": 286,
+                "cached_tokens": 175,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 286,
+                    "cached_tokens": 175,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_01169fabe92b06ac016af0327e682887d2ad64829ab98f997a": {
+                "input_tokens": 63,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_01169fabe92b06ac016af0328387a087d2ae1ddbd2fa4fda74": {
+                "input_tokens": 359,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 359,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_01169fabe92b06ac016af03287714c87d2a890c188bd5bc26e": {
+                "input_tokens": 0,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 99
+              },
+              "msg_01169fabe92b06ac016af0327bb1c087d2bbd33c087b2dcc2c": {
+                "input_tokens": 22,
+                "cached_tokens": 22,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 22,
+                    "cached_tokens": 22,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "rs_01169fabe92b06ac016af03284521087d2bd6c7b1bb018a52d": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 11
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 808,
+                "cached_tokens": 808,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 632,
+                "cached_tokens": 632,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_01169fabe92b06ac016af03289376087d2ae21523135669fbb",
+        "usage": {
+          "input_tokens": 2668,
+          "input_tokens_details": {
+            "cached_tokens": 2048,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 40,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 2708,
+          "attribution": {
+            "items": {
+              "fc_01169fabe92b06ac016af0327caf0887d297e17f0f995153d4": {
+                "input_tokens": 27,
+                "cached_tokens": 27,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_01169fabe92b06ac016af0327db7b087d2a8cd401f45d0502c": {
+                "input_tokens": 286,
+                "cached_tokens": 286,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 286,
+                    "cached_tokens": 286,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_01169fabe92b06ac016af0327e682887d2ad64829ab98f997a": {
+                "input_tokens": 63,
+                "cached_tokens": 63,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_01169fabe92b06ac016af0328387a087d2ae1ddbd2fa4fda74": {
+                "input_tokens": 359,
+                "cached_tokens": 210,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 359,
+                    "cached_tokens": 210,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_01169fabe92b06ac016af03287714c87d2a890c188bd5bc26e": {
+                "input_tokens": 99,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_01169fabe92b06ac016af03289379087d2b831234b8c9e8a38": {
+                "input_tokens": 357,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 357,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_01169fabe92b06ac016af0327bb1c087d2bbd33c087b2dcc2c": {
+                "input_tokens": 22,
+                "cached_tokens": 22,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 22,
+                    "cached_tokens": 22,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_01169fabe92b06ac016af0328a044087d2a42967b61f462ac0": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 40,
+                "content": [
+                  {
+                    "input_tokens": 2,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 40
+                  }
+                ]
+              },
+              "rs_01169fabe92b06ac016af03284521087d2bd6c7b1bb018a52d": {
+                "input_tokens": 13,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 808,
+                "cached_tokens": 808,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 632,
+                "cached_tokens": 632,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      }
+    ],
+    "retries": 0,
+    "capture_errors": [],
+    "first_provider_monotonic_ns": 1981113954,
+    "first_provider_language_hints": [],
+    "first_provider_wall_time_ms": 1794126459312,
+    "original_question_in_first_request": true,
+    "status_observations": [
+      {
+        "arguments": {
+          "action": "project",
+          "include_language": true
+        },
+        "request_monotonic_ns": 6552466835497,
+        "response_monotonic_ns": 6552637774154,
+        "request_wall_time_ns": 1794126460946800837,
+        "response_wall_time_ns": 1794126461117739254,
+        "payload": {
+          "action": "project",
+          "delivery_configuration": {
+            "compact_text": true,
+            "minilm_model_dir": null,
+            "text_fallback": true
+          },
+          "documentation_language": {
+            "basis": "catalog_declaration",
+            "catalog_sha256": "ea941adf3feaf2f191d989853ddd97efca77fc4a112d3c99a3ea5cfacefd7927",
+            "hint_only": true,
+            "languages": [
+              "en"
+            ],
+            "scope": "project",
+            "snapshot_sha256": "f0e7b14f913ddbe80d4020f2c761ff51baca1767a2f9853ac10578313082094e",
+            "source_count": 6,
+            "status": "declared",
+            "unknown_sources": 0
+          },
+          "project": {
+            "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project"
+          },
+          "project_binding": {
+            "project_id": "local:c5969289883c68fd089528a8f5015c377d73028660f327d1fe3599210ca4545e",
+            "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project",
+            "workspace_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/locations/A/V-M4"
+          },
+          "tool": "docs_status"
+        }
+      }
+    ],
+    "host_preflight_verified": null,
+    "host_hint_binding_verified": null,
+    "host_timestamp_order_verified": null,
+    "host_timestamp_reason": null,
+    "model_tool_calls": {
+      "docatlas_docs_status": 1,
+      "docatlas_get_docs_context": 2
+    },
+    "actual_mcp_calls": {
+      "docs_status": 1,
+      "get_docs_context": 2
+    },
+    "mcp_missing_responses": 0,
+    "qwen_receipts": [
+      {
+        "request_id": 3,
+        "context_quality": {
+          "reasons": [
+            "coverage_unverified"
+          ],
+          "status": "unavailable"
+        },
+        "metrics": null,
+        "minimal_context": null,
+        "source_selection": {
+          "calibration_scope": "selected_units_before_link_expansion",
+          "calibration_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+          "calibration_status": "empirical",
+          "candidate_units": 21,
+          "closure": {
+            "coverage": "unverified",
+            "delivered_spans": 0,
+            "incomplete_dependencies": [],
+            "reference_expansion": {
+              "added_spans": 0,
+              "examined_references": 0,
+              "followed_references": 0,
+              "max_hops": 1,
+              "pending_references": 0,
+              "recipe": "one-hop-v1",
+              "satisfied_references": 0
+            },
+            "selected_units": 0
+          },
+          "delivered_rows": 0,
+          "model_pairs": 21,
+          "policy": "complete_calibrated_context_v1",
+          "scan_complete": true,
+          "selected_units": 0
+        },
+        "reason_code": "no_relevant_source_context"
+      },
+      {
+        "request_id": 4,
+        "context_quality": {
+          "reasons": [
+            "coverage_unverified"
+          ],
+          "status": "unavailable"
+        },
+        "metrics": null,
+        "minimal_context": null,
+        "source_selection": {
+          "calibration_scope": "selected_units_before_link_expansion",
+          "calibration_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+          "calibration_status": "empirical",
+          "candidate_units": 21,
+          "closure": {
+            "coverage": "unverified",
+            "delivered_spans": 0,
+            "incomplete_dependencies": [],
+            "reference_expansion": {
+              "added_spans": 0,
+              "examined_references": 0,
+              "followed_references": 0,
+              "max_hops": 1,
+              "pending_references": 0,
+              "recipe": "one-hop-v1",
+              "satisfied_references": 0
+            },
+            "selected_units": 0
+          },
+          "delivered_rows": 0,
+          "model_pairs": 21,
+          "policy": "complete_calibrated_context_v1",
+          "scan_complete": true,
+          "selected_units": 0
+        },
+        "reason_code": "no_relevant_source_context"
+      }
+    ],
+    "qwen_pairs": 42,
+    "answer": "Не удалось найти в документации подтверждение температуры охлаждения, обязательной для всех общих приборов обсерватории. Это не доказывает, что такого требования нет.",
+    "answer_quality": "NOT_GRADED",
+    "source_facts_quality": "NOT_GRADED",
+    "timing_boundary": "wall-v2: Python time.time_ns versus JS Date.now, same-host epoch clock; JS millisecond resolution, wall-clock steps not excluded. Monotonic clocks are process-local only. Legacy Python wall time is never reconstructed. Not remote arrival."
+  },
+  {
+    "arm": "B",
+    "task": "V-M4",
+    "status": "CAPTURED",
+    "provider_requests": 3,
+    "provider_requests_by_kind": {
+      "primary": 3
+    },
+    "session_ids": [
+      "ses_e45ba8e12ffemMNVd4DWE6CSaC"
+    ],
+    "session_ids_count": 1,
+    "requests_with_usage": 3,
+    "usage": {
+      "input": 6028,
+      "output": 212,
+      "cached": 3200,
+      "cache_write": 0,
+      "reasoning": 11,
+      "uncached": 2828
+    },
+    "usage_coverage_complete": true,
+    "provider_records": [
+      {
+        "id": "resp_0c584dbfad1ba2a4016af0328e31e087d2aaf65907a22342cc",
+        "usage": {
+          "input_tokens": 1570,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 60,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1630,
+          "attribution": {
+            "items": {
+              "fc_0c584dbfad1ba2a4016af0328efca887d29cc0580e14eca819": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 60
+              },
+              "msg_0c584dbfad1ba2a4016af0328e320487d2aee3566daacd60a0": {
+                "input_tokens": 22,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 22,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 914,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 632,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_0c584dbfad1ba2a4016af03294190c87d2bb603c3b4d02ac0f",
+        "usage": {
+          "input_tokens": 1997,
+          "input_tokens_details": {
+            "cached_tokens": 1408,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 104,
+          "output_tokens_details": {
+            "reasoning_tokens": 11
+          },
+          "total_tokens": 2101,
+          "attribution": {
+            "items": {
+              "fc_0c584dbfad1ba2a4016af0328efca887d29cc0580e14eca819": {
+                "input_tokens": 62,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0c584dbfad1ba2a4016af03294193487d2aa344aaf78b8db20": {
+                "input_tokens": 365,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 365,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0c584dbfad1ba2a4016af0329696d487d2931bdad004948de6": {
+                "input_tokens": 0,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 93
+              },
+              "msg_0c584dbfad1ba2a4016af0328e320487d2aee3566daacd60a0": {
+                "input_tokens": 22,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 22,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "rs_0c584dbfad1ba2a4016af032949e5487d28a41f47b4d44de3c": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 11
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 914,
+                "cached_tokens": 776,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 632,
+                "cached_tokens": 632,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_0c584dbfad1ba2a4016af03298b1b487d28bc21b10b3883777",
+        "usage": {
+          "input_tokens": 2461,
+          "input_tokens_details": {
+            "cached_tokens": 1792,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 48,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 2509,
+          "attribution": {
+            "items": {
+              "fc_0c584dbfad1ba2a4016af0328efca887d29cc0580e14eca819": {
+                "input_tokens": 62,
+                "cached_tokens": 62,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0c584dbfad1ba2a4016af03294193487d2aa344aaf78b8db20": {
+                "input_tokens": 365,
+                "cached_tokens": 162,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 365,
+                    "cached_tokens": 162,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0c584dbfad1ba2a4016af0329696d487d2931bdad004948de6": {
+                "input_tokens": 93,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0c584dbfad1ba2a4016af03298b1e087d2859f315a98b15924": {
+                "input_tokens": 358,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 358,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_0c584dbfad1ba2a4016af0328e320487d2aee3566daacd60a0": {
+                "input_tokens": 22,
+                "cached_tokens": 22,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 22,
+                    "cached_tokens": 22,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_0c584dbfad1ba2a4016af0329948a887d2a09e4c99dc7e387b": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 48,
+                "content": [
+                  {
+                    "input_tokens": 2,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 48
+                  }
+                ]
+              },
+              "rs_0c584dbfad1ba2a4016af032949e5487d28a41f47b4d44de3c": {
+                "input_tokens": 13,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 914,
+                "cached_tokens": 914,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 632,
+                "cached_tokens": 632,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      }
+    ],
+    "retries": 0,
+    "capture_errors": [],
+    "first_provider_monotonic_ns": 2381086323,
+    "first_provider_language_hints": [
+      {
+        "status": "declared",
+        "languages": [
+          "en"
+        ],
+        "scope": "project",
+        "prompt_id": "e6368207dbaca5c1",
+        "hint_only": true
+      }
+    ],
+    "first_provider_wall_time_ms": 1794126477970,
+    "original_question_in_first_request": true,
+    "status_observations": [
+      {
+        "arguments": {
+          "action": "project",
+          "include_language": true,
+          "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project"
+        },
+        "request_monotonic_ns": 6568657980530,
+        "response_monotonic_ns": 6568827113914,
+        "request_wall_time_ns": 1794126477137945961,
+        "response_wall_time_ns": 1794126477307079181,
+        "payload": {
+          "action": "project",
+          "delivery_configuration": {
+            "compact_text": true,
+            "minilm_model_dir": null,
+            "text_fallback": true
+          },
+          "documentation_language": {
+            "basis": "catalog_declaration",
+            "catalog_sha256": "ea941adf3feaf2f191d989853ddd97efca77fc4a112d3c99a3ea5cfacefd7927",
+            "hint_only": true,
+            "languages": [
+              "en"
+            ],
+            "scope": "project",
+            "snapshot_sha256": "f0e7b14f913ddbe80d4020f2c761ff51baca1767a2f9853ac10578313082094e",
+            "source_count": 6,
+            "status": "declared",
+            "unknown_sources": 0
+          },
+          "project": {
+            "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project"
+          },
+          "project_binding": {
+            "project_id": "local:c5969289883c68fd089528a8f5015c377d73028660f327d1fe3599210ca4545e",
+            "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project",
+            "workspace_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/locations/B/V-M4"
+          },
+          "tool": "docs_status"
+        }
+      }
+    ],
+    "host_preflight_verified": true,
+    "host_hint_binding_verified": true,
+    "host_timestamp_order_verified": true,
+    "host_timestamp_reason": null,
+    "model_tool_calls": {},
+    "actual_mcp_calls": {
+      "docs_status": 1,
+      "get_docs_context": 2
+    },
+    "mcp_missing_responses": 0,
+    "qwen_receipts": [
+      {
+        "request_id": 3,
+        "context_quality": {
+          "reasons": [
+            "coverage_unverified"
+          ],
+          "status": "unavailable"
+        },
+        "metrics": null,
+        "minimal_context": null,
+        "source_selection": {
+          "calibration_scope": "selected_units_before_link_expansion",
+          "calibration_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+          "calibration_status": "empirical",
+          "candidate_units": 21,
+          "closure": {
+            "coverage": "unverified",
+            "delivered_spans": 0,
+            "incomplete_dependencies": [],
+            "reference_expansion": {
+              "added_spans": 0,
+              "examined_references": 0,
+              "followed_references": 0,
+              "max_hops": 1,
+              "pending_references": 0,
+              "recipe": "one-hop-v1",
+              "satisfied_references": 0
+            },
+            "selected_units": 0
+          },
+          "delivered_rows": 0,
+          "model_pairs": 21,
+          "policy": "complete_calibrated_context_v1",
+          "scan_complete": true,
+          "selected_units": 0
+        },
+        "reason_code": "no_relevant_source_context"
+      },
+      {
+        "request_id": 4,
+        "context_quality": {
+          "reasons": [
+            "coverage_unverified"
+          ],
+          "status": "unavailable"
+        },
+        "metrics": null,
+        "minimal_context": null,
+        "source_selection": {
+          "calibration_scope": "selected_units_before_link_expansion",
+          "calibration_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+          "calibration_status": "empirical",
+          "candidate_units": 21,
+          "closure": {
+            "coverage": "unverified",
+            "delivered_spans": 0,
+            "incomplete_dependencies": [],
+            "reference_expansion": {
+              "added_spans": 0,
+              "examined_references": 0,
+              "followed_references": 0,
+              "max_hops": 1,
+              "pending_references": 0,
+              "recipe": "one-hop-v1",
+              "satisfied_references": 0
+            },
+            "selected_units": 0
+          },
+          "delivered_rows": 0,
+          "model_pairs": 21,
+          "policy": "complete_calibrated_context_v1",
+          "scan_complete": true,
+          "selected_units": 0
+        },
+        "reason_code": "no_relevant_source_context"
+      }
+    ],
+    "qwen_pairs": 42,
+    "answer": "",
+    "answer_quality": "NOT_GRADED",
+    "source_facts_quality": "NOT_GRADED",
+    "timing_boundary": "wall-v2: Python time.time_ns versus JS Date.now, same-host epoch clock; JS millisecond resolution, wall-clock steps not excluded. Monotonic clocks are process-local only. Legacy Python wall time is never reconstructed. Not remote arrival."
+  },
+  {
+    "arm": "C",
+    "task": "V-M4",
+    "status": "CAPTURED",
+    "provider_requests": 4,
+    "provider_requests_by_kind": {
+      "primary": 4
+    },
+    "session_ids": [
+      "ses_e45b70482ffeu5OICIX7kXvoZq"
+    ],
+    "session_ids_count": 1,
+    "requests_with_usage": 4,
+    "usage": {
+      "input": 6638,
+      "output": 337,
+      "cached": 3712,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 2926
+    },
+    "usage_coverage_complete": true,
+    "provider_records": [
+      {
+        "id": "resp_096edf92e75d2e76016af03374c2d487d28ff353b3219e2505",
+        "usage": {
+          "input_tokens": 1245,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 58,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1303,
+          "attribution": {
+            "items": {
+              "fc_096edf92e75d2e76016af03375a8c087d29dba94627a51f9bd": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 58
+              },
+              "msg_096edf92e75d2e76016af03374c2f887d2bc7ec2e649e5839e": {
+                "input_tokens": 22,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 22,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 752,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 469,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_096edf92e75d2e76016af0337727a887d2a21bb4cb15627656",
+        "usage": {
+          "input_tokens": 1317,
+          "input_tokens_details": {
+            "cached_tokens": 1152,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 46,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1363,
+          "attribution": {
+            "items": {
+              "fc_096edf92e75d2e76016af03375a8c087d29dba94627a51f9bd": {
+                "input_tokens": 60,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_096edf92e75d2e76016af0337727e487d2a1d3136177e74af3": {
+                "input_tokens": 12,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 12,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_096edf92e75d2e76016af03377fc3487d2ba9dc931c20db94f": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 46
+              },
+              "msg_096edf92e75d2e76016af03374c2f887d2bc7ec2e649e5839e": {
+                "input_tokens": 22,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 22,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 752,
+                "cached_tokens": 683,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 469,
+                "cached_tokens": 469,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_096edf92e75d2e76016af033790d6487d29453a7b705acb07b",
+        "usage": {
+          "input_tokens": 1567,
+          "input_tokens_details": {
+            "cached_tokens": 1152,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 164,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1731,
+          "attribution": {
+            "items": {
+              "fc_096edf92e75d2e76016af03375a8c087d29dba94627a51f9bd": {
+                "input_tokens": 60,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_096edf92e75d2e76016af0337727e487d2a1d3136177e74af3": {
+                "input_tokens": 12,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 12,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_096edf92e75d2e76016af03377fc3487d2ba9dc931c20db94f": {
+                "input_tokens": 48,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_096edf92e75d2e76016af033790d8c87d2a272b050ab91ad08": {
+                "input_tokens": 202,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 202,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_096edf92e75d2e76016af03379b84c87d2871cc4166362c9a1": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 55
+              },
+              "fc_096edf92e75d2e76016af0337c5db887d291cee34d3564f9f1": {
+                "input_tokens": 0,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 36
+              },
+              "fc_096edf92e75d2e76016af0337c5db887d298110d37a943056c": {
+                "input_tokens": 0,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 37
+              },
+              "fc_096edf92e75d2e76016af0337c5db887d2bbf36991b21ece92": {
+                "input_tokens": 0,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 36
+              },
+              "msg_096edf92e75d2e76016af03374c2f887d2bc7ec2e649e5839e": {
+                "input_tokens": 22,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 22,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 752,
+                "cached_tokens": 683,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 469,
+                "cached_tokens": 469,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_096edf92e75d2e76016af0337d0ab487d2b7a5a78f85331f03",
+        "usage": {
+          "input_tokens": 2509,
+          "input_tokens_details": {
+            "cached_tokens": 1408,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 69,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 2578,
+          "attribution": {
+            "items": {
+              "fc_096edf92e75d2e76016af03375a8c087d29dba94627a51f9bd": {
+                "input_tokens": 60,
+                "cached_tokens": 60,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_096edf92e75d2e76016af0337727e487d2a1d3136177e74af3": {
+                "input_tokens": 12,
+                "cached_tokens": 12,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 12,
+                    "cached_tokens": 12,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_096edf92e75d2e76016af03377fc3487d2ba9dc931c20db94f": {
+                "input_tokens": 48,
+                "cached_tokens": 48,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_096edf92e75d2e76016af033790d8c87d2a272b050ab91ad08": {
+                "input_tokens": 202,
+                "cached_tokens": 45,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 202,
+                    "cached_tokens": 45,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_096edf92e75d2e76016af03379b84c87d2871cc4166362c9a1": {
+                "input_tokens": 57,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_096edf92e75d2e76016af0337c5db887d291cee34d3564f9f1": {
+                "input_tokens": 36,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_096edf92e75d2e76016af0337c5db887d298110d37a943056c": {
+                "input_tokens": 37,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_096edf92e75d2e76016af0337c5db887d2bbf36991b21ece92": {
+                "input_tokens": 36,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_096edf92e75d2e76016af0337d0adc87d2a35bbc65c6771279": {
+                "input_tokens": 193,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 193,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_096edf92e75d2e76016af0337d0adc87d2a80a1b77e08abea9": {
+                "input_tokens": 242,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 242,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_096edf92e75d2e76016af0337d0adc87d2ab675b19c86b4c84": {
+                "input_tokens": 178,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 178,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_096edf92e75d2e76016af0337d0adc87d2ad1c28f45cc3be32": {
+                "input_tokens": 163,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 163,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_096edf92e75d2e76016af03374c2f887d2bc7ec2e649e5839e": {
+                "input_tokens": 22,
+                "cached_tokens": 22,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 22,
+                    "cached_tokens": 22,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_096edf92e75d2e76016af0337d901887d29ded79da97cbb845": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 69,
+                "content": [
+                  {
+                    "input_tokens": 2,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 69
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 752,
+                "cached_tokens": 752,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 469,
+                "cached_tokens": 469,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      }
+    ],
+    "retries": 0,
+    "capture_errors": [],
+    "first_provider_monotonic_ns": 1075393905,
+    "first_provider_language_hints": [],
+    "first_provider_wall_time_ms": 1794126708498,
+    "original_question_in_first_request": true,
+    "status_observations": [],
+    "host_preflight_verified": null,
+    "host_hint_binding_verified": null,
+    "host_timestamp_order_verified": null,
+    "host_timestamp_reason": null,
+    "model_tool_calls": {
+      "grep": 1,
+      "glob": 1,
+      "read": 4
+    },
+    "actual_mcp_calls": {},
+    "mcp_missing_responses": 0,
+    "qwen_receipts": [],
+    "qwen_pairs": null,
+    "answer": "В доступной документации проекта не указана обязательная температура охлаждения для всех общих приборов обсерватории. Проект Meridian описывает планирование работы таких приборов и правила наблюдений, а не требования к их охлаждению ([overview.md:1–7](overview.md#L1-L7)).",
+    "answer_quality": "NOT_GRADED",
+    "source_facts_quality": "NOT_GRADED",
+    "timing_boundary": "wall-v2: Python time.time_ns versus JS Date.now, same-host epoch clock; JS millisecond resolution, wall-clock steps not excluded. Monotonic clocks are process-local only. Legacy Python wall time is never reconstructed. Not remote arrival."
+  }
+]

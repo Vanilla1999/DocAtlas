@@ -1,0 +1,2212 @@
+{
+  "schema": "step14-remaining-semantic-review-v1",
+  "review_scope": "attempt-02: C/V-M1 and A/B/C V-M2,V-M3; seven completed answerable sessions",
+  "method": "Offline evidence only. No runtime/provider invocation. Originals limited to six allowed Meridian documents. No private/closed documents read. Runner untouched.",
+  "rubric": {
+    "tasks": "eval/blind_project_context/step14-host-language-live/tasks.json",
+    "tasks_sha256": "d091e3e94bb56a9d67a1514d23fc9417bb0dc8ee1718b69c4dad63ab8f0505eb",
+    "identical_to_step12_tasks": true,
+    "criteria": "eval/blind_project_context/step14-host-language-live/review-criteria.json",
+    "criteria_sha256": "bcc423940023b89b8692a9020438132a8c6ef38478d84cd52bb6dafdc7fcab5c",
+    "historical_semantic_rubric": "eval/blind_project_context/step12-live-comparison/RESULTS_RU.md:56–69",
+    "historical_results_sha256": "d8b6cdfc2af5afea312a42d3a7ac97083b54f3b2b7891ed4d6a7d10bb5a0b48d",
+    "positions_per_complete_three_question_set": 19,
+    "positions_reviewed_here": 41,
+    "note": "41 session-fact positions, not independent observations. Missing facts use nearest-context quotes explicitly labelled; no fabricated positive quote."
+  },
+  "original_documents": [
+    {
+      "path": "eval/blind_project_context/step10-multidoc-gate/projects/validation/meridian/overview.md",
+      "sha256": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+      "matches_attempt_sources_manifest": true
+    },
+    {
+      "path": "eval/blind_project_context/step10-multidoc-gate/projects/validation/meridian/reservations.md",
+      "sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+      "matches_attempt_sources_manifest": true
+    },
+    {
+      "path": "eval/blind_project_context/step10-multidoc-gate/projects/validation/meridian/weather.md",
+      "sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+      "matches_attempt_sources_manifest": true
+    },
+    {
+      "path": "eval/blind_project_context/step10-multidoc-gate/projects/validation/meridian/clock.md",
+      "sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+      "matches_attempt_sources_manifest": true
+    },
+    {
+      "path": "eval/blind_project_context/step10-multidoc-gate/projects/validation/meridian/calendar.md",
+      "sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+      "matches_attempt_sources_manifest": true
+    },
+    {
+      "path": "eval/blind_project_context/step10-multidoc-gate/projects/validation/meridian/architecture.md",
+      "sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+      "matches_attempt_sources_manifest": true
+    }
+  ],
+  "hash_verification_boundary": "Compact MCP source records contain ref, source_uri, path, line_start, line_end, text, but no source SHA-256 field. Native read also supplies no source-hash assertion. Computed original-file hashes match attempt-02/sources.json; every returned source span/text is checked against the original at exact lines, and computed span hashes agree. These computed hashes are not represented as provider-returned hashes. Source_uri/ref are preserved, not claimed cryptographically validated. Native provider text retains original numbering/wrappers; normalization used only for comparison.",
+  "sessions": [
+    {
+      "arm": "C",
+      "task": "V-M1",
+      "question": "Как передать подтверждённое ночное наблюдение другому наблюдателю при активной блокировке обслуживания и погодной приостановке?",
+      "capture_path": "eval/blind_project_context/step14-host-language-live/attempt-02/C/V-M1/capture/events.jsonl",
+      "capture_sha256": "6ea96eebb53ae62ff582fd67dc3d7e737d1bd3ef1528852b76fcdee1ad2977f1",
+      "answer_path": "eval/blind_project_context/step14-host-language-live/attempt-02/C/V-M1/runtime/raw.jsonl",
+      "answer_raw_line": 14,
+      "answer_sha256": "251f3b2898811f2d2d99408d99e857b4eaebe26abd2ae454a98e24754045a13d",
+      "answer": "Для подтверждённого ночного наблюдения на общем инструменте порядок такой:\n\n1. Получите согласие принимающего наблюдателя и одобрение дежурного оператора.\n2. Пока действует блокировка обслуживания, **оставьте передачу в ожидании**, даже если оба согласия уже получены. Сначала блокировку должна снять команда инструмента.\n3. При передаче сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита. Погодная приостановка при передаче не изменяется. [reservations.md, строки 1–13](reservations.md#transfer)\n\nПогодное решение управляет **выполнением**, а не принадлежностью бронирования. Если наружные наблюдения приостановлены из-за размыкания ветровой блокировки, возобновить их можно только после её замыкания и регистрации разрешения на перезапуск дежурным оператором. Благоприятный прогноз сам по себе не разрешает перезапуск. [weather.md, строки 1–7, 13–15](weather.md#suspension)\n\nИсключение: инструмент, **явно классифицированный как находящийся в помещении**, может продолжать работу во время ветровой приостановки, если его собственные защитные блокировки замкнуты. Изображение закрытой крыши в календаре такой классификации не подтверждает. [weather.md, строки 9–11](weather.md#indoor-instrument)\n\nКалендарь служит только представлением состояния: его обновление не снимает блокировку обслуживания и не разрешает выполнение. Упрощённая передача дневного учебного слота инструктором к подтверждённому наблюдению не применяется. [calendar.md, строки 1–7](calendar.md#colours); [reservations.md, строки 15–17](reservations.md#training-slots)",
+      "final_provider_completed_capture_line": 482,
+      "provider_final_equals_runtime_answer": true,
+      "provider_request_lines": [
+        3,
+        23,
+        63
+      ],
+      "tool_delivery_checks": [
+        {
+          "call_id": "call_cb22abe5fe414ef7ad130d48f0b78edb",
+          "tool": "grep",
+          "tool_after_capture_line": 16,
+          "provider_request_capture_line": 23,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "4b4d7ac22cee34f92cd16fbe4193b0eb106e185100ea38f72b0190e1affaf933"
+        },
+        {
+          "call_id": "call_9bc0e1d2222c40b1bb1556cd20af5692",
+          "tool": "glob",
+          "tool_after_capture_line": 17,
+          "provider_request_capture_line": 23,
+          "request_input_index": 1,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "2e6328de746ca1b351fa7459c70c93e5769a2d555968d390890bacb347c3bcfd"
+        },
+        {
+          "call_id": "call_fd3881f6256e4b8ead93e454c2701a3d",
+          "tool": "read",
+          "tool_after_capture_line": 56,
+          "provider_request_capture_line": 63,
+          "request_input_index": 5,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "8323cb210cf50ad89084d7eaa57f0228e16dbf0778de3258b31445b80b1eb106"
+        },
+        {
+          "call_id": "call_e88b9285db3e4e3bb28340e6f6165193",
+          "tool": "read",
+          "tool_after_capture_line": 57,
+          "provider_request_capture_line": 63,
+          "request_input_index": 2,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "22db7116ac557e9fc6c393b6407c22e8d4a76357b34251edbfdee7f8c0c74fd8"
+        },
+        {
+          "call_id": "call_c503be91dc4b43e78aa32b9328ead63f",
+          "tool": "read",
+          "tool_after_capture_line": 58,
+          "provider_request_capture_line": 63,
+          "request_input_index": 1,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "58a48613072f84e4b4da07f6cfef31a1fd950e626a12e1be49994483fd155462"
+        },
+        {
+          "call_id": "call_455f5b6d049144c78979eee6f86463bc",
+          "tool": "read",
+          "tool_after_capture_line": 59,
+          "provider_request_capture_line": 63,
+          "request_input_index": 3,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "da06bde90264f4845206cbd3d1a81a747cf9595e2e8b87aa630110a2cd3439b8"
+        },
+        {
+          "call_id": "call_bcc06fa3bceb449c9aca31066a70d784",
+          "tool": "read",
+          "tool_after_capture_line": 60,
+          "provider_request_capture_line": 63,
+          "request_input_index": 4,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "d4a4d766efa644824d7e573e842c59ee0a26406e80779d319c30c92cda5f8717"
+        },
+        {
+          "call_id": "call_455a754f5c3841f58fae3f87fde67064",
+          "tool": "read",
+          "tool_after_capture_line": 61,
+          "provider_request_capture_line": 63,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "24d2bd0be64772c00221a09ec17ef1147105fb2bc82176b654fcf37b2878d9c3"
+        }
+      ],
+      "source_checks": [
+        {
+          "call_id": "call_fd3881f6256e4b8ead93e454c2701a3d",
+          "tool": "read",
+          "tool_after_capture_line": 56,
+          "provider_request_capture_line": 63,
+          "request_input_index": 5,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "8323cb210cf50ad89084d7eaa57f0228e16dbf0778de3258b31445b80b1eb106",
+          "path": "clock.md",
+          "line_start": 1,
+          "line_end": 15,
+          "ref": null,
+          "source_uri": null,
+          "original_file_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "original_span_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "returned_span_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "source_text_matches_original": true,
+          "comparison_method": "raw content exact; provider line prefixes removed only for line-by-line comparison, every line and index checked",
+          "returned_source_hash_field": null,
+          "text": "# Time coordination\n\nThe gateway compares instrument time with the observatory reference before executing a schedule.\n\n## Clock offset\n\nIf the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator. Keep queued reservations unchanged. Resume only after two consecutive reference checks report an offset within two seconds.\n\n## Missing reference\n\nIf the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.\n\n## Simulation clock\n\nThe simulator advances time manually and never waits for reference checks. Its accelerated clock is isolated from the real instrument gateway.\n"
+        },
+        {
+          "call_id": "call_e88b9285db3e4e3bb28340e6f6165193",
+          "tool": "read",
+          "tool_after_capture_line": 57,
+          "provider_request_capture_line": 63,
+          "request_input_index": 2,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "22db7116ac557e9fc6c393b6407c22e8d4a76357b34251edbfdee7f8c0c74fd8",
+          "path": "calendar.md",
+          "line_start": 1,
+          "line_end": 11,
+          "ref": null,
+          "source_uri": null,
+          "original_file_sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+          "original_span_sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+          "returned_span_sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+          "source_text_matches_original": true,
+          "comparison_method": "raw content exact; provider line prefixes removed only for line-by-line comparison, every line and index checked",
+          "returned_source_hash_field": null,
+          "text": "# Calendar display\n\nThe calendar is a read-only projection of reservation and instrument state.\n\n## Colours\n\nAmber indicates a pending assignment, blue a confirmed slot, and grey a suspended interval. Changing a browser theme changes colours locally without changing instrument execution. A visual refresh cannot clear a maintenance lock.\n\n## Timezones\n\nObservers may display the same reservation in different timezones. The stored start time and reservation identifier remain unchanged. Calendar export is a view, not a gateway command.\n"
+        },
+        {
+          "call_id": "call_c503be91dc4b43e78aa32b9328ead63f",
+          "tool": "read",
+          "tool_after_capture_line": 58,
+          "provider_request_capture_line": 63,
+          "request_input_index": 1,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "58a48613072f84e4b4da07f6cfef31a1fd950e626a12e1be49994483fd155462",
+          "path": "weather.md",
+          "line_start": 1,
+          "line_end": 15,
+          "ref": null,
+          "source_uri": null,
+          "original_file_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "original_span_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "returned_span_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "source_text_matches_original": true,
+          "comparison_method": "raw content exact; provider line prefixes removed only for line-by-line comparison, every line and index checked",
+          "returned_source_hash_field": null,
+          "text": "# Weather decisions\n\nWeather decisions govern execution, not ownership of reservations.\n\n## Suspension\n\nSuspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n\n## Indoor instrument\n\nAn instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.\n\n## Forecast display\n\nThe forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.\n"
+        },
+        {
+          "call_id": "call_455f5b6d049144c78979eee6f86463bc",
+          "tool": "read",
+          "tool_after_capture_line": 59,
+          "provider_request_capture_line": 63,
+          "request_input_index": 3,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "da06bde90264f4845206cbd3d1a81a747cf9595e2e8b87aa630110a2cd3439b8",
+          "path": "overview.md",
+          "line_start": 1,
+          "line_end": 11,
+          "ref": null,
+          "source_uri": null,
+          "original_file_sha256": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+          "original_span_sha256": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+          "returned_span_sha256": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+          "source_text_matches_original": true,
+          "comparison_method": "raw content exact; provider line prefixes removed only for line-by-line comparison, every line and index checked",
+          "returned_source_hash_field": null,
+          "text": "# Meridian scheduler\n\nMeridian schedules shared observatory instruments. Reservation rules below concern confirmed night-time observations, not daytime training sessions.\n\n## Services\n\nThe reservation service accepts requests, a planner assigns intervals, and an instrument gateway executes approved schedules. The calendar displays plans but cannot authorize execution.\n\n## Navigation\n\nRead [Transfer](reservations.md#transfer), [Weather](weather.md#suspension), and [Clock](clock.md#clock-offset) for operational details. The calendar's [colours](calendar.md#colours) are display conventions.\n"
+        },
+        {
+          "call_id": "call_bcc06fa3bceb449c9aca31066a70d784",
+          "tool": "read",
+          "tool_after_capture_line": 60,
+          "provider_request_capture_line": 63,
+          "request_input_index": 4,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "d4a4d766efa644824d7e573e842c59ee0a26406e80779d319c30c92cda5f8717",
+          "path": "architecture.md",
+          "line_start": 1,
+          "line_end": 11,
+          "ref": null,
+          "source_uri": null,
+          "original_file_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+          "original_span_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+          "returned_span_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+          "source_text_matches_original": true,
+          "comparison_method": "raw content exact; provider line prefixes removed only for line-by-line comparison, every line and index checked",
+          "returned_source_hash_field": null,
+          "text": "# Scheduler architecture\n\nMeridian separates ownership, planning, execution and display to permit independent restarts.\n\n## Planner\n\nThe planner solves interval conflicts using instrument availability and reservation priority. It can compute a plan while execution is suspended. A computed plan is not permission to bypass a weather interlock or clock check.\n\n## Prototype recovery\n\nThe retired prototype cleared pending reservations when time drifted and restarted on its first local clock sample. These behaviours must not be used to recover the current gateway.\n"
+        },
+        {
+          "call_id": "call_455a754f5c3841f58fae3f87fde67064",
+          "tool": "read",
+          "tool_after_capture_line": 61,
+          "provider_request_capture_line": 63,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "24d2bd0be64772c00221a09ec17ef1147105fb2bc82176b654fcf37b2878d9c3",
+          "path": "reservations.md",
+          "line_start": 1,
+          "line_end": 17,
+          "ref": null,
+          "source_uri": null,
+          "original_file_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+          "original_span_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+          "returned_span_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+          "source_text_matches_original": true,
+          "comparison_method": "raw content exact; provider line prefixes removed only for line-by-line comparison, every line and index checked",
+          "returned_source_hash_field": null,
+          "text": "# Confirmed reservations\n\nThese rules apply to confirmed night-time reservations on shared instruments.\n\nFor orientation, the reservation console links to the calendar's [colour legend](calendar.md#colours).\n\n## Transfer\n\nTransfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).\n\n## Locked instrument\n\nIf the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.\n\n## Training slots\n\nDaytime training slots can be reassigned by an instructor without the night-time approval workflow. This shortcut does not apply to confirmed observations.\n"
+        }
+      ],
+      "facts": [
+        {
+          "index": 1,
+          "source_section": "reservations.md#Confirmed reservations",
+          "expected_fact": "These rules apply to confirmed night-time reservations on shared instruments.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_455a754f5c3841f58fae3f87fde67064",
+              "provider_request_capture_line": 63,
+              "request_input_index": 0,
+              "path": "reservations.md",
+              "line_start": 1,
+              "line_end": 17,
+              "ref": null,
+              "original_span_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "Для подтверждённого ночного наблюдения на общем инструменте порядок такой:",
+          "quote_kind": "support",
+          "rationale_ru": "Все три ограничения применимости: подтверждённое, ночное, общий инструмент.",
+          "failure_attribution": null
+        },
+        {
+          "index": 2,
+          "source_section": "reservations.md#Transfer",
+          "expected_fact": "Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_455a754f5c3841f58fae3f87fde67064",
+              "provider_request_capture_line": 63,
+              "request_input_index": 0,
+              "path": "reservations.md",
+              "line_start": 1,
+              "line_end": 17,
+              "ref": null,
+              "original_span_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "Получите согласие принимающего наблюдателя и одобрение дежурного оператора.",
+          "quote_kind": "support",
+          "rationale_ru": "Оба обязательных согласования перед передачей.",
+          "failure_attribution": null
+        },
+        {
+          "index": 3,
+          "source_section": "reservations.md#Transfer",
+          "expected_fact": "Retain the original reservation identifier and record both observers in the audit trail.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_455a754f5c3841f58fae3f87fde67064",
+              "provider_request_capture_line": 63,
+              "request_input_index": 0,
+              "path": "reservations.md",
+              "line_start": 1,
+              "line_end": 17,
+              "ref": null,
+              "original_span_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "При передаче сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита.",
+          "quote_kind": "support",
+          "rationale_ru": "Исходный ID и оба наблюдателя в аудите отражены.",
+          "failure_attribution": null
+        },
+        {
+          "index": 4,
+          "source_section": "reservations.md#Locked instrument",
+          "expected_fact": "leave the transfer pending even after observer acceptance and operator approval",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_455a754f5c3841f58fae3f87fde67064",
+              "provider_request_capture_line": 63,
+              "request_input_index": 0,
+              "path": "reservations.md",
+              "line_start": 1,
+              "line_end": 17,
+              "ref": null,
+              "original_span_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "Пока действует блокировка обслуживания, **оставьте передачу в ожидании**, даже если оба согласия уже получены.",
+          "quote_kind": "support",
+          "rationale_ru": "Ожидание при активном maintenance lock; согласования не обходят lock.",
+          "failure_attribution": null
+        },
+        {
+          "index": 5,
+          "source_section": "reservations.md#Locked instrument",
+          "expected_fact": "The lock must be cleared by the instrument team first.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_455a754f5c3841f58fae3f87fde67064",
+              "provider_request_capture_line": 63,
+              "request_input_index": 0,
+              "path": "reservations.md",
+              "line_start": 1,
+              "line_end": 17,
+              "ref": null,
+              "original_span_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "Сначала блокировку должна снять команда инструмента.",
+          "quote_kind": "support",
+          "rationale_ru": "Указаны команда и обязательное предшествующее снятие.",
+          "failure_attribution": null
+        },
+        {
+          "index": 6,
+          "source_section": "weather.md#Suspension",
+          "expected_fact": "Suspend outdoor observations when the wind interlock opens.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_c503be91dc4b43e78aa32b9328ead63f",
+              "provider_request_capture_line": 63,
+              "request_input_index": 1,
+              "path": "weather.md",
+              "line_start": 1,
+              "line_end": 15,
+              "ref": null,
+              "original_span_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+            }
+          ],
+          "grade": "partial",
+          "answer_quote": "Если наружные наблюдения приостановлены из-за размыкания ветровой блокировки, возобновить их можно только после её замыкания и регистрации разрешения на перезапуск дежурным оператором.",
+          "quote_kind": "support",
+          "rationale_ru": "Есть связь наружных наблюдений, размыкания и состоявшейся приостановки; нет явной обязанности приостановить при размыкании. Применён semantic rubric step12:60–65.",
+          "failure_attribution": "fact delivered but omitted or only partially represented in final answer"
+        },
+        {
+          "index": 7,
+          "source_section": "weather.md#Suspension",
+          "expected_fact": "Preserve reservation identifiers during suspension.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_c503be91dc4b43e78aa32b9328ead63f",
+              "provider_request_capture_line": 63,
+              "request_input_index": 1,
+              "path": "weather.md",
+              "line_start": 1,
+              "line_end": 15,
+              "ref": null,
+              "original_span_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+            }
+          ],
+          "grade": "partial",
+          "answer_quote": "При передаче сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита. Погодная приостановка при передаче не изменяется.",
+          "quote_kind": "support",
+          "rationale_ru": "Сохранение ID указано при передаче, но не как обязанность на протяжении погодной приостановки. Неизменность самой приостановки это не заменяет; step12:64–65.",
+          "failure_attribution": "fact delivered but omitted or only partially represented in final answer"
+        },
+        {
+          "index": 8,
+          "source_section": "weather.md#Suspension",
+          "expected_fact": "Resume only after the interlock closes and the duty operator records a restart approval.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_c503be91dc4b43e78aa32b9328ead63f",
+              "provider_request_capture_line": 63,
+              "request_input_index": 1,
+              "path": "weather.md",
+              "line_start": 1,
+              "line_end": 15,
+              "ref": null,
+              "original_span_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "возобновить их можно только после её замыкания и регистрации разрешения на перезапуск дежурным оператором.",
+          "quote_kind": "support",
+          "rationale_ru": "Оба restart prerequisites и запись разрешения дежурным оператором.",
+          "failure_attribution": null
+        }
+      ],
+      "totals": {
+        "full": 6,
+        "partial": 2,
+        "missing": 0,
+        "contradicted": 0,
+        "delivered": 8
+      }
+    },
+    {
+      "arm": "A",
+      "task": "V-M2",
+      "question": "When should wind stop observations, what is required to restart, and may an indoor instrument continue?",
+      "capture_path": "eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M2/capture/events.jsonl",
+      "capture_sha256": "85f82d78587822d6b164567902f0339e36d74f0d6f972cd17d93a6780387cf35",
+      "answer_path": "eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M2/runtime/raw.jsonl",
+      "answer_raw_line": 8,
+      "answer_sha256": "d68a4182f0f5bca9059a0d373c5abcf1b48cb002b343b101adab09d3e7c3e98b",
+      "answer": "- **Stop:** Suspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during the suspension. [ev-159aa46f19575f991571621c, `weather.md:5–8`]\n- **Restart:** Resume only after the interlock closes **and** the duty operator records restart approval. A favourable forecast cannot authorize a restart. [ev-159aa46f19575f991571621c, `weather.md:5–8`; ev-d7ad6e3c0ae0215b63ed8bb6, `weather.md:13–15`]\n- **Indoor instrument:** It may continue during a wind suspension if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish indoor classification. [ev-0999a181d992f67ebae5ac73, `weather.md:9–12`]",
+      "final_provider_completed_capture_line": 274,
+      "provider_final_equals_runtime_answer": true,
+      "provider_request_lines": [
+        3,
+        28,
+        70
+      ],
+      "tool_delivery_checks": [
+        {
+          "call_id": "call_d5d8ecb2a4e44457b673917ffcdb85af",
+          "tool": "docatlas_docs_status",
+          "tool_after_capture_line": 26,
+          "provider_request_capture_line": 28,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "05751fee563d10301255212a43d6b980e792e6808d0e4541a0ac0c9a6d06b23d"
+        },
+        {
+          "call_id": "call_c6c351f6b2eb44c6a796996628de57ab",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 68,
+          "provider_request_capture_line": 70,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "efe00052a8c13daadb8fa50608cfbd5fa2cf915a59b779895fa8b4209b92c57a",
+          "stdio_response_line": 9
+        }
+      ],
+      "source_checks": [
+        {
+          "call_id": "call_c6c351f6b2eb44c6a796996628de57ab",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 68,
+          "provider_request_capture_line": 70,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "efe00052a8c13daadb8fa50608cfbd5fa2cf915a59b779895fa8b4209b92c57a",
+          "stdio_response_line": 9,
+          "path": "weather.md",
+          "line_start": 1,
+          "line_end": 4,
+          "ref": "ev-56d4c522edb788db6d1f445e",
+          "source_uri": "docatlas://source/v2/371400905031c384c1e6fddc",
+          "original_file_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "original_span_sha256": "740f4964bbdb12b745d683d1684ba2b43d7dcdea7bccbdab28a16584649211ac",
+          "returned_span_sha256": "740f4964bbdb12b745d683d1684ba2b43d7dcdea7bccbdab28a16584649211ac",
+          "source_text_matches_original": true,
+          "comparison_method": "exact",
+          "returned_source_hash_field": null,
+          "text": "# Weather decisions\n\nWeather decisions govern execution, not ownership of reservations.\n\n"
+        },
+        {
+          "call_id": "call_c6c351f6b2eb44c6a796996628de57ab",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 68,
+          "provider_request_capture_line": 70,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "efe00052a8c13daadb8fa50608cfbd5fa2cf915a59b779895fa8b4209b92c57a",
+          "stdio_response_line": 9,
+          "path": "weather.md",
+          "line_start": 5,
+          "line_end": 8,
+          "ref": "ev-159aa46f19575f991571621c",
+          "source_uri": "docatlas://source/v2/d32071fd76aa424004432316",
+          "original_file_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "original_span_sha256": "10b295cdd64de215489ac000a7bd2718a3312a78777f44199fd93fcb5981897a",
+          "returned_span_sha256": "10b295cdd64de215489ac000a7bd2718a3312a78777f44199fd93fcb5981897a",
+          "source_text_matches_original": true,
+          "comparison_method": "exact",
+          "returned_source_hash_field": null,
+          "text": "## Suspension\n\nSuspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n\n"
+        },
+        {
+          "call_id": "call_c6c351f6b2eb44c6a796996628de57ab",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 68,
+          "provider_request_capture_line": 70,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "efe00052a8c13daadb8fa50608cfbd5fa2cf915a59b779895fa8b4209b92c57a",
+          "stdio_response_line": 9,
+          "path": "weather.md",
+          "line_start": 9,
+          "line_end": 12,
+          "ref": "ev-0999a181d992f67ebae5ac73",
+          "source_uri": "docatlas://source/v2/33d59d8a55d088d942d80fef",
+          "original_file_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "original_span_sha256": "7f82f2d9638f89d407588962d6edc526396ac8697efa553fb153eb4246d33049",
+          "returned_span_sha256": "7f82f2d9638f89d407588962d6edc526396ac8697efa553fb153eb4246d33049",
+          "source_text_matches_original": true,
+          "comparison_method": "exact",
+          "returned_source_hash_field": null,
+          "text": "## Indoor instrument\n\nAn instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.\n\n"
+        },
+        {
+          "call_id": "call_c6c351f6b2eb44c6a796996628de57ab",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 68,
+          "provider_request_capture_line": 70,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "efe00052a8c13daadb8fa50608cfbd5fa2cf915a59b779895fa8b4209b92c57a",
+          "stdio_response_line": 9,
+          "path": "weather.md",
+          "line_start": 13,
+          "line_end": 15,
+          "ref": "ev-d7ad6e3c0ae0215b63ed8bb6",
+          "source_uri": "docatlas://source/v2/3a087ad5bfced9938945f6a0",
+          "original_file_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "original_span_sha256": "eb0849e69b984ad2cb2422b73a587624d59569e8f24ce2f139f0aac4dfa53b45",
+          "returned_span_sha256": "eb0849e69b984ad2cb2422b73a587624d59569e8f24ce2f139f0aac4dfa53b45",
+          "source_text_matches_original": true,
+          "comparison_method": "exact",
+          "returned_source_hash_field": null,
+          "text": "## Forecast display\n\nThe forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.\n"
+        }
+      ],
+      "facts": [
+        {
+          "index": 1,
+          "source_section": "weather.md#Weather decisions",
+          "expected_fact": "Weather decisions govern execution, not ownership of reservations.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_c6c351f6b2eb44c6a796996628de57ab",
+              "provider_request_capture_line": 70,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 1,
+              "line_end": 4,
+              "ref": "ev-56d4c522edb788db6d1f445e",
+              "original_span_sha256": "740f4964bbdb12b745d683d1684ba2b43d7dcdea7bccbdab28a16584649211ac"
+            }
+          ],
+          "grade": "missing",
+          "answer_quote": "- **Stop:** Suspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during the suspension. [ev-159aa46f19575f991571621c, `weather.md:5–8`]",
+          "quote_kind": "nearest_context_only",
+          "rationale_ru": "Нет различия execution/ownership. Сохранение ID не утверждает неизменность принадлежности. Цитата — ближайший контекст, не доказательство присутствия факта.",
+          "failure_attribution": "fact delivered but omitted or only partially represented in final answer"
+        },
+        {
+          "index": 2,
+          "source_section": "weather.md#Suspension",
+          "expected_fact": "Suspend outdoor observations when the wind interlock opens.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_c6c351f6b2eb44c6a796996628de57ab",
+              "provider_request_capture_line": 70,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 5,
+              "line_end": 8,
+              "ref": "ev-159aa46f19575f991571621c",
+              "original_span_sha256": "10b295cdd64de215489ac000a7bd2718a3312a78777f44199fd93fcb5981897a"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "- **Stop:** Suspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during the suspension. [ev-159aa46f19575f991571621c, `weather.md:5–8`]",
+          "quote_kind": "support",
+          "rationale_ru": "Наружные наблюдения останавливаются при размыкании ветровой блокировки.",
+          "failure_attribution": null
+        },
+        {
+          "index": 3,
+          "source_section": "weather.md#Suspension",
+          "expected_fact": "Preserve reservation identifiers during suspension.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_c6c351f6b2eb44c6a796996628de57ab",
+              "provider_request_capture_line": 70,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 5,
+              "line_end": 8,
+              "ref": "ev-159aa46f19575f991571621c",
+              "original_span_sha256": "10b295cdd64de215489ac000a7bd2718a3312a78777f44199fd93fcb5981897a"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "Preserve reservation identifiers during the suspension.",
+          "quote_kind": "support",
+          "rationale_ru": "Прямое сохранение идентификаторов во время suspension.",
+          "failure_attribution": null
+        },
+        {
+          "index": 4,
+          "source_section": "weather.md#Suspension",
+          "expected_fact": "Resume only after the interlock closes and the duty operator records a restart approval.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_c6c351f6b2eb44c6a796996628de57ab",
+              "provider_request_capture_line": 70,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 5,
+              "line_end": 8,
+              "ref": "ev-159aa46f19575f991571621c",
+              "original_span_sha256": "10b295cdd64de215489ac000a7bd2718a3312a78777f44199fd93fcb5981897a"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "- **Restart:** Resume only after the interlock closes **and** the duty operator records restart approval. A favourable forecast cannot authorize a restart. [ev-159aa46f19575f991571621c, `weather.md:5–8`; ev-d7ad6e3c0ae0215b63ed8bb6, `weather.md:13–15`]",
+          "quote_kind": "support",
+          "rationale_ru": "Только после замыкания interlock и записи restart approval дежурным оператором.",
+          "failure_attribution": null
+        },
+        {
+          "index": 5,
+          "source_section": "weather.md#Indoor instrument",
+          "expected_fact": "An instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_c6c351f6b2eb44c6a796996628de57ab",
+              "provider_request_capture_line": 70,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 9,
+              "line_end": 12,
+              "ref": "ev-0999a181d992f67ebae5ac73",
+              "original_span_sha256": "7f82f2d9638f89d407588962d6edc526396ac8697efa553fb153eb4246d33049"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "- **Indoor instrument:** It may continue during a wind suspension if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish indoor classification. [ev-0999a181d992f67ebae5ac73, `weather.md:9–12`]",
+          "quote_kind": "support",
+          "rationale_ru": "Разрешено продолжать при wind suspension только явно indoor-инструменту при замкнутых собственных safety interlocks; контекст suspension однозначен и для B.",
+          "failure_attribution": null
+        },
+        {
+          "index": 6,
+          "source_section": "weather.md#Indoor instrument",
+          "expected_fact": "A roof visible as closed on the calendar does not establish indoor classification.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_c6c351f6b2eb44c6a796996628de57ab",
+              "provider_request_capture_line": 70,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 9,
+              "line_end": 12,
+              "ref": "ev-0999a181d992f67ebae5ac73",
+              "original_span_sha256": "7f82f2d9638f89d407588962d6edc526396ac8697efa553fb153eb4246d33049"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "- **Indoor instrument:** It may continue during a wind suspension if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish indoor classification. [ev-0999a181d992f67ebae5ac73, `weather.md:9–12`]",
+          "quote_kind": "support",
+          "rationale_ru": "Закрытая крыша на календаре прямо признана недостаточной для indoor classification.",
+          "failure_attribution": null
+        }
+      ],
+      "totals": {
+        "full": 5,
+        "partial": 0,
+        "missing": 1,
+        "contradicted": 0,
+        "delivered": 6
+      }
+    },
+    {
+      "arm": "B",
+      "task": "V-M2",
+      "question": "When should wind stop observations, what is required to restart, and may an indoor instrument continue?",
+      "capture_path": "eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M2/capture/events.jsonl",
+      "capture_sha256": "7c2e87d4c497c9c7a53ff4b4f87c07a89eb31cfd048cc13bdae9eb839513b01a",
+      "answer_path": "eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M2/runtime/raw.jsonl",
+      "answer_raw_line": 5,
+      "answer_sha256": "38bbe06bd57f72887ed45c15c496f28115d180b355f317a418d2903294e3f953",
+      "answer": "- **Stop outdoor observations** when the wind interlock opens. Preserve reservation identifiers during the suspension. [ev-159aa46f19575f991571621c, `weather.md:5–8`]\n- **Restart only after** the interlock closes and the duty operator records a restart approval. A favourable forecast alone cannot authorize a restart. [ev-159aa46f19575f991571621c, `weather.md:5–8`; ev-d7ad6e3c0ae0215b63ed8bb6, `weather.md:13–15`]\n- **An indoor instrument may continue** if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish that classification. [ev-0999a181d992f67ebae5ac73, `weather.md:9–12`]",
+      "final_provider_completed_capture_line": 243,
+      "provider_final_equals_runtime_answer": true,
+      "provider_request_lines": [
+        3,
+        45
+      ],
+      "tool_delivery_checks": [
+        {
+          "call_id": "call_4b498203f2554a5cb53c45b660521c30",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 43,
+          "provider_request_capture_line": 45,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "efe00052a8c13daadb8fa50608cfbd5fa2cf915a59b779895fa8b4209b92c57a",
+          "stdio_response_line": 9
+        }
+      ],
+      "source_checks": [
+        {
+          "call_id": "call_4b498203f2554a5cb53c45b660521c30",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 43,
+          "provider_request_capture_line": 45,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "efe00052a8c13daadb8fa50608cfbd5fa2cf915a59b779895fa8b4209b92c57a",
+          "stdio_response_line": 9,
+          "path": "weather.md",
+          "line_start": 1,
+          "line_end": 4,
+          "ref": "ev-56d4c522edb788db6d1f445e",
+          "source_uri": "docatlas://source/v2/371400905031c384c1e6fddc",
+          "original_file_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "original_span_sha256": "740f4964bbdb12b745d683d1684ba2b43d7dcdea7bccbdab28a16584649211ac",
+          "returned_span_sha256": "740f4964bbdb12b745d683d1684ba2b43d7dcdea7bccbdab28a16584649211ac",
+          "source_text_matches_original": true,
+          "comparison_method": "exact",
+          "returned_source_hash_field": null,
+          "text": "# Weather decisions\n\nWeather decisions govern execution, not ownership of reservations.\n\n"
+        },
+        {
+          "call_id": "call_4b498203f2554a5cb53c45b660521c30",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 43,
+          "provider_request_capture_line": 45,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "efe00052a8c13daadb8fa50608cfbd5fa2cf915a59b779895fa8b4209b92c57a",
+          "stdio_response_line": 9,
+          "path": "weather.md",
+          "line_start": 5,
+          "line_end": 8,
+          "ref": "ev-159aa46f19575f991571621c",
+          "source_uri": "docatlas://source/v2/d32071fd76aa424004432316",
+          "original_file_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "original_span_sha256": "10b295cdd64de215489ac000a7bd2718a3312a78777f44199fd93fcb5981897a",
+          "returned_span_sha256": "10b295cdd64de215489ac000a7bd2718a3312a78777f44199fd93fcb5981897a",
+          "source_text_matches_original": true,
+          "comparison_method": "exact",
+          "returned_source_hash_field": null,
+          "text": "## Suspension\n\nSuspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n\n"
+        },
+        {
+          "call_id": "call_4b498203f2554a5cb53c45b660521c30",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 43,
+          "provider_request_capture_line": 45,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "efe00052a8c13daadb8fa50608cfbd5fa2cf915a59b779895fa8b4209b92c57a",
+          "stdio_response_line": 9,
+          "path": "weather.md",
+          "line_start": 9,
+          "line_end": 12,
+          "ref": "ev-0999a181d992f67ebae5ac73",
+          "source_uri": "docatlas://source/v2/33d59d8a55d088d942d80fef",
+          "original_file_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "original_span_sha256": "7f82f2d9638f89d407588962d6edc526396ac8697efa553fb153eb4246d33049",
+          "returned_span_sha256": "7f82f2d9638f89d407588962d6edc526396ac8697efa553fb153eb4246d33049",
+          "source_text_matches_original": true,
+          "comparison_method": "exact",
+          "returned_source_hash_field": null,
+          "text": "## Indoor instrument\n\nAn instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.\n\n"
+        },
+        {
+          "call_id": "call_4b498203f2554a5cb53c45b660521c30",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 43,
+          "provider_request_capture_line": 45,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "efe00052a8c13daadb8fa50608cfbd5fa2cf915a59b779895fa8b4209b92c57a",
+          "stdio_response_line": 9,
+          "path": "weather.md",
+          "line_start": 13,
+          "line_end": 15,
+          "ref": "ev-d7ad6e3c0ae0215b63ed8bb6",
+          "source_uri": "docatlas://source/v2/3a087ad5bfced9938945f6a0",
+          "original_file_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "original_span_sha256": "eb0849e69b984ad2cb2422b73a587624d59569e8f24ce2f139f0aac4dfa53b45",
+          "returned_span_sha256": "eb0849e69b984ad2cb2422b73a587624d59569e8f24ce2f139f0aac4dfa53b45",
+          "source_text_matches_original": true,
+          "comparison_method": "exact",
+          "returned_source_hash_field": null,
+          "text": "## Forecast display\n\nThe forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.\n"
+        }
+      ],
+      "facts": [
+        {
+          "index": 1,
+          "source_section": "weather.md#Weather decisions",
+          "expected_fact": "Weather decisions govern execution, not ownership of reservations.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_4b498203f2554a5cb53c45b660521c30",
+              "provider_request_capture_line": 45,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 1,
+              "line_end": 4,
+              "ref": "ev-56d4c522edb788db6d1f445e",
+              "original_span_sha256": "740f4964bbdb12b745d683d1684ba2b43d7dcdea7bccbdab28a16584649211ac"
+            }
+          ],
+          "grade": "missing",
+          "answer_quote": "- **Stop outdoor observations** when the wind interlock opens. Preserve reservation identifiers during the suspension. [ev-159aa46f19575f991571621c, `weather.md:5–8`]",
+          "quote_kind": "nearest_context_only",
+          "rationale_ru": "Нет различия execution/ownership. Сохранение ID не утверждает неизменность принадлежности. Цитата — ближайший контекст, не доказательство присутствия факта.",
+          "failure_attribution": "fact delivered but omitted or only partially represented in final answer"
+        },
+        {
+          "index": 2,
+          "source_section": "weather.md#Suspension",
+          "expected_fact": "Suspend outdoor observations when the wind interlock opens.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_4b498203f2554a5cb53c45b660521c30",
+              "provider_request_capture_line": 45,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 5,
+              "line_end": 8,
+              "ref": "ev-159aa46f19575f991571621c",
+              "original_span_sha256": "10b295cdd64de215489ac000a7bd2718a3312a78777f44199fd93fcb5981897a"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "- **Stop outdoor observations** when the wind interlock opens. Preserve reservation identifiers during the suspension. [ev-159aa46f19575f991571621c, `weather.md:5–8`]",
+          "quote_kind": "support",
+          "rationale_ru": "Наружные наблюдения останавливаются при размыкании ветровой блокировки.",
+          "failure_attribution": null
+        },
+        {
+          "index": 3,
+          "source_section": "weather.md#Suspension",
+          "expected_fact": "Preserve reservation identifiers during suspension.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_4b498203f2554a5cb53c45b660521c30",
+              "provider_request_capture_line": 45,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 5,
+              "line_end": 8,
+              "ref": "ev-159aa46f19575f991571621c",
+              "original_span_sha256": "10b295cdd64de215489ac000a7bd2718a3312a78777f44199fd93fcb5981897a"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "Preserve reservation identifiers during the suspension.",
+          "quote_kind": "support",
+          "rationale_ru": "Прямое сохранение идентификаторов во время suspension.",
+          "failure_attribution": null
+        },
+        {
+          "index": 4,
+          "source_section": "weather.md#Suspension",
+          "expected_fact": "Resume only after the interlock closes and the duty operator records a restart approval.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_4b498203f2554a5cb53c45b660521c30",
+              "provider_request_capture_line": 45,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 5,
+              "line_end": 8,
+              "ref": "ev-159aa46f19575f991571621c",
+              "original_span_sha256": "10b295cdd64de215489ac000a7bd2718a3312a78777f44199fd93fcb5981897a"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "- **Restart only after** the interlock closes and the duty operator records a restart approval. A favourable forecast alone cannot authorize a restart. [ev-159aa46f19575f991571621c, `weather.md:5–8`; ev-d7ad6e3c0ae0215b63ed8bb6, `weather.md:13–15`]",
+          "quote_kind": "support",
+          "rationale_ru": "Только после замыкания interlock и записи restart approval дежурным оператором.",
+          "failure_attribution": null
+        },
+        {
+          "index": 5,
+          "source_section": "weather.md#Indoor instrument",
+          "expected_fact": "An instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_4b498203f2554a5cb53c45b660521c30",
+              "provider_request_capture_line": 45,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 9,
+              "line_end": 12,
+              "ref": "ev-0999a181d992f67ebae5ac73",
+              "original_span_sha256": "7f82f2d9638f89d407588962d6edc526396ac8697efa553fb153eb4246d33049"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "- **An indoor instrument may continue** if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish that classification. [ev-0999a181d992f67ebae5ac73, `weather.md:9–12`]",
+          "quote_kind": "support",
+          "rationale_ru": "Разрешено продолжать при wind suspension только явно indoor-инструменту при замкнутых собственных safety interlocks; контекст suspension однозначен и для B.",
+          "failure_attribution": null
+        },
+        {
+          "index": 6,
+          "source_section": "weather.md#Indoor instrument",
+          "expected_fact": "A roof visible as closed on the calendar does not establish indoor classification.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_4b498203f2554a5cb53c45b660521c30",
+              "provider_request_capture_line": 45,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 9,
+              "line_end": 12,
+              "ref": "ev-0999a181d992f67ebae5ac73",
+              "original_span_sha256": "7f82f2d9638f89d407588962d6edc526396ac8697efa553fb153eb4246d33049"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "- **An indoor instrument may continue** if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish that classification. [ev-0999a181d992f67ebae5ac73, `weather.md:9–12`]",
+          "quote_kind": "support",
+          "rationale_ru": "Закрытая крыша на календаре прямо признана недостаточной для indoor classification.",
+          "failure_attribution": null
+        }
+      ],
+      "totals": {
+        "full": 5,
+        "partial": 0,
+        "missing": 1,
+        "contradicted": 0,
+        "delivered": 6
+      }
+    },
+    {
+      "arm": "C",
+      "task": "V-M2",
+      "question": "When should wind stop observations, what is required to restart, and may an indoor instrument continue?",
+      "capture_path": "eval/blind_project_context/step14-host-language-live/attempt-02/C/V-M2/capture/events.jsonl",
+      "capture_sha256": "ec5547376ca07ffebe7375de9151715206ade40835e42ea6f34e3f9d6b8cfe27",
+      "answer_path": "eval/blind_project_context/step14-host-language-live/attempt-02/C/V-M2/runtime/raw.jsonl",
+      "answer_raw_line": 8,
+      "answer_sha256": "8eb8c184f3e5d2b90ca2477d4f6626b76bbc2283ea94559713828446b006efed",
+      "answer": "- **Stop outdoor observations** when the wind interlock opens. Preserve reservation identifiers during the suspension. (`weather.md`, lines 3–7)\n- **Restart only after** the interlock closes **and** the duty operator records restart approval. A favourable forecast cannot authorize a restart. (`weather.md`, lines 7, 13–15)\n- **An indoor instrument may continue** during the wind suspension if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish indoor classification. (`weather.md`, lines 9–11)",
+      "final_provider_completed_capture_line": 233,
+      "provider_final_equals_runtime_answer": true,
+      "provider_request_lines": [
+        3,
+        56,
+        98
+      ],
+      "tool_delivery_checks": [
+        {
+          "call_id": "call_06a4ea2b8657454ab5c038364d689092",
+          "tool": "grep",
+          "tool_after_capture_line": 54,
+          "provider_request_capture_line": 56,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "7ec3e5f4568e4154ffda017e309444e12f8af067af02196b5dd731abb0215691"
+        },
+        {
+          "call_id": "call_892a68cee1b143b3b88819f122bcff49",
+          "tool": "read",
+          "tool_after_capture_line": 96,
+          "provider_request_capture_line": 98,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "58a48613072f84e4b4da07f6cfef31a1fd950e626a12e1be49994483fd155462"
+        }
+      ],
+      "source_checks": [
+        {
+          "call_id": "call_06a4ea2b8657454ab5c038364d689092",
+          "tool": "grep",
+          "tool_after_capture_line": 54,
+          "provider_request_capture_line": 56,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "7ec3e5f4568e4154ffda017e309444e12f8af067af02196b5dd731abb0215691",
+          "path": "weather.md",
+          "line_start": 7,
+          "line_end": 7,
+          "ref": null,
+          "source_uri": null,
+          "original_file_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "original_span_sha256": "eda2d2cc587773cbe049c454d2a6efd152592ddd24b1269fbaf59d4ea8ac34b9",
+          "returned_span_sha256": "eda2d2cc587773cbe049c454d2a6efd152592ddd24b1269fbaf59d4ea8ac34b9",
+          "source_text_matches_original": true,
+          "comparison_method": "exact grep source line and byte offset; exact content delivered",
+          "returned_source_hash_field": null,
+          "text": "Suspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n"
+        },
+        {
+          "call_id": "call_06a4ea2b8657454ab5c038364d689092",
+          "tool": "grep",
+          "tool_after_capture_line": 54,
+          "provider_request_capture_line": 56,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "7ec3e5f4568e4154ffda017e309444e12f8af067af02196b5dd731abb0215691",
+          "path": "weather.md",
+          "line_start": 11,
+          "line_end": 11,
+          "ref": null,
+          "source_uri": null,
+          "original_file_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "original_span_sha256": "570f512973275df2f493e6847e112939821547ba0bbdf69c14383124c9291fbe",
+          "returned_span_sha256": "570f512973275df2f493e6847e112939821547ba0bbdf69c14383124c9291fbe",
+          "source_text_matches_original": true,
+          "comparison_method": "exact grep source line and byte offset; exact content delivered",
+          "returned_source_hash_field": null,
+          "text": "An instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.\n"
+        },
+        {
+          "call_id": "call_06a4ea2b8657454ab5c038364d689092",
+          "tool": "grep",
+          "tool_after_capture_line": 54,
+          "provider_request_capture_line": 56,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "7ec3e5f4568e4154ffda017e309444e12f8af067af02196b5dd731abb0215691",
+          "path": "weather.md",
+          "line_start": 15,
+          "line_end": 15,
+          "ref": null,
+          "source_uri": null,
+          "original_file_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "original_span_sha256": "121b16c2602c14381319fb672a712895752fbd669fb6184ae1ecef0e67b11970",
+          "returned_span_sha256": "121b16c2602c14381319fb672a712895752fbd669fb6184ae1ecef0e67b11970",
+          "source_text_matches_original": true,
+          "comparison_method": "exact grep source line and byte offset; exact content delivered",
+          "returned_source_hash_field": null,
+          "text": "The forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.\n"
+        },
+        {
+          "call_id": "call_892a68cee1b143b3b88819f122bcff49",
+          "tool": "read",
+          "tool_after_capture_line": 96,
+          "provider_request_capture_line": 98,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "58a48613072f84e4b4da07f6cfef31a1fd950e626a12e1be49994483fd155462",
+          "path": "weather.md",
+          "line_start": 1,
+          "line_end": 15,
+          "ref": null,
+          "source_uri": null,
+          "original_file_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "original_span_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "returned_span_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+          "source_text_matches_original": true,
+          "comparison_method": "raw content exact; provider line prefixes removed only for line-by-line comparison, every line and index checked",
+          "returned_source_hash_field": null,
+          "text": "# Weather decisions\n\nWeather decisions govern execution, not ownership of reservations.\n\n## Suspension\n\nSuspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n\n## Indoor instrument\n\nAn instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.\n\n## Forecast display\n\nThe forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.\n"
+        }
+      ],
+      "facts": [
+        {
+          "index": 1,
+          "source_section": "weather.md#Weather decisions",
+          "expected_fact": "Weather decisions govern execution, not ownership of reservations.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_892a68cee1b143b3b88819f122bcff49",
+              "provider_request_capture_line": 98,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 1,
+              "line_end": 15,
+              "ref": null,
+              "original_span_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+            }
+          ],
+          "grade": "missing",
+          "answer_quote": "- **Stop outdoor observations** when the wind interlock opens. Preserve reservation identifiers during the suspension. (`weather.md`, lines 3–7)",
+          "quote_kind": "nearest_context_only",
+          "rationale_ru": "Нет различия execution/ownership. Сохранение ID не утверждает неизменность принадлежности. Цитата — ближайший контекст, не доказательство присутствия факта.",
+          "failure_attribution": "fact delivered but omitted or only partially represented in final answer"
+        },
+        {
+          "index": 2,
+          "source_section": "weather.md#Suspension",
+          "expected_fact": "Suspend outdoor observations when the wind interlock opens.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_06a4ea2b8657454ab5c038364d689092",
+              "provider_request_capture_line": 56,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 7,
+              "line_end": 7,
+              "ref": null,
+              "original_span_sha256": "eda2d2cc587773cbe049c454d2a6efd152592ddd24b1269fbaf59d4ea8ac34b9"
+            },
+            {
+              "call_id": "call_892a68cee1b143b3b88819f122bcff49",
+              "provider_request_capture_line": 98,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 1,
+              "line_end": 15,
+              "ref": null,
+              "original_span_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "- **Stop outdoor observations** when the wind interlock opens. Preserve reservation identifiers during the suspension. (`weather.md`, lines 3–7)",
+          "quote_kind": "support",
+          "rationale_ru": "Наружные наблюдения останавливаются при размыкании ветровой блокировки.",
+          "failure_attribution": null
+        },
+        {
+          "index": 3,
+          "source_section": "weather.md#Suspension",
+          "expected_fact": "Preserve reservation identifiers during suspension.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_06a4ea2b8657454ab5c038364d689092",
+              "provider_request_capture_line": 56,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 7,
+              "line_end": 7,
+              "ref": null,
+              "original_span_sha256": "eda2d2cc587773cbe049c454d2a6efd152592ddd24b1269fbaf59d4ea8ac34b9"
+            },
+            {
+              "call_id": "call_892a68cee1b143b3b88819f122bcff49",
+              "provider_request_capture_line": 98,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 1,
+              "line_end": 15,
+              "ref": null,
+              "original_span_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "Preserve reservation identifiers during the suspension.",
+          "quote_kind": "support",
+          "rationale_ru": "Прямое сохранение идентификаторов во время suspension.",
+          "failure_attribution": null
+        },
+        {
+          "index": 4,
+          "source_section": "weather.md#Suspension",
+          "expected_fact": "Resume only after the interlock closes and the duty operator records a restart approval.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_06a4ea2b8657454ab5c038364d689092",
+              "provider_request_capture_line": 56,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 7,
+              "line_end": 7,
+              "ref": null,
+              "original_span_sha256": "eda2d2cc587773cbe049c454d2a6efd152592ddd24b1269fbaf59d4ea8ac34b9"
+            },
+            {
+              "call_id": "call_892a68cee1b143b3b88819f122bcff49",
+              "provider_request_capture_line": 98,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 1,
+              "line_end": 15,
+              "ref": null,
+              "original_span_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "- **Restart only after** the interlock closes **and** the duty operator records restart approval. A favourable forecast cannot authorize a restart. (`weather.md`, lines 7, 13–15)",
+          "quote_kind": "support",
+          "rationale_ru": "Только после замыкания interlock и записи restart approval дежурным оператором.",
+          "failure_attribution": null
+        },
+        {
+          "index": 5,
+          "source_section": "weather.md#Indoor instrument",
+          "expected_fact": "An instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_06a4ea2b8657454ab5c038364d689092",
+              "provider_request_capture_line": 56,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 11,
+              "line_end": 11,
+              "ref": null,
+              "original_span_sha256": "570f512973275df2f493e6847e112939821547ba0bbdf69c14383124c9291fbe"
+            },
+            {
+              "call_id": "call_892a68cee1b143b3b88819f122bcff49",
+              "provider_request_capture_line": 98,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 1,
+              "line_end": 15,
+              "ref": null,
+              "original_span_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "- **An indoor instrument may continue** during the wind suspension if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish indoor classification. (`weather.md`, lines 9–11)",
+          "quote_kind": "support",
+          "rationale_ru": "Разрешено продолжать при wind suspension только явно indoor-инструменту при замкнутых собственных safety interlocks; контекст suspension однозначен и для B.",
+          "failure_attribution": null
+        },
+        {
+          "index": 6,
+          "source_section": "weather.md#Indoor instrument",
+          "expected_fact": "A roof visible as closed on the calendar does not establish indoor classification.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_06a4ea2b8657454ab5c038364d689092",
+              "provider_request_capture_line": 56,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 11,
+              "line_end": 11,
+              "ref": null,
+              "original_span_sha256": "570f512973275df2f493e6847e112939821547ba0bbdf69c14383124c9291fbe"
+            },
+            {
+              "call_id": "call_892a68cee1b143b3b88819f122bcff49",
+              "provider_request_capture_line": 98,
+              "request_input_index": 0,
+              "path": "weather.md",
+              "line_start": 1,
+              "line_end": 15,
+              "ref": null,
+              "original_span_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "- **An indoor instrument may continue** during the wind suspension if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish indoor classification. (`weather.md`, lines 9–11)",
+          "quote_kind": "support",
+          "rationale_ru": "Закрытая крыша на календаре прямо признана недостаточной для indoor classification.",
+          "failure_attribution": null
+        }
+      ],
+      "totals": {
+        "full": 5,
+        "partial": 0,
+        "missing": 1,
+        "contradicted": 0,
+        "delivered": 6
+      }
+    },
+    {
+      "arm": "A",
+      "task": "V-M3",
+      "question": "What must the gateway do after excessive clock drift, including recovery when the reference clock is unavailable?",
+      "capture_path": "eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M3/capture/events.jsonl",
+      "capture_sha256": "b399499ddf4637673b9cb7a29620ef360aa5df4bcb658f68ccc5e58be3030b93",
+      "answer_path": "eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M3/runtime/raw.jsonl",
+      "answer_raw_line": 8,
+      "answer_sha256": "abab867dbf50581bddd393a013fcaadc2bc6b932b6b42eecedf70d58574cf76d",
+      "answer": "If the absolute offset between instrument time and the observatory reference **exceeds two seconds**, the gateway must:\n\n1. Pause schedule execution and notify the duty operator.\n2. Keep queued reservations unchanged.\n3. Resume only after **two consecutive reference checks** report an offset within two seconds. [ev-7ff924db065d30bda70fa508, `clock.md:5–8`]\n\nIf the reference clock is unavailable, execution must remain paused; a local clock reading alone cannot satisfy either recovery check. [ev-7431ef82d2347181ffe5f433, `clock.md:9–12`]\n\nThe retired prototype’s behavior—clearing pending reservations and restarting on the first local clock sample—must not be used for the current gateway. [ev-74eb9cba956360994f654dbe, `architecture.md:9–11`]",
+      "final_provider_completed_capture_line": 265,
+      "provider_final_equals_runtime_answer": true,
+      "provider_request_lines": [
+        3,
+        28,
+        70
+      ],
+      "tool_delivery_checks": [
+        {
+          "call_id": "call_945d2fe17dcc4c938548b6b5c8bad22e",
+          "tool": "docatlas_docs_status",
+          "tool_after_capture_line": 26,
+          "provider_request_capture_line": 28,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "d431649a565f5940726718b5ffc8dad02a6a7b468d460e071f9182fa64619876"
+        },
+        {
+          "call_id": "call_fe4a0a4ee9ea4d7cb07f368601549616",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 68,
+          "provider_request_capture_line": 70,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "ffc615b9c8abd0967e8cc04c64150b7d2111e170ea222d6993005591caa1d9c6",
+          "stdio_response_line": 9
+        }
+      ],
+      "source_checks": [
+        {
+          "call_id": "call_fe4a0a4ee9ea4d7cb07f368601549616",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 68,
+          "provider_request_capture_line": 70,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "ffc615b9c8abd0967e8cc04c64150b7d2111e170ea222d6993005591caa1d9c6",
+          "stdio_response_line": 9,
+          "path": "architecture.md",
+          "line_start": 1,
+          "line_end": 4,
+          "ref": "ev-9d09cae8e21c7ef232baca1b",
+          "source_uri": "docatlas://source/v2/c695c01206b22ed215dbb7b8",
+          "original_file_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+          "original_span_sha256": "4aac5d3971f0a4044019e497eba777939ea31f5229b938c105d56eeed6636463",
+          "returned_span_sha256": "4aac5d3971f0a4044019e497eba777939ea31f5229b938c105d56eeed6636463",
+          "source_text_matches_original": true,
+          "comparison_method": "exact",
+          "returned_source_hash_field": null,
+          "text": "# Scheduler architecture\n\nMeridian separates ownership, planning, execution and display to permit independent restarts.\n\n"
+        },
+        {
+          "call_id": "call_fe4a0a4ee9ea4d7cb07f368601549616",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 68,
+          "provider_request_capture_line": 70,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "ffc615b9c8abd0967e8cc04c64150b7d2111e170ea222d6993005591caa1d9c6",
+          "stdio_response_line": 9,
+          "path": "architecture.md",
+          "line_start": 9,
+          "line_end": 11,
+          "ref": "ev-74eb9cba956360994f654dbe",
+          "source_uri": "docatlas://source/v2/8d0f1b368c63e1fb2ca19ff7",
+          "original_file_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+          "original_span_sha256": "c862dcce4e2171579b1fa22807a40ddfc7597f2fe85b7b61f9f381c128dcde96",
+          "returned_span_sha256": "c862dcce4e2171579b1fa22807a40ddfc7597f2fe85b7b61f9f381c128dcde96",
+          "source_text_matches_original": true,
+          "comparison_method": "exact",
+          "returned_source_hash_field": null,
+          "text": "## Prototype recovery\n\nThe retired prototype cleared pending reservations when time drifted and restarted on its first local clock sample. These behaviours must not be used to recover the current gateway.\n"
+        },
+        {
+          "call_id": "call_fe4a0a4ee9ea4d7cb07f368601549616",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 68,
+          "provider_request_capture_line": 70,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "ffc615b9c8abd0967e8cc04c64150b7d2111e170ea222d6993005591caa1d9c6",
+          "stdio_response_line": 9,
+          "path": "clock.md",
+          "line_start": 1,
+          "line_end": 4,
+          "ref": "ev-b6b5595954763d0a93f9d70e",
+          "source_uri": "docatlas://source/v2/a5dc35973c3641a5d732b326",
+          "original_file_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "original_span_sha256": "961c18374f4344cc06d12c55d91051457ca71f23e522fde21fdcadfd18f56717",
+          "returned_span_sha256": "961c18374f4344cc06d12c55d91051457ca71f23e522fde21fdcadfd18f56717",
+          "source_text_matches_original": true,
+          "comparison_method": "exact",
+          "returned_source_hash_field": null,
+          "text": "# Time coordination\n\nThe gateway compares instrument time with the observatory reference before executing a schedule.\n\n"
+        },
+        {
+          "call_id": "call_fe4a0a4ee9ea4d7cb07f368601549616",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 68,
+          "provider_request_capture_line": 70,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "ffc615b9c8abd0967e8cc04c64150b7d2111e170ea222d6993005591caa1d9c6",
+          "stdio_response_line": 9,
+          "path": "clock.md",
+          "line_start": 5,
+          "line_end": 8,
+          "ref": "ev-7ff924db065d30bda70fa508",
+          "source_uri": "docatlas://source/v2/ed33a292f44fae64e35ff8b1",
+          "original_file_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "original_span_sha256": "a931510f931e319852125fb57fe145f622a4a32f599e6244bf43249044ded4d0",
+          "returned_span_sha256": "a931510f931e319852125fb57fe145f622a4a32f599e6244bf43249044ded4d0",
+          "source_text_matches_original": true,
+          "comparison_method": "exact",
+          "returned_source_hash_field": null,
+          "text": "## Clock offset\n\nIf the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator. Keep queued reservations unchanged. Resume only after two consecutive reference checks report an offset within two seconds.\n\n"
+        },
+        {
+          "call_id": "call_fe4a0a4ee9ea4d7cb07f368601549616",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 68,
+          "provider_request_capture_line": 70,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "ffc615b9c8abd0967e8cc04c64150b7d2111e170ea222d6993005591caa1d9c6",
+          "stdio_response_line": 9,
+          "path": "clock.md",
+          "line_start": 9,
+          "line_end": 12,
+          "ref": "ev-7431ef82d2347181ffe5f433",
+          "source_uri": "docatlas://source/v2/6e927fc4c2fc54ef8204e52b",
+          "original_file_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "original_span_sha256": "86713feaf994f3abf280c1513ceca84a1cdef41988dedc333f39b22443e5d003",
+          "returned_span_sha256": "86713feaf994f3abf280c1513ceca84a1cdef41988dedc333f39b22443e5d003",
+          "source_text_matches_original": true,
+          "comparison_method": "exact",
+          "returned_source_hash_field": null,
+          "text": "## Missing reference\n\nIf the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.\n\n"
+        },
+        {
+          "call_id": "call_fe4a0a4ee9ea4d7cb07f368601549616",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 68,
+          "provider_request_capture_line": 70,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "ffc615b9c8abd0967e8cc04c64150b7d2111e170ea222d6993005591caa1d9c6",
+          "stdio_response_line": 9,
+          "path": "clock.md",
+          "line_start": 13,
+          "line_end": 15,
+          "ref": "ev-d0ae269afd83183145b789a0",
+          "source_uri": "docatlas://source/v2/316d7458153e06372aec6ea5",
+          "original_file_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "original_span_sha256": "c3a5f3a5ac72857d7da4d61093e10a4a221e54db75e0ae24f8d32ad0f2ee7dbf",
+          "returned_span_sha256": "c3a5f3a5ac72857d7da4d61093e10a4a221e54db75e0ae24f8d32ad0f2ee7dbf",
+          "source_text_matches_original": true,
+          "comparison_method": "exact",
+          "returned_source_hash_field": null,
+          "text": "## Simulation clock\n\nThe simulator advances time manually and never waits for reference checks. Its accelerated clock is isolated from the real instrument gateway.\n"
+        }
+      ],
+      "facts": [
+        {
+          "index": 1,
+          "source_section": "clock.md#Time coordination",
+          "expected_fact": "The gateway compares instrument time with the observatory reference before executing a schedule.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_fe4a0a4ee9ea4d7cb07f368601549616",
+              "provider_request_capture_line": 70,
+              "request_input_index": 0,
+              "path": "clock.md",
+              "line_start": 1,
+              "line_end": 4,
+              "ref": "ev-b6b5595954763d0a93f9d70e",
+              "original_span_sha256": "961c18374f4344cc06d12c55d91051457ca71f23e522fde21fdcadfd18f56717"
+            }
+          ],
+          "grade": "missing",
+          "answer_quote": "If the absolute offset between instrument time and the observatory reference **exceeds two seconds**, the gateway must:",
+          "quote_kind": "nearest_context_only",
+          "rationale_ru": "Предварительная gateway-проверка перед исполнением расписания не сформулирована. Упоминание offset/reference описывает условие реакции на drift, не самостоятельную обязанность pre-execution comparison. Ссылка на clock.md:3 сама по себе факта в answer не добавляет. Классификация согласована с историческим step12:68–69.",
+          "failure_attribution": "fact delivered but omitted or only partially represented in final answer"
+        },
+        {
+          "index": 2,
+          "source_section": "clock.md#Clock offset",
+          "expected_fact": "If the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_fe4a0a4ee9ea4d7cb07f368601549616",
+              "provider_request_capture_line": 70,
+              "request_input_index": 0,
+              "path": "clock.md",
+              "line_start": 5,
+              "line_end": 8,
+              "ref": "ev-7ff924db065d30bda70fa508",
+              "original_span_sha256": "a931510f931e319852125fb57fe145f622a4a32f599e6244bf43249044ded4d0"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "If the absolute offset between instrument time and the observatory reference **exceeds two seconds**, the gateway must:\n\n1. Pause schedule execution and notify the duty operator.",
+          "quote_kind": "support",
+          "rationale_ru": "Абсолютный offset >2 секунд; pause schedule и notify duty operator.",
+          "failure_attribution": null
+        },
+        {
+          "index": 3,
+          "source_section": "clock.md#Clock offset",
+          "expected_fact": "Keep queued reservations unchanged.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_fe4a0a4ee9ea4d7cb07f368601549616",
+              "provider_request_capture_line": 70,
+              "request_input_index": 0,
+              "path": "clock.md",
+              "line_start": 5,
+              "line_end": 8,
+              "ref": "ev-7ff924db065d30bda70fa508",
+              "original_span_sha256": "a931510f931e319852125fb57fe145f622a4a32f599e6244bf43249044ded4d0"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "Keep queued reservations unchanged.",
+          "quote_kind": "support",
+          "rationale_ru": "Очередь бронирований неизменна.",
+          "failure_attribution": null
+        },
+        {
+          "index": 4,
+          "source_section": "clock.md#Clock offset",
+          "expected_fact": "Resume only after two consecutive reference checks report an offset within two seconds.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_fe4a0a4ee9ea4d7cb07f368601549616",
+              "provider_request_capture_line": 70,
+              "request_input_index": 0,
+              "path": "clock.md",
+              "line_start": 5,
+              "line_end": 8,
+              "ref": "ev-7ff924db065d30bda70fa508",
+              "original_span_sha256": "a931510f931e319852125fb57fe145f622a4a32f599e6244bf43249044ded4d0"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "Resume only after **two consecutive reference checks** report an offset within two seconds.",
+          "quote_kind": "support",
+          "rationale_ru": "Две последовательные reference checks, каждая в пределах двух секунд, только затем resume.",
+          "failure_attribution": null
+        },
+        {
+          "index": 5,
+          "source_section": "clock.md#Missing reference",
+          "expected_fact": "If the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_fe4a0a4ee9ea4d7cb07f368601549616",
+              "provider_request_capture_line": 70,
+              "request_input_index": 0,
+              "path": "clock.md",
+              "line_start": 9,
+              "line_end": 12,
+              "ref": "ev-7431ef82d2347181ffe5f433",
+              "original_span_sha256": "86713feaf994f3abf280c1513ceca84a1cdef41988dedc333f39b22443e5d003"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "If the reference clock is unavailable, execution must remain paused; a local clock reading alone cannot satisfy either recovery check. [ev-7431ef82d2347181ffe5f433, `clock.md:9–12`]",
+          "quote_kind": "support",
+          "rationale_ru": "При недоступном reference остаётся pause; local reading не годится ни для одной recovery check.",
+          "failure_attribution": null
+        }
+      ],
+      "totals": {
+        "full": 4,
+        "partial": 0,
+        "missing": 1,
+        "contradicted": 0,
+        "delivered": 5
+      }
+    },
+    {
+      "arm": "B",
+      "task": "V-M3",
+      "question": "What must the gateway do after excessive clock drift, including recovery when the reference clock is unavailable?",
+      "capture_path": "eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M3/capture/events.jsonl",
+      "capture_sha256": "1dadf27da360ef2d4fcd6b741e0b8c75edcd8ce6a6d10b19853e8a57948b375c",
+      "answer_path": "eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M3/runtime/raw.jsonl",
+      "answer_raw_line": 5,
+      "answer_sha256": "acae93f4cdea2161c694a2ef51c1b201dde8e9d76f2db28f316f36f28a96f63d",
+      "answer": "If the gateway’s **absolute clock offset exceeds two seconds**, it must pause schedule execution, notify the duty operator, and leave queued reservations unchanged. It may resume only after **two consecutive reference-clock checks** each report an offset within two seconds. [ev-7ff924db065d30bda70fa508, `clock.md:5–8`]\n\nIf the reference clock is unavailable, the gateway must remain paused: a local clock reading alone cannot satisfy either recovery check. [ev-7431ef82d2347181ffe5f433, `clock.md:9–12`] It must not use the retired prototype’s recovery behavior of clearing pending reservations and restarting on the first local clock sample. [ev-74eb9cba956360994f654dbe, `architecture.md:9–11`]",
+      "final_provider_completed_capture_line": 226,
+      "provider_final_equals_runtime_answer": true,
+      "provider_request_lines": [
+        3,
+        45
+      ],
+      "tool_delivery_checks": [
+        {
+          "call_id": "call_13aea3846fb341658fd2408c6b432615",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 43,
+          "provider_request_capture_line": 45,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "ffc615b9c8abd0967e8cc04c64150b7d2111e170ea222d6993005591caa1d9c6",
+          "stdio_response_line": 9
+        }
+      ],
+      "source_checks": [
+        {
+          "call_id": "call_13aea3846fb341658fd2408c6b432615",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 43,
+          "provider_request_capture_line": 45,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "ffc615b9c8abd0967e8cc04c64150b7d2111e170ea222d6993005591caa1d9c6",
+          "stdio_response_line": 9,
+          "path": "architecture.md",
+          "line_start": 1,
+          "line_end": 4,
+          "ref": "ev-9d09cae8e21c7ef232baca1b",
+          "source_uri": "docatlas://source/v2/c695c01206b22ed215dbb7b8",
+          "original_file_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+          "original_span_sha256": "4aac5d3971f0a4044019e497eba777939ea31f5229b938c105d56eeed6636463",
+          "returned_span_sha256": "4aac5d3971f0a4044019e497eba777939ea31f5229b938c105d56eeed6636463",
+          "source_text_matches_original": true,
+          "comparison_method": "exact",
+          "returned_source_hash_field": null,
+          "text": "# Scheduler architecture\n\nMeridian separates ownership, planning, execution and display to permit independent restarts.\n\n"
+        },
+        {
+          "call_id": "call_13aea3846fb341658fd2408c6b432615",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 43,
+          "provider_request_capture_line": 45,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "ffc615b9c8abd0967e8cc04c64150b7d2111e170ea222d6993005591caa1d9c6",
+          "stdio_response_line": 9,
+          "path": "architecture.md",
+          "line_start": 9,
+          "line_end": 11,
+          "ref": "ev-74eb9cba956360994f654dbe",
+          "source_uri": "docatlas://source/v2/8d0f1b368c63e1fb2ca19ff7",
+          "original_file_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+          "original_span_sha256": "c862dcce4e2171579b1fa22807a40ddfc7597f2fe85b7b61f9f381c128dcde96",
+          "returned_span_sha256": "c862dcce4e2171579b1fa22807a40ddfc7597f2fe85b7b61f9f381c128dcde96",
+          "source_text_matches_original": true,
+          "comparison_method": "exact",
+          "returned_source_hash_field": null,
+          "text": "## Prototype recovery\n\nThe retired prototype cleared pending reservations when time drifted and restarted on its first local clock sample. These behaviours must not be used to recover the current gateway.\n"
+        },
+        {
+          "call_id": "call_13aea3846fb341658fd2408c6b432615",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 43,
+          "provider_request_capture_line": 45,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "ffc615b9c8abd0967e8cc04c64150b7d2111e170ea222d6993005591caa1d9c6",
+          "stdio_response_line": 9,
+          "path": "clock.md",
+          "line_start": 1,
+          "line_end": 4,
+          "ref": "ev-b6b5595954763d0a93f9d70e",
+          "source_uri": "docatlas://source/v2/a5dc35973c3641a5d732b326",
+          "original_file_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "original_span_sha256": "961c18374f4344cc06d12c55d91051457ca71f23e522fde21fdcadfd18f56717",
+          "returned_span_sha256": "961c18374f4344cc06d12c55d91051457ca71f23e522fde21fdcadfd18f56717",
+          "source_text_matches_original": true,
+          "comparison_method": "exact",
+          "returned_source_hash_field": null,
+          "text": "# Time coordination\n\nThe gateway compares instrument time with the observatory reference before executing a schedule.\n\n"
+        },
+        {
+          "call_id": "call_13aea3846fb341658fd2408c6b432615",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 43,
+          "provider_request_capture_line": 45,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "ffc615b9c8abd0967e8cc04c64150b7d2111e170ea222d6993005591caa1d9c6",
+          "stdio_response_line": 9,
+          "path": "clock.md",
+          "line_start": 5,
+          "line_end": 8,
+          "ref": "ev-7ff924db065d30bda70fa508",
+          "source_uri": "docatlas://source/v2/ed33a292f44fae64e35ff8b1",
+          "original_file_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "original_span_sha256": "a931510f931e319852125fb57fe145f622a4a32f599e6244bf43249044ded4d0",
+          "returned_span_sha256": "a931510f931e319852125fb57fe145f622a4a32f599e6244bf43249044ded4d0",
+          "source_text_matches_original": true,
+          "comparison_method": "exact",
+          "returned_source_hash_field": null,
+          "text": "## Clock offset\n\nIf the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator. Keep queued reservations unchanged. Resume only after two consecutive reference checks report an offset within two seconds.\n\n"
+        },
+        {
+          "call_id": "call_13aea3846fb341658fd2408c6b432615",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 43,
+          "provider_request_capture_line": 45,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "ffc615b9c8abd0967e8cc04c64150b7d2111e170ea222d6993005591caa1d9c6",
+          "stdio_response_line": 9,
+          "path": "clock.md",
+          "line_start": 9,
+          "line_end": 12,
+          "ref": "ev-7431ef82d2347181ffe5f433",
+          "source_uri": "docatlas://source/v2/6e927fc4c2fc54ef8204e52b",
+          "original_file_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "original_span_sha256": "86713feaf994f3abf280c1513ceca84a1cdef41988dedc333f39b22443e5d003",
+          "returned_span_sha256": "86713feaf994f3abf280c1513ceca84a1cdef41988dedc333f39b22443e5d003",
+          "source_text_matches_original": true,
+          "comparison_method": "exact",
+          "returned_source_hash_field": null,
+          "text": "## Missing reference\n\nIf the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.\n\n"
+        },
+        {
+          "call_id": "call_13aea3846fb341658fd2408c6b432615",
+          "tool": "docatlas_get_docs_context",
+          "tool_after_capture_line": 43,
+          "provider_request_capture_line": 45,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "ffc615b9c8abd0967e8cc04c64150b7d2111e170ea222d6993005591caa1d9c6",
+          "stdio_response_line": 9,
+          "path": "clock.md",
+          "line_start": 13,
+          "line_end": 15,
+          "ref": "ev-d0ae269afd83183145b789a0",
+          "source_uri": "docatlas://source/v2/316d7458153e06372aec6ea5",
+          "original_file_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "original_span_sha256": "c3a5f3a5ac72857d7da4d61093e10a4a221e54db75e0ae24f8d32ad0f2ee7dbf",
+          "returned_span_sha256": "c3a5f3a5ac72857d7da4d61093e10a4a221e54db75e0ae24f8d32ad0f2ee7dbf",
+          "source_text_matches_original": true,
+          "comparison_method": "exact",
+          "returned_source_hash_field": null,
+          "text": "## Simulation clock\n\nThe simulator advances time manually and never waits for reference checks. Its accelerated clock is isolated from the real instrument gateway.\n"
+        }
+      ],
+      "facts": [
+        {
+          "index": 1,
+          "source_section": "clock.md#Time coordination",
+          "expected_fact": "The gateway compares instrument time with the observatory reference before executing a schedule.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_13aea3846fb341658fd2408c6b432615",
+              "provider_request_capture_line": 45,
+              "request_input_index": 0,
+              "path": "clock.md",
+              "line_start": 1,
+              "line_end": 4,
+              "ref": "ev-b6b5595954763d0a93f9d70e",
+              "original_span_sha256": "961c18374f4344cc06d12c55d91051457ca71f23e522fde21fdcadfd18f56717"
+            }
+          ],
+          "grade": "missing",
+          "answer_quote": "If the gateway’s **absolute clock offset exceeds two seconds**, it must pause schedule execution, notify the duty operator, and leave queued reservations unchanged. It may resume only after **two consecutive reference-clock checks** each report an offset within two seconds. [ev-7ff924db065d30bda70fa508, `clock.md:5–8`]",
+          "quote_kind": "nearest_context_only",
+          "rationale_ru": "Предварительная gateway-проверка перед исполнением расписания не сформулирована. Упоминание offset/reference описывает условие реакции на drift, не самостоятельную обязанность pre-execution comparison. Ссылка на clock.md:3 сама по себе факта в answer не добавляет. Классификация согласована с историческим step12:68–69.",
+          "failure_attribution": "fact delivered but omitted or only partially represented in final answer"
+        },
+        {
+          "index": 2,
+          "source_section": "clock.md#Clock offset",
+          "expected_fact": "If the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_13aea3846fb341658fd2408c6b432615",
+              "provider_request_capture_line": 45,
+              "request_input_index": 0,
+              "path": "clock.md",
+              "line_start": 5,
+              "line_end": 8,
+              "ref": "ev-7ff924db065d30bda70fa508",
+              "original_span_sha256": "a931510f931e319852125fb57fe145f622a4a32f599e6244bf43249044ded4d0"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "If the gateway’s **absolute clock offset exceeds two seconds**, it must pause schedule execution, notify the duty operator, and leave queued reservations unchanged. It may resume only after **two consecutive reference-clock checks** each report an offset within two seconds. [ev-7ff924db065d30bda70fa508, `clock.md:5–8`]",
+          "quote_kind": "support",
+          "rationale_ru": "Абсолютный offset >2 секунд; pause schedule и notify duty operator.",
+          "failure_attribution": null
+        },
+        {
+          "index": 3,
+          "source_section": "clock.md#Clock offset",
+          "expected_fact": "Keep queued reservations unchanged.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_13aea3846fb341658fd2408c6b432615",
+              "provider_request_capture_line": 45,
+              "request_input_index": 0,
+              "path": "clock.md",
+              "line_start": 5,
+              "line_end": 8,
+              "ref": "ev-7ff924db065d30bda70fa508",
+              "original_span_sha256": "a931510f931e319852125fb57fe145f622a4a32f599e6244bf43249044ded4d0"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "leave queued reservations unchanged.",
+          "quote_kind": "support",
+          "rationale_ru": "Очередь бронирований неизменна.",
+          "failure_attribution": null
+        },
+        {
+          "index": 4,
+          "source_section": "clock.md#Clock offset",
+          "expected_fact": "Resume only after two consecutive reference checks report an offset within two seconds.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_13aea3846fb341658fd2408c6b432615",
+              "provider_request_capture_line": 45,
+              "request_input_index": 0,
+              "path": "clock.md",
+              "line_start": 5,
+              "line_end": 8,
+              "ref": "ev-7ff924db065d30bda70fa508",
+              "original_span_sha256": "a931510f931e319852125fb57fe145f622a4a32f599e6244bf43249044ded4d0"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "If the gateway’s **absolute clock offset exceeds two seconds**, it must pause schedule execution, notify the duty operator, and leave queued reservations unchanged. It may resume only after **two consecutive reference-clock checks** each report an offset within two seconds. [ev-7ff924db065d30bda70fa508, `clock.md:5–8`]",
+          "quote_kind": "support",
+          "rationale_ru": "Две последовательные reference checks, каждая в пределах двух секунд, только затем resume.",
+          "failure_attribution": null
+        },
+        {
+          "index": 5,
+          "source_section": "clock.md#Missing reference",
+          "expected_fact": "If the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_13aea3846fb341658fd2408c6b432615",
+              "provider_request_capture_line": 45,
+              "request_input_index": 0,
+              "path": "clock.md",
+              "line_start": 9,
+              "line_end": 12,
+              "ref": "ev-7431ef82d2347181ffe5f433",
+              "original_span_sha256": "86713feaf994f3abf280c1513ceca84a1cdef41988dedc333f39b22443e5d003"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "If the reference clock is unavailable, the gateway must remain paused: a local clock reading alone cannot satisfy either recovery check. [ev-7431ef82d2347181ffe5f433, `clock.md:9–12`] It must not use the retired prototype’s recovery behavior of clearing pending reservations and restarting on the first local clock sample. [ev-74eb9cba956360994f654dbe, `architecture.md:9–11`]",
+          "quote_kind": "support",
+          "rationale_ru": "При недоступном reference остаётся pause; local reading не годится ни для одной recovery check.",
+          "failure_attribution": null
+        }
+      ],
+      "totals": {
+        "full": 4,
+        "partial": 0,
+        "missing": 1,
+        "contradicted": 0,
+        "delivered": 5
+      }
+    },
+    {
+      "arm": "C",
+      "task": "V-M3",
+      "question": "What must the gateway do after excessive clock drift, including recovery when the reference clock is unavailable?",
+      "capture_path": "eval/blind_project_context/step14-host-language-live/attempt-02/C/V-M3/capture/events.jsonl",
+      "capture_sha256": "29b8a91f710fb30cbaab40d444f725a6b9adb0fa67ebf90a382ee5999a169d5a",
+      "answer_path": "eval/blind_project_context/step14-host-language-live/attempt-02/C/V-M3/runtime/raw.jsonl",
+      "answer_raw_line": 13,
+      "answer_sha256": "d3d90788277b612f6bde90fc0b304a926935a521d9c041ed033325e5352d99b3",
+      "answer": "If the absolute offset between instrument time and the observatory reference **exceeds two seconds**, the gateway must pause schedule execution, notify the duty operator, and leave queued reservations unchanged. It may resume only after **two consecutive reference checks** each report an offset within two seconds. [clock.md:3–7](clock.md#L3-L7)\n\nIf the reference clock is unavailable, execution must remain paused: a local clock reading alone cannot satisfy either recovery check. [clock.md:9–11](clock.md#L9-L11)\n\nThe gateway must not use the retired prototype’s recovery behavior of clearing pending reservations or restarting on the first local clock sample. A planner may compute a plan while execution is suspended, but that plan does not bypass the clock check or a weather interlock. [architecture.md:5–11](architecture.md#L5-L11)",
+      "final_provider_completed_capture_line": 319,
+      "provider_final_equals_runtime_answer": true,
+      "provider_request_lines": [
+        3,
+        53,
+        106,
+        131
+      ],
+      "tool_delivery_checks": [
+        {
+          "call_id": "call_371acfc2e41c4924a2491ca163dca2fb",
+          "tool": "grep",
+          "tool_after_capture_line": 51,
+          "provider_request_capture_line": 53,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "4b4d7ac22cee34f92cd16fbe4193b0eb106e185100ea38f72b0190e1affaf933"
+        },
+        {
+          "call_id": "call_ac628f4a2d494613abaef8c0c7c272dd",
+          "tool": "grep",
+          "tool_after_capture_line": 104,
+          "provider_request_capture_line": 106,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "76cff50f5b69d587443c339748bc028ef7c77b9cfcc43830d6bfee3672525680"
+        },
+        {
+          "call_id": "call_2660308655f3455784af3e5d24627b53",
+          "tool": "read",
+          "tool_after_capture_line": 127,
+          "provider_request_capture_line": 131,
+          "request_input_index": 2,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "6d7a1d0c63cec539576cb086953f635d83977a7d407244e619e1ac5b34c02e8f"
+        },
+        {
+          "call_id": "call_f4771954a80f4a018072db598ab84b24",
+          "tool": "read",
+          "tool_after_capture_line": 128,
+          "provider_request_capture_line": 131,
+          "request_input_index": 1,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "d4a4d766efa644824d7e573e842c59ee0a26406e80779d319c30c92cda5f8717"
+        },
+        {
+          "call_id": "call_25d9d2a0a25a47ca809fc84069d94c04",
+          "tool": "read",
+          "tool_after_capture_line": 129,
+          "provider_request_capture_line": 131,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "8323cb210cf50ad89084d7eaa57f0228e16dbf0778de3258b31445b80b1eb106"
+        }
+      ],
+      "source_checks": [
+        {
+          "call_id": "call_ac628f4a2d494613abaef8c0c7c272dd",
+          "tool": "grep",
+          "tool_after_capture_line": 104,
+          "provider_request_capture_line": 106,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "76cff50f5b69d587443c339748bc028ef7c77b9cfcc43830d6bfee3672525680",
+          "path": "clock.md",
+          "line_start": 11,
+          "line_end": 11,
+          "ref": null,
+          "source_uri": null,
+          "original_file_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "original_span_sha256": "9c08eccc8c786ca1d1c2bb130886ecbc61dd35bedcfc9da17fdb726e297bf299",
+          "returned_span_sha256": "9c08eccc8c786ca1d1c2bb130886ecbc61dd35bedcfc9da17fdb726e297bf299",
+          "source_text_matches_original": true,
+          "comparison_method": "exact grep source line and byte offset; exact content delivered",
+          "returned_source_hash_field": null,
+          "text": "If the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.\n"
+        },
+        {
+          "call_id": "call_ac628f4a2d494613abaef8c0c7c272dd",
+          "tool": "grep",
+          "tool_after_capture_line": 104,
+          "provider_request_capture_line": 106,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "76cff50f5b69d587443c339748bc028ef7c77b9cfcc43830d6bfee3672525680",
+          "path": "architecture.md",
+          "line_start": 11,
+          "line_end": 11,
+          "ref": null,
+          "source_uri": null,
+          "original_file_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+          "original_span_sha256": "5bb6e4899a6fe8253ee0cca6e4944bad901c537ce9d67ca38f07cd544c81a150",
+          "returned_span_sha256": "5bb6e4899a6fe8253ee0cca6e4944bad901c537ce9d67ca38f07cd544c81a150",
+          "source_text_matches_original": true,
+          "comparison_method": "exact grep source line and byte offset; exact content delivered",
+          "returned_source_hash_field": null,
+          "text": "The retired prototype cleared pending reservations when time drifted and restarted on its first local clock sample. These behaviours must not be used to recover the current gateway.\n"
+        },
+        {
+          "call_id": "call_f4771954a80f4a018072db598ab84b24",
+          "tool": "read",
+          "tool_after_capture_line": 128,
+          "provider_request_capture_line": 131,
+          "request_input_index": 1,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "d4a4d766efa644824d7e573e842c59ee0a26406e80779d319c30c92cda5f8717",
+          "path": "architecture.md",
+          "line_start": 1,
+          "line_end": 11,
+          "ref": null,
+          "source_uri": null,
+          "original_file_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+          "original_span_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+          "returned_span_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+          "source_text_matches_original": true,
+          "comparison_method": "raw content exact; provider line prefixes removed only for line-by-line comparison, every line and index checked",
+          "returned_source_hash_field": null,
+          "text": "# Scheduler architecture\n\nMeridian separates ownership, planning, execution and display to permit independent restarts.\n\n## Planner\n\nThe planner solves interval conflicts using instrument availability and reservation priority. It can compute a plan while execution is suspended. A computed plan is not permission to bypass a weather interlock or clock check.\n\n## Prototype recovery\n\nThe retired prototype cleared pending reservations when time drifted and restarted on its first local clock sample. These behaviours must not be used to recover the current gateway.\n"
+        },
+        {
+          "call_id": "call_25d9d2a0a25a47ca809fc84069d94c04",
+          "tool": "read",
+          "tool_after_capture_line": 129,
+          "provider_request_capture_line": 131,
+          "request_input_index": 0,
+          "exact_tool_content_delivery": true,
+          "provider_output_sha256": "8323cb210cf50ad89084d7eaa57f0228e16dbf0778de3258b31445b80b1eb106",
+          "path": "clock.md",
+          "line_start": 1,
+          "line_end": 15,
+          "ref": null,
+          "source_uri": null,
+          "original_file_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "original_span_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "returned_span_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+          "source_text_matches_original": true,
+          "comparison_method": "raw content exact; provider line prefixes removed only for line-by-line comparison, every line and index checked",
+          "returned_source_hash_field": null,
+          "text": "# Time coordination\n\nThe gateway compares instrument time with the observatory reference before executing a schedule.\n\n## Clock offset\n\nIf the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator. Keep queued reservations unchanged. Resume only after two consecutive reference checks report an offset within two seconds.\n\n## Missing reference\n\nIf the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.\n\n## Simulation clock\n\nThe simulator advances time manually and never waits for reference checks. Its accelerated clock is isolated from the real instrument gateway.\n"
+        }
+      ],
+      "facts": [
+        {
+          "index": 1,
+          "source_section": "clock.md#Time coordination",
+          "expected_fact": "The gateway compares instrument time with the observatory reference before executing a schedule.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_25d9d2a0a25a47ca809fc84069d94c04",
+              "provider_request_capture_line": 131,
+              "request_input_index": 0,
+              "path": "clock.md",
+              "line_start": 1,
+              "line_end": 15,
+              "ref": null,
+              "original_span_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10"
+            }
+          ],
+          "grade": "missing",
+          "answer_quote": "If the absolute offset between instrument time and the observatory reference **exceeds two seconds**, the gateway must pause schedule execution, notify the duty operator, and leave queued reservations unchanged. It may resume only after **two consecutive reference checks** each report an offset within two seconds. [clock.md:3–7](clock.md#L3-L7)",
+          "quote_kind": "nearest_context_only",
+          "rationale_ru": "Предварительная gateway-проверка перед исполнением расписания не сформулирована. Упоминание offset/reference описывает условие реакции на drift, не самостоятельную обязанность pre-execution comparison. Ссылка на clock.md:3 сама по себе факта в answer не добавляет. Классификация согласована с историческим step12:68–69.",
+          "failure_attribution": "fact delivered but omitted or only partially represented in final answer"
+        },
+        {
+          "index": 2,
+          "source_section": "clock.md#Clock offset",
+          "expected_fact": "If the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_25d9d2a0a25a47ca809fc84069d94c04",
+              "provider_request_capture_line": 131,
+              "request_input_index": 0,
+              "path": "clock.md",
+              "line_start": 1,
+              "line_end": 15,
+              "ref": null,
+              "original_span_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "If the absolute offset between instrument time and the observatory reference **exceeds two seconds**, the gateway must pause schedule execution, notify the duty operator, and leave queued reservations unchanged. It may resume only after **two consecutive reference checks** each report an offset within two seconds. [clock.md:3–7](clock.md#L3-L7)",
+          "quote_kind": "support",
+          "rationale_ru": "Абсолютный offset >2 секунд; pause schedule и notify duty operator.",
+          "failure_attribution": null
+        },
+        {
+          "index": 3,
+          "source_section": "clock.md#Clock offset",
+          "expected_fact": "Keep queued reservations unchanged.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_25d9d2a0a25a47ca809fc84069d94c04",
+              "provider_request_capture_line": 131,
+              "request_input_index": 0,
+              "path": "clock.md",
+              "line_start": 1,
+              "line_end": 15,
+              "ref": null,
+              "original_span_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "leave queued reservations unchanged.",
+          "quote_kind": "support",
+          "rationale_ru": "Очередь бронирований неизменна.",
+          "failure_attribution": null
+        },
+        {
+          "index": 4,
+          "source_section": "clock.md#Clock offset",
+          "expected_fact": "Resume only after two consecutive reference checks report an offset within two seconds.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_25d9d2a0a25a47ca809fc84069d94c04",
+              "provider_request_capture_line": 131,
+              "request_input_index": 0,
+              "path": "clock.md",
+              "line_start": 1,
+              "line_end": 15,
+              "ref": null,
+              "original_span_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "If the absolute offset between instrument time and the observatory reference **exceeds two seconds**, the gateway must pause schedule execution, notify the duty operator, and leave queued reservations unchanged. It may resume only after **two consecutive reference checks** each report an offset within two seconds. [clock.md:3–7](clock.md#L3-L7)",
+          "quote_kind": "support",
+          "rationale_ru": "Две последовательные reference checks, каждая в пределах двух секунд, только затем resume.",
+          "failure_attribution": null
+        },
+        {
+          "index": 5,
+          "source_section": "clock.md#Missing reference",
+          "expected_fact": "If the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.",
+          "delivered": true,
+          "delivery_evidence": [
+            {
+              "call_id": "call_ac628f4a2d494613abaef8c0c7c272dd",
+              "provider_request_capture_line": 106,
+              "request_input_index": 0,
+              "path": "clock.md",
+              "line_start": 11,
+              "line_end": 11,
+              "ref": null,
+              "original_span_sha256": "9c08eccc8c786ca1d1c2bb130886ecbc61dd35bedcfc9da17fdb726e297bf299"
+            },
+            {
+              "call_id": "call_25d9d2a0a25a47ca809fc84069d94c04",
+              "provider_request_capture_line": 131,
+              "request_input_index": 0,
+              "path": "clock.md",
+              "line_start": 1,
+              "line_end": 15,
+              "ref": null,
+              "original_span_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10"
+            }
+          ],
+          "grade": "full",
+          "answer_quote": "If the reference clock is unavailable, execution must remain paused: a local clock reading alone cannot satisfy either recovery check. [clock.md:9–11](clock.md#L9-L11)",
+          "quote_kind": "support",
+          "rationale_ru": "При недоступном reference остаётся pause; local reading не годится ни для одной recovery check.",
+          "failure_attribution": null
+        }
+      ],
+      "totals": {
+        "full": 4,
+        "partial": 0,
+        "missing": 1,
+        "contradicted": 0,
+        "delivered": 5
+      }
+    }
+  ],
+  "totals": {
+    "sessions": 7,
+    "fact_positions": 41,
+    "delivered": 41,
+    "full": 33,
+    "partial": 2,
+    "missing": 6,
+    "contradicted": 0
+  },
+  "parent_comparison": {
+    "grade_differences": [],
+    "conclusion_ru": "Предварительные totals подтверждены независимым чтением ответов, исходных документов и capture request bodies. Существенных расхождений в оценках нет.",
+    "clarification_ru": "Все 8 неполных/пропущенных позиций были доставлены в последующие provider requests. Это потери final answer, не retrieval/delivery. Не выдавать вычисленные source hashes за поля, возвращённые compact API."
+  }
+}

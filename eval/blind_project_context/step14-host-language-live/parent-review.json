@@ -1,0 +1,15 @@
+{
+  "phase": "before_setup_attempt_02",
+  "reviewed": ["run.py", "session_runtime.py", "observe_stdio.py", "observer/index.js", "account.py", "../step13-runtime-token-review/session_runtime.py cleanup"],
+  "observations": [
+    "Public stdio preparation preserves six documents and unchanged four questions.",
+    "One-hop and minimal-context recipe shared across A/B; language preflight is the intended treatment.",
+    "Owned standalone process group and pidfd-registered MCP identities are cleaned before next session.",
+    "Provider capture uses actual bodies and usage, not local token-size estimates.",
+    "Prompt admission metadata plus complete MCP response and first provider body are required for host preflight verification.",
+    "Semantic answer quality remains separate from transport/accounting acceptance."
+  ],
+  "required_correction": "Use existing OpenCode authorization, not a new paid API key or a new interactive login. Runtime agent is correcting this before setup.",
+  "filesystem_fix": "Removed group/other write permission only from this experiment's newly created docatlas-eval and step14 parents, required by installed storage policy.",
+  "not_yet_verified": ["provider compatibility with isolated standalone capture", "real Qwen inference", "real host preflight", "semantic answers", "provider token totals"]
+}

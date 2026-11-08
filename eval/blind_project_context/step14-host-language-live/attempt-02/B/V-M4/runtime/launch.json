@@ -1,0 +1,24 @@
+{
+  "command": [
+    "/home/viadmin/.opencode/bin/opencode",
+    "run",
+    "--standalone",
+    "--format",
+    "json",
+    "--agent",
+    "measure",
+    "--model",
+    "openai/gpt-6.1-terra#low",
+    "--title",
+    "Step14 B V-M4"
+  ],
+  "cwd": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/locations/B/V-M4",
+  "question": "Какая температура охлаждения обязательна для всех общих приборов обсерватории?",
+  "timeout_seconds": 900,
+  "capture_drain_seconds": 10,
+  "environment_values_recorded": false,
+  "automatic_retries": false,
+  "owned_process_files": [
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M4/mcp-process.json"
+  ]
+}

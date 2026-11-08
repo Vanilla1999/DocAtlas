@@ -1,0 +1,17 @@
+{
+  "monotonic_ns": 6810425739285,
+  "devices": [
+    [
+      "GPU-846ef7ef-4619-12e7-7ffe-e9ee7cffef35",
+      "1391",
+      "14443"
+    ]
+  ],
+  "compute": [
+    [
+      "GPU-846ef7ef-4619-12e7-7ffe-e9ee7cffef35",
+      "192996",
+      "337"
+    ]
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "session_status": "finished",
+  "retrieval_status": "succeeded",
+  "answer_status": "produced",
+  "answer": "Передача возможна, но при активной блокировке обслуживания её нужно оставить **в ожидании**, даже если согласия уже получены.\n\n1. Получите согласие принимающего наблюдателя и одобрение передачи от дежурного оператора.\n2. Сохраните исходный идентификатор бронирования и укажите обоих наблюдателей в журнале аудита.\n3. Не завершайте передачу, пока команда инструмента не снимет блокировку обслуживания. Обновление календаря блокировку не снимает. [ev-c921e34c76fdfa492bebb68b, `reservations.md:7–10`; ev-8c0b8ec623baa336612c0ae6, `reservations.md:11–14`; ev-af3fb3da8c27448bc32cb3fd, `calendar.md:5–8`]\n\n**Погодная приостановка при передаче не меняется:** погодные решения регулируют выполнение наблюдений, а не владение бронированием. Если наружные наблюдения приостановлены из-за размыкания ветровой блокировки, возобновить их можно только после её замыкания и регистрации дежурным оператором разрешения на запуск. Идентификатор бронирования при приостановке сохраняется. [ev-c921e34c76fdfa492bebb68b, `reservations.md:7–10`; ev-56d4c522edb788db6d1f445e, `weather.md:1–4`; ev-159aa46f19575f991571621c, `weather.md:5–8`]\n\nУпрощённое переназначение инструктором для дневных учебных слотов к подтверждённым наблюдениям не применяется. [ev-db6c99cd7162ee2e647282c4, `reservations.md:15–17`]",
+  "failures": [],
+  "capture_errors": [],
+  "tool_calls": 1,
+  "retrieval_calls": 1,
+  "expected_host_rejections": [],
+  "transport_pass": true,
+  "answer_quality": "not_graded",
+  "termination": null,
+  "returncode": 0,
+  "seconds": 18.242770885000027,
+  "cleanup": {
+    "strategy": "held private group plus explicitly registered MCP pidfds; no foreign-group signals",
+    "group": 210965,
+    "observed_processes": [
+      {
+        "pid": 210965,
+        "state": "Z",
+        "pgid": 210965,
+        "sid": 210965,
+        "start_ticks": 618510,
+        "name": "opencode"
+      },
+      {
+        "pid": 211003,
+        "state": "S",
+        "pgid": 211003,
+        "sid": 211003,
+        "start_ticks": 618578,
+        "name": "python",
+        "role": "transport",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M1/mcp-process.json"
+      },
+      {
+        "pid": 211004,
+        "state": "R",
+        "pgid": 211003,
+        "sid": 211003,
+        "start_ticks": 618580,
+        "name": "doc-atlas",
+        "role": "server",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M1/mcp-process.json"
+      }
+    ],
+    "before_cleanup": [
+      {
+        "pid": 210965,
+        "state": "Z",
+        "pgid": 210965,
+        "sid": 210965,
+        "start_ticks": 618510,
+        "name": "opencode"
+      }
+    ],
+    "signals": [],
+    "remaining_live": [],
+    "escaped_live_observed": [],
+    "registered_processes": [
+      {
+        "role": "transport",
+        "pid": 211003,
+        "pgid": 211003,
+        "sid": 211003,
+        "start_ticks": 618578,
+        "pid_namespace": "pid:[4026531836]",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M1/mcp-process.json",
+        "exit_verified": true
+      },
+      {
+        "role": "server",
+        "pid": 211004,
+        "pgid": 211003,
+        "sid": 211003,
+        "start_ticks": 618580,
+        "pid_namespace": "pid:[4026531836]",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M1/mcp-process.json",
+        "exit_verified": true
+      }
+    ],
+    "registration_errors": {},
+    "no_live_owned_processes": true,
+    "leader_reaped": true,
+    "boundary": "Private group plus explicit MCP launch registrations/observed identities; unseen detached descendants and GPU VRAM are not measured."
+  },
+  "provider_capture_completed_before_cleanup": true
+}

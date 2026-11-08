@@ -1,0 +1,6 @@
+{
+  "status": "FAILED_NOT_RETRIED",
+  "exception_type": "RuntimeError",
+  "error": "Session/capture failed; raw preserved; automatic retry forbidden: /tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M1",
+  "boundary": "Preserved partial work; inspect actual capture before counting operations"
+}

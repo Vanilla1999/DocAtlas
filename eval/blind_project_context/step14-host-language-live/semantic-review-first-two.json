@@ -1,0 +1,220 @@
+{
+  "schema": "independent-semantic-review-first-two-v1",
+  "review_date": "2026-11-08",
+  "scope": ["A/V-M1", "B/V-M1"],
+  "artifact_root": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02",
+  "original_docs_root": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step10-multidoc-gate/projects/validation/meridian",
+  "basis": {
+    "tasks": "../tasks.json:3-59 relative to artifact_root",
+    "criteria": "../review-criteria.json:3-26 relative to artifact_root",
+    "historical_scale": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step12-live-comparison/RESULTS_RU.md:55-70",
+    "answer_field": "runtime/receipt.json $.answer only",
+    "fact_order": "Unchanged V-M1 facts from tasks.json, positions 1-8",
+    "grading": "full / partial / missing / contradicted; contradiction overrides other grades; no weighted score invented"
+  },
+  "caveats_ru": [
+    "Независимая проверка только двух завершённых ответов. Другие задания, C и другие попытки не оценивались. Сравнение с историей относится к шкале, а не к тождественности исторических ответов.",
+    "Для факта 1 вопрос уже задаёт подтверждённое ночное наблюдение; это не повод требовать механического повторения вопроса. Но ни вопрос, ни ответы не сообщают ограничение на shared instruments. Ответы лишь косвенно передают применимость через исключение дневного учебного shortcut, поэтому partial, не full и не missing.",
+    "Для факта 6 описание уже приостановленного наблюдения вследствие размыкания ветровой блокировки оценивается partial согласно RESULTS_RU.md:60-65. Это не явная обязанность приостановить наружные наблюдения при размыкании.",
+    "Delivery означает наличие полного успешного tool output в последующем исходящем provider request в capture/events.jsonl. Проверялись только декодированные data payloads; наличие текста в context или tool.after само по себе не считалось delivery. Это не доказательство внутреннего внимания/использования текста моделью.",
+    "SHA-256 файлов сверены с attempt-02/sources.json. SHA-256 span вычислен независимо по исходным байтам и сравнен с SHA-256 декодированного sources[].text. У compact source rows нет отдельного заявленного content_hash; ev-ref и source_uri не выдаются за криптографические хеши контента.",
+    "Исходники reservations/weather/clock прочитаны напрямую; calendar дополнительно проверен как доставленный allowed источник и цитата B. Private/closed и исключённые документы не открывались. Clock служит hard negative, фактов clock в ответах не обнаружено.",
+    "Не выполнялись provider/inference-вызовы, повторные прогоны или изменения runner/account/setup. Эталоны и исходные артефакты не изменялись; коммит не создавался.",
+    "Этот отчёт не оценивает host-preflight, токены, стоимость или общую пригодность rollout. Два ответа не дают статистического вывода об улучшении A/B."
+  ],
+  "expected_facts": [
+    {"position": 1, "source": "reservations.md#Confirmed reservations", "original_lines": [3, 3], "text": "These rules apply to confirmed night-time reservations on shared instruments.", "delivery_ref": "ev-f0eb1e549fed1aca3d464c2e"},
+    {"position": 2, "source": "reservations.md#Transfer", "original_lines": [9, 9], "text": "Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer.", "delivery_ref": "ev-c921e34c76fdfa492bebb68b"},
+    {"position": 3, "source": "reservations.md#Transfer", "original_lines": [9, 9], "text": "Retain the original reservation identifier and record both observers in the audit trail.", "delivery_ref": "ev-c921e34c76fdfa492bebb68b"},
+    {"position": 4, "source": "reservations.md#Locked instrument", "original_lines": [13, 13], "text": "leave the transfer pending even after observer acceptance and operator approval", "delivery_ref": "ev-8c0b8ec623baa336612c0ae6"},
+    {"position": 5, "source": "reservations.md#Locked instrument", "original_lines": [13, 13], "text": "The lock must be cleared by the instrument team first.", "delivery_ref": "ev-8c0b8ec623baa336612c0ae6"},
+    {"position": 6, "source": "weather.md#Suspension", "original_lines": [7, 7], "text": "Suspend outdoor observations when the wind interlock opens.", "delivery_ref": "ev-159aa46f19575f991571621c"},
+    {"position": 7, "source": "weather.md#Suspension", "original_lines": [7, 7], "text": "Preserve reservation identifiers during suspension.", "delivery_ref": "ev-159aa46f19575f991571621c"},
+    {"position": 8, "source": "weather.md#Suspension", "original_lines": [7, 7], "text": "Resume only after the interlock closes and the duty operator records a restart approval.", "delivery_ref": "ev-159aa46f19575f991571621c"}
+  ],
+  "reviews": [
+    {
+      "arm": "A",
+      "task": "V-M1",
+      "receipt": "A/V-M1/runtime/receipt.json",
+      "session_status": "finished",
+      "counts": {"full": 6, "partial": 2, "missing": 0, "contradicted": 0},
+      "facts": [
+        {
+          "position": 1, "grade": "partial",
+          "answer_quotes": ["Упрощённый порядок переназначения дневных учебных слотов к подтверждённым наблюдениям не применяется."],
+          "reason_ru": "Подтверждённые наблюдения отделены от дневных учебных слотов, ночной контекст задан вопросом. Ограничение shared instruments отсутствует.",
+          "returned": true, "delivered": true,
+          "attribution": "fact delivered but only partially represented in final answer"
+        },
+        {
+          "position": 2, "grade": "full",
+          "answer_quotes": ["Получите согласие принимающего наблюдателя и одобрение передачи от дежурного оператора."],
+          "reason_ru": "Названы оба обязательных согласования до завершения передачи.",
+          "returned": true, "delivered": true, "attribution": null
+        },
+        {
+          "position": 3, "grade": "full",
+          "answer_quotes": ["Сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита."],
+          "reason_ru": "И исходный ID, и оба наблюдателя в аудите отражены явно.",
+          "returned": true, "delivered": true, "attribution": null
+        },
+        {
+          "position": 4, "grade": "full",
+          "answer_quotes": ["Передачу можно подготовить, но **завершить её при активной блокировке обслуживания нельзя**:", "Оставьте передачу в статусе ожидания, даже если согласие и одобрение уже получены."],
+          "reason_ru": "Активная maintenance lock сохраняет pending независимо от двух согласований.",
+          "returned": true, "delivered": true, "attribution": null
+        },
+        {
+          "position": 5, "grade": "full",
+          "answer_quotes": ["Сначала команда инструмента должна снять блокировку обслуживания."],
+          "reason_ru": "Названа ответственная команда и предшествование снятия блокировки завершению передачи.",
+          "returned": true, "delivered": true, "attribution": null
+        },
+        {
+          "position": 6, "grade": "partial",
+          "answer_quotes": ["Если наблюдение приостановлено из-за размыкания ветровой блокировки, возобновить его можно только после её замыкания и записи дежурным оператором разрешения на запуск."],
+          "reason_ru": "Причина состоявшейся приостановки названа. Нет явной обязанности остановить наблюдения при размыкании, также не указано outdoor. Историческая шкала требует partial для такого описания.",
+          "returned": true, "delivered": true,
+          "attribution": "fact delivered but only partially represented in final answer"
+        },
+        {
+          "position": 7, "grade": "full",
+          "answer_quotes": ["Идентификатор бронирования при приостановке сохраняется."],
+          "reason_ru": "Сохранение ID относится явно к приостановке, а не только к передаче.",
+          "returned": true, "delivered": true, "attribution": null
+        },
+        {
+          "position": 8, "grade": "full",
+          "answer_quotes": ["Если наблюдение приостановлено из-за размыкания ветровой блокировки, возобновить его можно только после её замыкания и записи дежурным оператором разрешения на запуск."],
+          "reason_ru": "Оба условия restart и ограничение только после выражены явно.",
+          "returned": true, "delivered": true, "attribution": null
+        }
+      ],
+      "delivery": {
+        "capture": "A/V-M1/capture/events.jsonl",
+        "provider_send_lines": [3, 28, 109],
+        "successful_tool_after_line": 107,
+        "successful_tool_status": "completed",
+        "context_status": "ok",
+        "subsequent_provider_send_line": 109,
+        "event_type": "experimental.ws.send",
+        "payload_pointer_after_json_decode": "data.input[0].output",
+        "call_id": "call_6cc6a83b088d4596a07b3d83939d25a7",
+        "previous_response_id": "resp_0f56f582f31f29a6016af030fe9ce087d28830b30002dcd7f0",
+        "output_exactly_equals_tool_after_result_output": true,
+        "output_utf8_sha256": "9f54f41cd2f32f9879fef43f4cf6f7a1f3c3d8f92dcc8353857a7600f2743e2b",
+        "verified_delivered_spans": 8,
+        "all_eight_expected_facts_present_in_delivered_source_text": true,
+        "final_answer_citation_occurrences": 6,
+        "all_final_ref_path_line_ranges_match_delivered_sources": true,
+        "returned_but_not_delivered_facts": []
+      }
+    },
+    {
+      "arm": "B",
+      "task": "V-M1",
+      "receipt": "B/V-M1/runtime/receipt.json",
+      "session_status": "finished",
+      "counts": {"full": 6, "partial": 2, "missing": 0, "contradicted": 0},
+      "facts": [
+        {
+          "position": 1, "grade": "partial",
+          "answer_quotes": ["Упрощённое переназначение инструктором для дневных учебных слотов к подтверждённым наблюдениям не применяется."],
+          "reason_ru": "Подтверждённые наблюдения отделены от дневных учебных слотов, ночной контекст задан вопросом. Ограничение shared instruments отсутствует.",
+          "returned": true, "delivered": true,
+          "attribution": "fact delivered but only partially represented in final answer"
+        },
+        {
+          "position": 2, "grade": "full",
+          "answer_quotes": ["Получите согласие принимающего наблюдателя и одобрение передачи от дежурного оператора."],
+          "reason_ru": "Оба обязательных согласования отражены.",
+          "returned": true, "delivered": true, "attribution": null
+        },
+        {
+          "position": 3, "grade": "full",
+          "answer_quotes": ["Сохраните исходный идентификатор бронирования и укажите обоих наблюдателей в журнале аудита."],
+          "reason_ru": "И исходный ID, и оба наблюдателя в аудите отражены явно.",
+          "returned": true, "delivered": true, "attribution": null
+        },
+        {
+          "position": 4, "grade": "full",
+          "answer_quotes": ["Передача возможна, но при активной блокировке обслуживания её нужно оставить **в ожидании**, даже если согласия уже получены.", "Получите согласие принимающего наблюдателя и одобрение передачи от дежурного оператора.", "Не завершайте передачу, пока команда инструмента не снимет блокировку обслуживания."],
+          "reason_ru": "Слово согласия в вводной фразе раскрывается обоими обязательными согласованиями в пункте 1. В совокупности текст однозначно сохраняет pending независимо от их получения; запрет завершения не противоречит вводному возможна.",
+          "returned": true, "delivered": true, "attribution": null
+        },
+        {
+          "position": 5, "grade": "full",
+          "answer_quotes": ["Не завершайте передачу, пока команда инструмента не снимет блокировку обслуживания."],
+          "reason_ru": "Названа ответственная команда и обязательное снятие блокировки до завершения передачи.",
+          "returned": true, "delivered": true, "attribution": null
+        },
+        {
+          "position": 6, "grade": "partial",
+          "answer_quotes": ["Если наружные наблюдения приостановлены из-за размыкания ветровой блокировки, возобновить их можно только после её замыкания и регистрации дежурным оператором разрешения на запуск."],
+          "reason_ru": "Наружные наблюдения и причина приостановки указаны. Но передано состояние уже приостановлены, а не обязанность приостановить при размыкании. По исторической шкале partial.",
+          "returned": true, "delivered": true,
+          "attribution": "fact delivered but only partially represented in final answer"
+        },
+        {
+          "position": 7, "grade": "full",
+          "answer_quotes": ["Идентификатор бронирования при приостановке сохраняется."],
+          "reason_ru": "ID явно сохраняется при приостановке.",
+          "returned": true, "delivered": true, "attribution": null
+        },
+        {
+          "position": 8, "grade": "full",
+          "answer_quotes": ["Если наружные наблюдения приостановлены из-за размыкания ветровой блокировки, возобновить их можно только после её замыкания и регистрации дежурным оператором разрешения на запуск."],
+          "reason_ru": "Оба условия restart и ограничение только после выражены явно.",
+          "returned": true, "delivered": true, "attribution": null
+        }
+      ],
+      "delivery": {
+        "capture": "B/V-M1/capture/events.jsonl",
+        "provider_send_lines": [3, 78],
+        "successful_tool_after_line": 76,
+        "successful_tool_status": "completed",
+        "context_status": "ok",
+        "subsequent_provider_send_line": 78,
+        "event_type": "experimental.ws.send",
+        "payload_pointer_after_json_decode": "data.input[0].output",
+        "call_id": "call_554da5a15e604135a3646b529ec7e70a",
+        "previous_response_id": "resp_0b5538720dc8a568016af03110516887d2966a29a146f12ba0",
+        "output_exactly_equals_tool_after_result_output": true,
+        "output_utf8_sha256": "de1ecb20908af90a99a8116abb617c36c8da2d2fdcea1608c20def4e9998cd0a",
+        "verified_delivered_spans": 8,
+        "all_eight_expected_facts_present_in_delivered_source_text": true,
+        "final_answer_citation_occurrences": 7,
+        "all_final_ref_path_line_ranges_match_delivered_sources": true,
+        "returned_but_not_delivered_facts": []
+      }
+    }
+  ],
+  "source_verification": {
+    "method_ru": "Для каждого доставленного source row сравнить UTF-8 bytes(text) с конкатенацией оригинальных строк [line_start-1:line_end], сохраняя переводы строк. SHA-256 этих двух байтовых последовательностей совпадает. Числа строк 1-based inclusive. Все восемь rows идентичны между A и B.",
+    "manifest": "sources.json relative to artifact_root",
+    "original_file_hashes": [
+      {"path": "reservations.md", "sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080", "matches_manifest": true},
+      {"path": "weather.md", "sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a", "matches_manifest": true},
+      {"path": "clock.md", "sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10", "matches_manifest": true},
+      {"path": "calendar.md", "sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad", "matches_manifest": true}
+    ],
+    "spans_verified_in_both_provider_bodies": [
+      {"ref": "ev-525706a82d989ad63f985d9b", "path": "calendar.md", "lines": [1, 4], "sha256": "7d60a4fa66e4609132a3693811e06c273674bb2be6f5e8f23f64afcb7cb4ec38", "bytes_equal": true},
+      {"ref": "ev-af3fb3da8c27448bc32cb3fd", "path": "calendar.md", "lines": [5, 8], "sha256": "a9610a975f27b5175555e73a29dcac6f5d76ac327cb52487d83a8cb9bcf614e2", "bytes_equal": true},
+      {"ref": "ev-f0eb1e549fed1aca3d464c2e", "path": "reservations.md", "lines": [1, 6], "sha256": "a0ce59b3d3a5fad6548716d80e96c7f49bb96c53007d0028e0209129924c66f4", "bytes_equal": true},
+      {"ref": "ev-c921e34c76fdfa492bebb68b", "path": "reservations.md", "lines": [7, 10], "sha256": "f7d3f13974929d476081693be393eb8b846ed68354a29c4861defca5667aae73", "bytes_equal": true},
+      {"ref": "ev-8c0b8ec623baa336612c0ae6", "path": "reservations.md", "lines": [11, 14], "sha256": "6818b4616a76497f549ae45d760110948783427bc0515e1a0c276a0ca2f0a3ad", "bytes_equal": true},
+      {"ref": "ev-db6c99cd7162ee2e647282c4", "path": "reservations.md", "lines": [15, 17], "sha256": "5f99a2452b1953505685e5a7051250f6683b537aa0d2ef332815dfff5ed1e2ec", "bytes_equal": true},
+      {"ref": "ev-56d4c522edb788db6d1f445e", "path": "weather.md", "lines": [1, 4], "sha256": "740f4964bbdb12b745d683d1684ba2b43d7dcdea7bccbdab28a16584649211ac", "bytes_equal": true},
+      {"ref": "ev-159aa46f19575f991571621c", "path": "weather.md", "lines": [5, 8], "sha256": "10b295cdd64de215489ac000a7bd2718a3312a78777f44199fd93fcb5981897a", "bytes_equal": true}
+    ],
+    "scope": "project",
+    "version_binding": "unversioned",
+    "allowed_delivered_paths": ["calendar.md", "reservations.md", "weather.md"],
+    "source_text_mismatches": [],
+    "citation_ref_or_span_mismatches": [],
+    "hard_negative_clock_used_as_answer_support": false
+  },
+  "conclusion_ru": "Оба ответа: 6 full / 2 partial / 0 missing / 0 contradicted. Частичны факты 1 (неполная область применимости) и 6 (нет явной stop-duty). Все 8 фактов реально доставлены в последующих provider bodies; недостатки относятся к final answer, не к отсутствию retrieval/delivery. Все доставленные source spans совпадают с исходными allowed docs, исходные файловые хеши совпадают с manifest. B явно говорит наружные наблюдения, A нет, но это не меняет partial по исторической stop-шкале."
+}

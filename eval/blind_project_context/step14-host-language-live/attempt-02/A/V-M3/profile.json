@@ -1,0 +1,47 @@
+{
+  "profile": "documentation-light-v1",
+  "backend": "mcp",
+  "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project",
+  "instruction_variant": "concise-v1",
+  "tool_description_policy": "concise-v1 model-facing annotations only",
+  "workspace_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/locations/A/V-M3",
+  "scope": "project",
+  "agent": "measure",
+  "model_step_limit": 12,
+  "presentation": "literal-v2",
+  "common_prompt_sha256": "9533321f7cf4cfeff4a26ff66fa03058694a07455e87e54e188c8f3fa0b78aea",
+  "system_sha256": "1281b5263e488208132c4a02cff4c05209ef71a39a0300ca0d726476758b5d54",
+  "allowed_tools": [
+    "docatlas_get_docs_context",
+    "docatlas_docs_status",
+    "docatlas_read_docs_source",
+    "opencode_read_mcp_resource"
+  ],
+  "language_preflight": "unchanged; bound language unknown",
+  "language_preflight_mode": "model",
+  "adapter_execute_tools": [
+    "docatlas_get_docs_context",
+    "docatlas_docs_status",
+    "docatlas_read_docs_source"
+  ],
+  "adapter_guard_tools": [
+    "opencode_read_mcp_resource"
+  ],
+  "retrieval_policy_selected_by_profile": false,
+  "instructions_disabled": false,
+  "history_pruned": false,
+  "file_control_snapshot": null,
+  "mcp_active_snapshot_verified_by_builder": false,
+  "model_calls": 0,
+  "preparation_calls": 0,
+  "inputs": {
+    "documentation_profile.py": "0cf8658fb602c0ae98fd02498f4abed778846903574019a7f792a2387609925e",
+    "profile/common.txt": "3dca2da563a7f156c7bc94594dc7c486834b95982278e3d707c931e1571ee5e1",
+    "profile/mcp-concise.txt": "bf428bdc64a19f72bacda702fb39a0c4513a5ced571c65c7eaf97ac87dc05d7d",
+    "profile/index.js": "d072e29e98de3b334e44df9e4f69eac6f516074a2431b05313051d7bc9337468",
+    "index.js": "6245f6d5f93ddbf17297f7da67bf7da0beb1687ca5e75680622f6e59e0cc832b",
+    "count_tokens.py": "afce729722c87d60d95b95105432a2d1dfe48002f9f9040a27bfba0bbf565e80",
+    "profile/language-preflight.js": "201814ccec89572689dab1d53c09962cd4c0a94f39f7b374e51a8985e2369622"
+  },
+  "boundary": "Configuration only; actual client/runtime acceptance is recorded separately."
+}

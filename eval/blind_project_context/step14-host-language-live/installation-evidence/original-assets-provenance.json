@@ -1,0 +1,145 @@
+{
+  "model": "Qwen/Qwen3-Reranker-0.6B",
+  "revision": "e61197ed45024b0ed8a2d74b80b4d909f1255473",
+  "official_origin": "https://huggingface.co/Qwen/Qwen3-Reranker-0.6B",
+  "gate_inference_calls": 0,
+  "model_inference_calls": 0,
+  "files": {
+    "README.md": {
+      "sha256": "5bba8c734f6dd3ae48317b4139317e45a7fce48fc55e15670b23a0dd15492ab6",
+      "bytes": 14742,
+      "url": "https://huggingface.co/Qwen/Qwen3-Reranker-0.6B/resolve/e61197ed45024b0ed8a2d74b80b4d909f1255473/README.md",
+      "remote_lfs_sha256": null,
+      "remote_git_blob_sha1": "b8bfdef6c3cd9297bf8f5965c87edbee65a444aa"
+    },
+    "config.json": {
+      "sha256": "d479c427a9ca5295218063d4f9aca4f297ab4ac27487cca7af42c84643d51ef0",
+      "bytes": 727,
+      "url": "https://huggingface.co/Qwen/Qwen3-Reranker-0.6B/resolve/e61197ed45024b0ed8a2d74b80b4d909f1255473/config.json",
+      "remote_lfs_sha256": null,
+      "remote_git_blob_sha1": "39784456e9de7a06590f8a4a38760ac1fb38d65e"
+    },
+    "generation_config.json": {
+      "sha256": "81051cd3f6e77013827148d0b8a6ead93f8ac390d5ab805f849199f0af6a08db",
+      "bytes": 214,
+      "url": "https://huggingface.co/Qwen/Qwen3-Reranker-0.6B/resolve/e61197ed45024b0ed8a2d74b80b4d909f1255473/generation_config.json",
+      "remote_lfs_sha256": null,
+      "remote_git_blob_sha1": "e4f1d3193e99a3e5d7047edf56e93a6e933fa31b"
+    },
+    "tokenizer.json": {
+      "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+      "bytes": 11422654,
+      "url": "https://huggingface.co/Qwen/Qwen3-Reranker-0.6B/resolve/e61197ed45024b0ed8a2d74b80b4d909f1255473/tokenizer.json",
+      "remote_lfs_sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+      "remote_git_blob_sha1": "cd71f61a15a522601badb3dc960d800d9cb3766c"
+    },
+    "tokenizer_config.json": {
+      "sha256": "253153d0738ceb4c668d2eff957714dd2bea0b56de772a9fdccd96cbf517e6a0",
+      "bytes": 9706,
+      "url": "https://huggingface.co/Qwen/Qwen3-Reranker-0.6B/resolve/e61197ed45024b0ed8a2d74b80b4d909f1255473/tokenizer_config.json",
+      "remote_lfs_sha256": null,
+      "remote_git_blob_sha1": "7345216a0785dc7086e8c245b2a9d3896ce2b756"
+    },
+    "merges.txt": {
+      "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+      "bytes": 1671853,
+      "url": "https://huggingface.co/Qwen/Qwen3-Reranker-0.6B/resolve/e61197ed45024b0ed8a2d74b80b4d909f1255473/merges.txt",
+      "remote_lfs_sha256": null,
+      "remote_git_blob_sha1": "31349551d90c7606f325fe0f11bbb8bd5fa0d7c7"
+    },
+    "vocab.json": {
+      "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+      "bytes": 2776833,
+      "url": "https://huggingface.co/Qwen/Qwen3-Reranker-0.6B/resolve/e61197ed45024b0ed8a2d74b80b4d909f1255473/vocab.json",
+      "remote_lfs_sha256": null,
+      "remote_git_blob_sha1": "4783fe10ac3adce15ac8f358ef5462739852c569"
+    },
+    "chat_template.jinja": {
+      "sha256": "6f682162495ec5b39fd9005c01b6aa2a74669379fe967039f1e2cbbe8752369d",
+      "bytes": 741,
+      "url": "https://huggingface.co/Qwen/Qwen3-Reranker-0.6B/resolve/e61197ed45024b0ed8a2d74b80b4d909f1255473/chat_template.jinja",
+      "remote_lfs_sha256": null,
+      "remote_git_blob_sha1": "63b97f268a9ddb9c6b34e6d7d8ef531d1fee9cf4"
+    },
+    "model.safetensors": {
+      "sha256": "27cd75a405b9c1b46b59abfd88aaa209e6fed2a1972cde9b70e7659537c5e65b",
+      "bytes": 1191588280,
+      "url": "https://huggingface.co/Qwen/Qwen3-Reranker-0.6B/resolve/e61197ed45024b0ed8a2d74b80b4d909f1255473/model.safetensors",
+      "remote_lfs_sha256": "27cd75a405b9c1b46b59abfd88aaa209e6fed2a1972cde9b70e7659537c5e65b",
+      "remote_git_blob_sha1": "c2009afdaf622dc596bec224a625daa46a2b4cc9"
+    }
+  },
+  "runtime": {
+    "packages": {
+      "numpy": "2.5.4",
+      "nvidia-cusparselt-cu12": "0.7.1",
+      "nvidia-cuda-cupti-cu12": "12.8.90",
+      "nvidia-cusolver-cu12": "11.7.3.90",
+      "filelock": "4.2.6",
+      "Jinja2": "3.1.6",
+      "PyYAML": "6.0.3",
+      "huggingface_hub": "0.36.2",
+      "torch": "2.10.0",
+      "packaging": "26.3",
+      "setuptools": "84.2.1",
+      "nvidia-nvjitlink-cu12": "12.8.93",
+      "regex": "2026.9.29",
+      "idna": "3.20",
+      "fsspec": "2026.9.0",
+      "nvidia-cublas-cu12": "12.8.4.1",
+      "transformers": "4.57.1",
+      "typing_extensions": "4.16.0",
+      "tqdm": "4.70.1",
+      "nvidia-nvtx-cu12": "12.8.90",
+      "triton": "3.6.0",
+      "charset-normalizer": "3.5.2",
+      "cuda-bindings": "12.9.4",
+      "nvidia-cuda-nvrtc-cu12": "12.8.93",
+      "nvidia-cufft-cu12": "11.3.3.83",
+      "sympy": "1.14.0",
+      "nvidia-curand-cu12": "10.3.9.90",
+      "safetensors": "0.8.0",
+      "requests": "2.34.2",
+      "nvidia-cudnn-cu12": "9.10.2.21",
+      "certifi": "2026.10.23",
+      "networkx": "3.7",
+      "nvidia-nccl-cu12": "2.27.5",
+      "nvidia-cuda-runtime-cu12": "12.8.90",
+      "nvidia-cusparse-cu12": "12.5.8.93",
+      "cuda-pathfinder": "1.8.5",
+      "nvidia-cufile-cu12": "1.13.1.3",
+      "hf-xet": "1.8.0",
+      "nvidia-nvshmem-cu12": "3.4.5",
+      "urllib3": "2.8.0",
+      "tokenizers": "0.22.2",
+      "mpmath": "1.3.0",
+      "MarkupSafe": "3.0.4"
+    },
+    "torch": "2.10.0+cu128",
+    "cuda": "12.8",
+    "gpu": "NVIDIA GeForce RTX 5070 Ti",
+    "capability": [
+      12,
+      0
+    ],
+    "compiled_arches": [
+      "sm_70",
+      "sm_75",
+      "sm_80",
+      "sm_86",
+      "sm_90",
+      "sm_100",
+      "sm_120"
+    ],
+    "bf16_matmul": "PASS",
+    "label_ids": {
+      "yes": [
+        9693
+      ],
+      "no": [
+        2152
+      ]
+    },
+    "tokenizer_model_max_length": 131072
+  }
+}

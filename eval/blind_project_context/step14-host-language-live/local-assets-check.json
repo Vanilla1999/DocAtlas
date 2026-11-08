@@ -1,0 +1,26 @@
+{
+  "status": "blocked_missing_pinned_weights",
+  "model": "Qwen/Qwen3-Reranker-0.6B",
+  "revision": "e61197ed45024b0ed8a2d74b80b4d909f1255473",
+  "expected_weights_bytes": 1191588280,
+  "expected_weights_sha256": "27cd75a405b9c1b46b59abfd88aaa209e6fed2a1972cde9b70e7659537c5e65b",
+  "search": {
+    "roots": ["/home/viadmin", "/tmp", "/var/tmp", "/opt", "/mnt", "/media"],
+    "additional_scan": "Readable root filesystem, find / -xdev: exact weights size, HF blob name, reranker GGUF/ZIP and Qwen tar archives",
+    "matches_for_pinned_weights": [],
+    "limitations": "Permission-denied paths were not elevated or searched; archive contents were not exhaustively inspected. No additional mounted data disks shown by findmnt.",
+    "other_model": "/home/viadmin/.local/share/local-llm/models/Huihui-Qwen3.8-27B-abliterated-GSQ-RCO-IQ3_XXS.gguf"
+  },
+  "existing_runtime_candidate": {
+    "python": "/home/viadmin/.venv/ml_training_gpu/bin/python",
+    "installed_package_metadata": {"torch": "2.5.1+cu121", "transformers": "5.6.2", "safetensors": "0.7.0"},
+    "matches_original_versions": false,
+    "inference_compatibility_tested": false
+  },
+  "input_integrity": "PASS immutable input hashes; NOT a readiness or runtime check",
+  "comparison_sessions_run": 0,
+  "provider_usage": null,
+  "quality_metrics": null,
+  "downloads": 0,
+  "next_requirement": "Provide local pinned model assets or explicitly authorize their download; then finish runtime, profiles, index and runner preparation."
+}

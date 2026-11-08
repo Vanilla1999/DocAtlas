@@ -1,0 +1,90 @@
+{
+  "session_status": "finished",
+  "retrieval_status": "succeeded",
+  "answer_status": "produced",
+  "answer": "Передачу можно подготовить, но **завершить её при активной блокировке обслуживания нельзя**:\n\n1. Получите согласие принимающего наблюдателя и одобрение передачи от дежурного оператора. Сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита. [ev-c921e34c76fdfa492bebb68b, `reservations.md:7–10`]\n2. Оставьте передачу в статусе ожидания, даже если согласие и одобрение уже получены. Сначала команда инструмента должна снять блокировку обслуживания. [ev-8c0b8ec623baa336612c0ae6, `reservations.md:11–14`]\n3. Передача не отменяет погодную приостановку: погодные решения регулируют выполнение наблюдений, а не принадлежность бронирования. Если наблюдение приостановлено из-за размыкания ветровой блокировки, возобновить его можно только после её замыкания и записи дежурным оператором разрешения на запуск. Идентификатор бронирования при приостановке сохраняется. [ev-c921e34c76fdfa492bebb68b, `reservations.md:7–10`; ev-56d4c522edb788db6d1f445e, `weather.md:1–4`; ev-159aa46f19575f991571621c, `weather.md:5–8`]\n\nУпрощённый порядок переназначения дневных учебных слотов к подтверждённым наблюдениям не применяется. [ev-db6c99cd7162ee2e647282c4, `reservations.md:15–17`]",
+  "failures": [],
+  "capture_errors": [],
+  "tool_calls": 2,
+  "retrieval_calls": 1,
+  "expected_host_rejections": [],
+  "transport_pass": true,
+  "answer_quality": "not_graded",
+  "termination": null,
+  "returncode": 0,
+  "seconds": 19.264272084000368,
+  "cleanup": {
+    "strategy": "held private group plus explicitly registered MCP pidfds; no foreign-group signals",
+    "group": 210270,
+    "observed_processes": [
+      {
+        "pid": 210270,
+        "state": "Z",
+        "pgid": 210270,
+        "sid": 210270,
+        "start_ticks": 616572,
+        "name": "opencode"
+      },
+      {
+        "pid": 210315,
+        "state": "S",
+        "pgid": 210315,
+        "sid": 210315,
+        "start_ticks": 616641,
+        "name": "python",
+        "role": "transport",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M1/mcp-process.json"
+      },
+      {
+        "pid": 210316,
+        "state": "R",
+        "pgid": 210315,
+        "sid": 210315,
+        "start_ticks": 616643,
+        "name": "doc-atlas",
+        "role": "server",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M1/mcp-process.json"
+      }
+    ],
+    "before_cleanup": [
+      {
+        "pid": 210270,
+        "state": "Z",
+        "pgid": 210270,
+        "sid": 210270,
+        "start_ticks": 616572,
+        "name": "opencode"
+      }
+    ],
+    "signals": [],
+    "remaining_live": [],
+    "escaped_live_observed": [],
+    "registered_processes": [
+      {
+        "role": "transport",
+        "pid": 210315,
+        "pgid": 210315,
+        "sid": 210315,
+        "start_ticks": 616641,
+        "pid_namespace": "pid:[4026531836]",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M1/mcp-process.json",
+        "exit_verified": true
+      },
+      {
+        "role": "server",
+        "pid": 210316,
+        "pgid": 210315,
+        "sid": 210315,
+        "start_ticks": 616643,
+        "pid_namespace": "pid:[4026531836]",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M1/mcp-process.json",
+        "exit_verified": true
+      }
+    ],
+    "registration_errors": {},
+    "no_live_owned_processes": true,
+    "leader_reaped": true,
+    "boundary": "Private group plus explicit MCP launch registrations/observed identities; unseen detached descendants and GPU VRAM are not measured."
+  },
+  "provider_capture_completed_before_cleanup": true
+}

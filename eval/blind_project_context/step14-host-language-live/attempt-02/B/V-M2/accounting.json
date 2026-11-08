@@ -1,0 +1,275 @@
+{
+  "arm": "B",
+  "task": "V-M2",
+  "status": "CAPTURED",
+  "provider_requests": 2,
+  "provider_requests_by_kind": {
+    "primary": 2
+  },
+  "session_ids": [
+    "ses_e45bbc7d8ffe1rohtEeagnCMkB"
+  ],
+  "session_ids_count": 1,
+  "requests_with_usage": 2,
+  "usage": {
+    "input": 3960,
+    "output": 233,
+    "cached": 1408,
+    "cache_write": 0,
+    "reasoning": 0,
+    "uncached": 2552
+  },
+  "usage_coverage_complete": true,
+  "provider_records": [
+    {
+      "id": "resp_0f4a911bdbf07a53016af0323dd7bc87d2949dec6f241fe1bc",
+      "usage": {
+        "input_tokens": 1569,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0
+        },
+        "output_tokens": 43,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 1612,
+        "attribution": {
+          "items": {
+            "fc_0f4a911bdbf07a53016af0323f6aec87d2858228418c041e5a": {
+              "input_tokens": 2,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 43
+            },
+            "msg_0f4a911bdbf07a53016af0323dd7e087d29b52afc68950e3af": {
+              "input_tokens": 23,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 23,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            }
+          },
+          "request_fields": {
+            "instructions": {
+              "input_tokens": 912,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "tools": {
+              "input_tokens": 632,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "resp_0f4a911bdbf07a53016af032442a6487d2914eb91ac81c33f8",
+      "usage": {
+        "input_tokens": 2391,
+        "input_tokens_details": {
+          "cached_tokens": 1408,
+          "cache_write_tokens": 0
+        },
+        "output_tokens": 190,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 2581,
+        "attribution": {
+          "items": {
+            "fc_0f4a911bdbf07a53016af0323f6aec87d2858228418c041e5a": {
+              "input_tokens": 45,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_0f4a911bdbf07a53016af032442a9887d290f27a9b2a202b4e": {
+              "input_tokens": 777,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 777,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "msg_0f4a911bdbf07a53016af0323dd7e087d29b52afc68950e3af": {
+              "input_tokens": 23,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 23,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "msg_0f4a911bdbf07a53016af03244dcd087d29ec00832228eb04c": {
+              "input_tokens": 2,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 190,
+              "content": [
+                {
+                  "input_tokens": 2,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 190
+                }
+              ]
+            }
+          },
+          "request_fields": {
+            "instructions": {
+              "input_tokens": 912,
+              "cached_tokens": 776,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "tools": {
+              "input_tokens": 632,
+              "cached_tokens": 632,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            }
+          }
+        }
+      }
+    }
+  ],
+  "retries": 0,
+  "capture_errors": [],
+  "first_provider_monotonic_ns": 2351291663,
+  "first_provider_language_hints": [
+    {
+      "status": "declared",
+      "languages": [
+        "en"
+      ],
+      "scope": "project",
+      "prompt_id": "832290b335ffcfa4",
+      "hint_only": true
+    }
+  ],
+  "first_provider_wall_time_ms": 1794126397598,
+  "original_question_in_first_request": true,
+  "status_observations": [
+    {
+      "arguments": {
+        "action": "project",
+        "include_language": true,
+        "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project"
+      },
+      "request_monotonic_ns": 6488353665514,
+      "response_monotonic_ns": 6488524773079,
+      "request_wall_time_ns": 1794126396833630640,
+      "response_wall_time_ns": 1794126397004738285,
+      "payload": {
+        "action": "project",
+        "delivery_configuration": {
+          "compact_text": true,
+          "minilm_model_dir": null,
+          "text_fallback": true
+        },
+        "documentation_language": {
+          "basis": "catalog_declaration",
+          "catalog_sha256": "ea941adf3feaf2f191d989853ddd97efca77fc4a112d3c99a3ea5cfacefd7927",
+          "hint_only": true,
+          "languages": [
+            "en"
+          ],
+          "scope": "project",
+          "snapshot_sha256": "f0e7b14f913ddbe80d4020f2c761ff51baca1767a2f9853ac10578313082094e",
+          "source_count": 6,
+          "status": "declared",
+          "unknown_sources": 0
+        },
+        "project": {
+          "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project"
+        },
+        "project_binding": {
+          "project_id": "local:c5969289883c68fd089528a8f5015c377d73028660f327d1fe3599210ca4545e",
+          "project_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/project",
+          "workspace_path": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/locations/B/V-M2"
+        },
+        "tool": "docs_status"
+      }
+    }
+  ],
+  "host_preflight_verified": true,
+  "host_hint_binding_verified": true,
+  "host_timestamp_order_verified": true,
+  "host_timestamp_reason": null,
+  "model_tool_calls": {
+    "docatlas_get_docs_context": 1
+  },
+  "actual_mcp_calls": {
+    "docs_status": 1,
+    "get_docs_context": 1
+  },
+  "mcp_missing_responses": 0,
+  "qwen_receipts": [
+    {
+      "request_id": 3,
+      "context_quality": {
+        "reasons": [
+          "coverage_unverified"
+        ],
+        "status": "unverified"
+      },
+      "metrics": null,
+      "minimal_context": null,
+      "source_selection": {
+        "calibration_scope": "selected_units_before_link_expansion",
+        "calibration_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+        "calibration_status": "empirical",
+        "candidate_units": 21,
+        "closure": {
+          "coverage": "unverified",
+          "delivered_spans": 4,
+          "incomplete_dependencies": [],
+          "reference_expansion": {
+            "added_spans": 0,
+            "examined_references": 0,
+            "followed_references": 0,
+            "max_hops": 1,
+            "pending_references": 0,
+            "recipe": "one-hop-v1",
+            "satisfied_references": 0
+          },
+          "selected_units": 4
+        },
+        "delivered_rows": 4,
+        "model_pairs": 21,
+        "policy": "complete_calibrated_context_v1",
+        "scan_complete": true,
+        "selected_units": 4
+      },
+      "reason_code": null
+    }
+  ],
+  "qwen_pairs": 21,
+  "answer": "- **Stop outdoor observations** when the wind interlock opens. Preserve reservation identifiers during the suspension. [ev-159aa46f19575f991571621c, `weather.md:5–8`]\n- **Restart only after** the interlock closes and the duty operator records a restart approval. A favourable forecast alone cannot authorize a restart. [ev-159aa46f19575f991571621c, `weather.md:5–8`; ev-d7ad6e3c0ae0215b63ed8bb6, `weather.md:13–15`]\n- **An indoor instrument may continue** if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish that classification. [ev-0999a181d992f67ebae5ac73, `weather.md:9–12`]",
+  "answer_quality": "NOT_GRADED",
+  "source_facts_quality": "NOT_GRADED",
+  "timing_boundary": "wall-v2: Python time.time_ns versus JS Date.now, same-host epoch clock; JS millisecond resolution, wall-clock steps not excluded. Monotonic clocks are process-local only. Legacy Python wall time is never reconstructed. Not remote arrival."
+}

@@ -1,0 +1,31 @@
+{
+  "basis": "Unchanged tasks.json facts, independently read reservations.md, weather.md and clock.md. This file is for post-run reviewers only; never include it in model profiles or prompts.",
+  "grades": {
+    "full": "Answer conveys the complete fact, including all conjuncts, prerequisites, exceptions and numeric bounds; faithful paraphrase is accepted.",
+    "partial": "Answer conveys part of the fact but omits at least one required conjunct or qualification.",
+    "missing": "Answer does not convey the fact.",
+    "contradicted": "Answer conflicts with the fact; record separately, do not count as full or partial."
+  },
+  "fact_order": "Exactly the order in tasks.json; expected counts V-M1=8, V-M2=6, V-M3=5, V-M4=0. These are 19 scoring positions, with weather facts repeated across questions, not 19 statistically independent observations.",
+  "grading_precedence": "Contradiction overrides full/partial. Compound checks are reminders, not exhaustive substitutes for the original fact. Accept faithful paraphrases without requiring separate repeated wording for conditions already unambiguously expressed.",
+  "compound_fact_checks": {
+    "V-M1:2": ["receiving observer acceptance", "duty operator approval"],
+    "V-M1:3": ["original reservation ID retained", "both observers recorded in audit trail"],
+    "V-M1:4": ["transfer remains pending while maintenance lock active", "acceptance and operator approval do not override lock"],
+    "V-M1:5": ["instrument team clears lock", "clearance precedes proceeding"],
+    "V-M1:8": ["wind interlock closes", "duty operator records restart approval"],
+    "V-M2:4": ["wind interlock closes", "duty operator records restart approval"],
+    "V-M2:5": ["may continue during wind suspension", "explicit indoor classification", "own safety interlocks remain closed"],
+    "V-M2:6": ["calendar roof-closed indicator insufficient for indoor classification"],
+    "V-M3:1": ["gateway compares instrument time to observatory reference", "before execution"],
+    "V-M3:2": ["absolute offset greater than two seconds", "pause execution", "notify duty operator"],
+    "V-M3:4": ["two consecutive reference checks", "offset within two seconds", "only then resume"],
+    "V-M3:5": ["missing reference keeps execution paused", "local clock alone cannot satisfy either recovery check"]
+  },
+  "delivery": "Verify source text and spans against unchanged original documents, then verify that the corresponding successful tool result actually appears in a subsequent provider request. A server output not sent to Terra is not delivery. Quote matching alone is insufficient for line-numbered or escaped text.",
+  "failure_attribution": ["fact absent from retrieval/server output", "fact returned but not delivered to provider", "fact delivered but omitted or only partially represented in final answer"],
+  "V-M4": "No mandatory cooling temperature is supported by the six allowed documents. Check final answer for invented numerical or universal requirement and for honest scope limits. Do not inspect excluded/private source.",
+  "accounting": "Use provider usage only and verify field semantics from captured records. input includes cached; uncached=input-cached. Do not add cache twice or add reasoning again when included in output. Missing usage is unknown, not zero. Sum all provider calls including continuations and retries; report failed/incomplete-session consumption separately as well as total experimental consumption.",
+  "host_preflight": "B requires successful host docs_status completion before first provider request and verified language hint in that request. Count host status separately from model-selected status. Absence of a model call alone is insufficient.",
+  "interpretation": "Four questions are diagnostic, not a statistical rollout guarantee. Compare matching successful questions; report incomplete runs and errors explicitly. Do not compute money savings without applicable cache/input/output tariffs."
+}

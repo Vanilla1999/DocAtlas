@@ -1,0 +1,526 @@
+{
+  "status": "12_COMPLETED_WITH_MEASUREMENT_GAPS",
+  "sessions": [
+    {
+      "arm": "A",
+      "task": "V-M1",
+      "usage": {
+        "input": 6350,
+        "output": 490,
+        "cached": 2944,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 3406
+      },
+      "provider_requests": 3,
+      "seconds": 19.264272084000368,
+      "model_tool_calls": {
+        "docatlas_docs_status": 1,
+        "docatlas_get_docs_context": 1
+      },
+      "actual_mcp_calls": {
+        "docs_status": 1,
+        "get_docs_context": 1
+      },
+      "qwen_pairs": 21,
+      "host_hint_binding_verified": null,
+      "host_timestamp_order_verified": null,
+      "answer": "Передачу можно подготовить, но **завершить её при активной блокировке обслуживания нельзя**:\n\n1. Получите согласие принимающего наблюдателя и одобрение передачи от дежурного оператора. Сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита. [ev-c921e34c76fdfa492bebb68b, `reservations.md:7–10`]\n2. Оставьте передачу в статусе ожидания, даже если согласие и одобрение уже получены. Сначала команда инструмента должна снять блокировку обслуживания. [ev-8c0b8ec623baa336612c0ae6, `reservations.md:11–14`]\n3. Передача не отменяет погодную приостановку: погодные решения регулируют выполнение наблюдений, а не принадлежность бронирования. Если наблюдение приостановлено из-за размыкания ветровой блокировки, возобновить его можно только после её замыкания и записи дежурным оператором разрешения на запуск. Идентификатор бронирования при приостановке сохраняется. [ev-c921e34c76fdfa492bebb68b, `reservations.md:7–10`; ev-56d4c522edb788db6d1f445e, `weather.md:1–4`; ev-159aa46f19575f991571621c, `weather.md:5–8`]\n\nУпрощённый порядок переназначения дневных учебных слотов к подтверждённым наблюдениям не применяется. [ev-db6c99cd7162ee2e647282c4, `reservations.md:15–17`]",
+      "answer_source": "runtime/receipt.json",
+      "quality": {
+        "full": 6,
+        "partial": 2,
+        "missing": 0,
+        "contradicted": 0
+      },
+      "source_facts_found": 8,
+      "source_facts_delivered": 8,
+      "quality_evidence": [
+        "semantic-review-first-two.json",
+        "semantic-review-remaining.json",
+        "parent-semantic-review.json"
+      ],
+      "measurement_gap": null
+    },
+    {
+      "arm": "B",
+      "task": "V-M1",
+      "usage": {
+        "input": 4454,
+        "output": 489,
+        "cached": 1408,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 3046
+      },
+      "provider_requests": 2,
+      "seconds": 18.242770885000027,
+      "model_tool_calls": {
+        "docatlas_get_docs_context": 1
+      },
+      "actual_mcp_calls": {
+        "docs_status": 1,
+        "get_docs_context": 1
+      },
+      "qwen_pairs": 21,
+      "host_hint_binding_verified": true,
+      "host_timestamp_order_verified": null,
+      "answer": "Передача возможна, но при активной блокировке обслуживания её нужно оставить **в ожидании**, даже если согласия уже получены.\n\n1. Получите согласие принимающего наблюдателя и одобрение передачи от дежурного оператора.\n2. Сохраните исходный идентификатор бронирования и укажите обоих наблюдателей в журнале аудита.\n3. Не завершайте передачу, пока команда инструмента не снимет блокировку обслуживания. Обновление календаря блокировку не снимает. [ev-c921e34c76fdfa492bebb68b, `reservations.md:7–10`; ev-8c0b8ec623baa336612c0ae6, `reservations.md:11–14`; ev-af3fb3da8c27448bc32cb3fd, `calendar.md:5–8`]\n\n**Погодная приостановка при передаче не меняется:** погодные решения регулируют выполнение наблюдений, а не владение бронированием. Если наружные наблюдения приостановлены из-за размыкания ветровой блокировки, возобновить их можно только после её замыкания и регистрации дежурным оператором разрешения на запуск. Идентификатор бронирования при приостановке сохраняется. [ev-c921e34c76fdfa492bebb68b, `reservations.md:7–10`; ev-56d4c522edb788db6d1f445e, `weather.md:1–4`; ev-159aa46f19575f991571621c, `weather.md:5–8`]\n\nУпрощённое переназначение инструктором для дневных учебных слотов к подтверждённым наблюдениям не применяется. [ev-db6c99cd7162ee2e647282c4, `reservations.md:15–17`]",
+      "answer_source": "runtime/receipt.json",
+      "quality": {
+        "full": 6,
+        "partial": 2,
+        "missing": 0,
+        "contradicted": 0
+      },
+      "source_facts_found": 8,
+      "source_facts_delivered": 8,
+      "quality_evidence": [
+        "semantic-review-first-two.json",
+        "semantic-review-remaining.json",
+        "parent-semantic-review.json"
+      ],
+      "measurement_gap": "Bun/Python clock epochs differ; first-request hint is verified, chronological timestamp ordering unknown"
+    },
+    {
+      "arm": "C",
+      "task": "V-M1",
+      "usage": {
+        "input": 5818,
+        "output": 769,
+        "cached": 1152,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 4666
+      },
+      "provider_requests": 3,
+      "seconds": 17.977134443000068,
+      "model_tool_calls": {
+        "grep": 1,
+        "glob": 1,
+        "read": 6
+      },
+      "actual_mcp_calls": {},
+      "qwen_pairs": null,
+      "host_hint_binding_verified": null,
+      "host_timestamp_order_verified": null,
+      "answer": "Для подтверждённого ночного наблюдения на общем инструменте порядок такой:\n\n1. Получите согласие принимающего наблюдателя и одобрение дежурного оператора.\n2. Пока действует блокировка обслуживания, **оставьте передачу в ожидании**, даже если оба согласия уже получены. Сначала блокировку должна снять команда инструмента.\n3. При передаче сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита. Погодная приостановка при передаче не изменяется. [reservations.md, строки 1–13](reservations.md#transfer)\n\nПогодное решение управляет **выполнением**, а не принадлежностью бронирования. Если наружные наблюдения приостановлены из-за размыкания ветровой блокировки, возобновить их можно только после её замыкания и регистрации разрешения на перезапуск дежурным оператором. Благоприятный прогноз сам по себе не разрешает перезапуск. [weather.md, строки 1–7, 13–15](weather.md#suspension)\n\nИсключение: инструмент, **явно классифицированный как находящийся в помещении**, может продолжать работу во время ветровой приостановки, если его собственные защитные блокировки замкнуты. Изображение закрытой крыши в календаре такой классификации не подтверждает. [weather.md, строки 9–11](weather.md#indoor-instrument)\n\nКалендарь служит только представлением состояния: его обновление не снимает блокировку обслуживания и не разрешает выполнение. Упрощённая передача дневного учебного слота инструктором к подтверждённому наблюдению не применяется. [calendar.md, строки 1–7](calendar.md#colours); [reservations.md, строки 15–17](reservations.md#training-slots)",
+      "answer_source": "runtime/receipt.json",
+      "quality": {
+        "full": 6,
+        "partial": 2,
+        "missing": 0,
+        "contradicted": 0
+      },
+      "source_facts_found": 8,
+      "source_facts_delivered": 8,
+      "quality_evidence": [
+        "semantic-review-first-two.json",
+        "semantic-review-remaining.json",
+        "parent-semantic-review.json"
+      ],
+      "measurement_gap": null
+    },
+    {
+      "arm": "A",
+      "task": "V-M2",
+      "usage": {
+        "input": 5843,
+        "output": 264,
+        "cached": 2944,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 2899
+      },
+      "provider_requests": 3,
+      "seconds": 14.700132217999453,
+      "model_tool_calls": {
+        "docatlas_docs_status": 1,
+        "docatlas_get_docs_context": 1
+      },
+      "actual_mcp_calls": {
+        "docs_status": 1,
+        "get_docs_context": 1
+      },
+      "qwen_pairs": 21,
+      "host_hint_binding_verified": null,
+      "host_timestamp_order_verified": null,
+      "answer": "- **Stop:** Suspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during the suspension. [ev-159aa46f19575f991571621c, `weather.md:5–8`]\n- **Restart:** Resume only after the interlock closes **and** the duty operator records restart approval. A favourable forecast cannot authorize a restart. [ev-159aa46f19575f991571621c, `weather.md:5–8`; ev-d7ad6e3c0ae0215b63ed8bb6, `weather.md:13–15`]\n- **Indoor instrument:** It may continue during a wind suspension if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish indoor classification. [ev-0999a181d992f67ebae5ac73, `weather.md:9–12`]",
+      "answer_source": "runtime/receipt.json",
+      "quality": {
+        "full": 5,
+        "partial": 0,
+        "missing": 1,
+        "contradicted": 0
+      },
+      "source_facts_found": 6,
+      "source_facts_delivered": 6,
+      "quality_evidence": [
+        "semantic-review-first-two.json",
+        "semantic-review-remaining.json",
+        "parent-semantic-review.json"
+      ],
+      "measurement_gap": null
+    },
+    {
+      "arm": "B",
+      "task": "V-M2",
+      "usage": {
+        "input": 3960,
+        "output": 233,
+        "cached": 1408,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 2552
+      },
+      "provider_requests": 2,
+      "seconds": 13.684908901000199,
+      "model_tool_calls": {
+        "docatlas_get_docs_context": 1
+      },
+      "actual_mcp_calls": {
+        "docs_status": 1,
+        "get_docs_context": 1
+      },
+      "qwen_pairs": 21,
+      "host_hint_binding_verified": true,
+      "host_timestamp_order_verified": true,
+      "answer": "- **Stop outdoor observations** when the wind interlock opens. Preserve reservation identifiers during the suspension. [ev-159aa46f19575f991571621c, `weather.md:5–8`]\n- **Restart only after** the interlock closes and the duty operator records a restart approval. A favourable forecast alone cannot authorize a restart. [ev-159aa46f19575f991571621c, `weather.md:5–8`; ev-d7ad6e3c0ae0215b63ed8bb6, `weather.md:13–15`]\n- **An indoor instrument may continue** if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish that classification. [ev-0999a181d992f67ebae5ac73, `weather.md:9–12`]",
+      "answer_source": "runtime/receipt.json",
+      "quality": {
+        "full": 5,
+        "partial": 0,
+        "missing": 1,
+        "contradicted": 0
+      },
+      "source_facts_found": 6,
+      "source_facts_delivered": 6,
+      "quality_evidence": [
+        "semantic-review-first-two.json",
+        "semantic-review-remaining.json",
+        "parent-semantic-review.json"
+      ],
+      "measurement_gap": null
+    },
+    {
+      "arm": "C",
+      "task": "V-M2",
+      "usage": {
+        "input": 4364,
+        "output": 217,
+        "cached": 1280,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 3084
+      },
+      "provider_requests": 3,
+      "seconds": 7.619260710000162,
+      "model_tool_calls": {
+        "grep": 1,
+        "read": 1
+      },
+      "actual_mcp_calls": {},
+      "qwen_pairs": null,
+      "host_hint_binding_verified": null,
+      "host_timestamp_order_verified": null,
+      "answer": "- **Stop outdoor observations** when the wind interlock opens. Preserve reservation identifiers during the suspension. (`weather.md`, lines 3–7)\n- **Restart only after** the interlock closes **and** the duty operator records restart approval. A favourable forecast cannot authorize a restart. (`weather.md`, lines 7, 13–15)\n- **An indoor instrument may continue** during the wind suspension if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish indoor classification. (`weather.md`, lines 9–11)",
+      "answer_source": "runtime/receipt.json",
+      "quality": {
+        "full": 5,
+        "partial": 0,
+        "missing": 1,
+        "contradicted": 0
+      },
+      "source_facts_found": 6,
+      "source_facts_delivered": 6,
+      "quality_evidence": [
+        "semantic-review-first-two.json",
+        "semantic-review-remaining.json",
+        "parent-semantic-review.json"
+      ],
+      "measurement_gap": null
+    },
+    {
+      "arm": "A",
+      "task": "V-M3",
+      "usage": {
+        "input": 6041,
+        "output": 255,
+        "cached": 1664,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 4377
+      },
+      "provider_requests": 3,
+      "seconds": 14.051254456000606,
+      "model_tool_calls": {
+        "docatlas_docs_status": 1,
+        "docatlas_get_docs_context": 1
+      },
+      "actual_mcp_calls": {
+        "docs_status": 1,
+        "get_docs_context": 1
+      },
+      "qwen_pairs": 21,
+      "host_hint_binding_verified": null,
+      "host_timestamp_order_verified": null,
+      "answer": "If the absolute offset between instrument time and the observatory reference **exceeds two seconds**, the gateway must:\n\n1. Pause schedule execution and notify the duty operator.\n2. Keep queued reservations unchanged.\n3. Resume only after **two consecutive reference checks** report an offset within two seconds. [ev-7ff924db065d30bda70fa508, `clock.md:5–8`]\n\nIf the reference clock is unavailable, execution must remain paused; a local clock reading alone cannot satisfy either recovery check. [ev-7431ef82d2347181ffe5f433, `clock.md:9–12`]\n\nThe retired prototype’s behavior—clearing pending reservations and restarting on the first local clock sample—must not be used for the current gateway. [ev-74eb9cba956360994f654dbe, `architecture.md:9–11`]",
+      "answer_source": "runtime/receipt.json",
+      "quality": {
+        "full": 4,
+        "partial": 0,
+        "missing": 1,
+        "contradicted": 0
+      },
+      "source_facts_found": 5,
+      "source_facts_delivered": 5,
+      "quality_evidence": [
+        "semantic-review-first-two.json",
+        "semantic-review-remaining.json",
+        "parent-semantic-review.json"
+      ],
+      "measurement_gap": null
+    },
+    {
+      "arm": "B",
+      "task": "V-M3",
+      "usage": {
+        "input": 4162,
+        "output": 216,
+        "cached": 1408,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 2754
+      },
+      "provider_requests": 2,
+      "seconds": 13.467858248000084,
+      "model_tool_calls": {
+        "docatlas_get_docs_context": 1
+      },
+      "actual_mcp_calls": {
+        "docs_status": 1,
+        "get_docs_context": 1
+      },
+      "qwen_pairs": 21,
+      "host_hint_binding_verified": true,
+      "host_timestamp_order_verified": true,
+      "answer": "If the gateway’s **absolute clock offset exceeds two seconds**, it must pause schedule execution, notify the duty operator, and leave queued reservations unchanged. It may resume only after **two consecutive reference-clock checks** each report an offset within two seconds. [ev-7ff924db065d30bda70fa508, `clock.md:5–8`]\n\nIf the reference clock is unavailable, the gateway must remain paused: a local clock reading alone cannot satisfy either recovery check. [ev-7431ef82d2347181ffe5f433, `clock.md:9–12`] It must not use the retired prototype’s recovery behavior of clearing pending reservations and restarting on the first local clock sample. [ev-74eb9cba956360994f654dbe, `architecture.md:9–11`]",
+      "answer_source": "runtime/receipt.json",
+      "quality": {
+        "full": 4,
+        "partial": 0,
+        "missing": 1,
+        "contradicted": 0
+      },
+      "source_facts_found": 5,
+      "source_facts_delivered": 5,
+      "quality_evidence": [
+        "semantic-review-first-two.json",
+        "semantic-review-remaining.json",
+        "parent-semantic-review.json"
+      ],
+      "measurement_gap": null
+    },
+    {
+      "arm": "C",
+      "task": "V-M3",
+      "usage": {
+        "input": 6076,
+        "output": 404,
+        "cached": 3712,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 2364
+      },
+      "provider_requests": 4,
+      "seconds": 12.69807544700052,
+      "model_tool_calls": {
+        "grep": 2,
+        "read": 3
+      },
+      "actual_mcp_calls": {},
+      "qwen_pairs": null,
+      "host_hint_binding_verified": null,
+      "host_timestamp_order_verified": null,
+      "answer": "If the absolute offset between instrument time and the observatory reference **exceeds two seconds**, the gateway must pause schedule execution, notify the duty operator, and leave queued reservations unchanged. It may resume only after **two consecutive reference checks** each report an offset within two seconds. [clock.md:3–7](clock.md#L3-L7)\n\nIf the reference clock is unavailable, execution must remain paused: a local clock reading alone cannot satisfy either recovery check. [clock.md:9–11](clock.md#L9-L11)\n\nThe gateway must not use the retired prototype’s recovery behavior of clearing pending reservations or restarting on the first local clock sample. A planner may compute a plan while execution is suspended, but that plan does not bypass the clock check or a weather interlock. [architecture.md:5–11](architecture.md#L5-L11)",
+      "answer_source": "runtime/receipt.json",
+      "quality": {
+        "full": 4,
+        "partial": 0,
+        "missing": 1,
+        "contradicted": 0
+      },
+      "source_facts_found": 5,
+      "source_facts_delivered": 5,
+      "quality_evidence": [
+        "semantic-review-first-two.json",
+        "semantic-review-remaining.json",
+        "parent-semantic-review.json"
+      ],
+      "measurement_gap": null
+    },
+    {
+      "arm": "A",
+      "task": "V-M4",
+      "usage": {
+        "input": 8108,
+        "output": 236,
+        "cached": 4992,
+        "cache_write": 0,
+        "reasoning": 11,
+        "uncached": 3116
+      },
+      "provider_requests": 4,
+      "seconds": 18.135183241999584,
+      "model_tool_calls": {
+        "docatlas_docs_status": 1,
+        "docatlas_get_docs_context": 2
+      },
+      "actual_mcp_calls": {
+        "docs_status": 1,
+        "get_docs_context": 2
+      },
+      "qwen_pairs": 42,
+      "host_hint_binding_verified": null,
+      "host_timestamp_order_verified": null,
+      "answer": "Не удалось найти в документации подтверждение температуры охлаждения, обязательной для всех общих приборов обсерватории. Это не доказывает, что такого требования нет.",
+      "answer_source": "runtime/receipt.json",
+      "quality": null,
+      "source_facts_found": null,
+      "source_facts_delivered": null,
+      "quality_evidence": [
+        "no-answer-review.json"
+      ],
+      "measurement_gap": null
+    },
+    {
+      "arm": "B",
+      "task": "V-M4",
+      "usage": {
+        "input": 6028,
+        "output": 212,
+        "cached": 3200,
+        "cache_write": 0,
+        "reasoning": 11,
+        "uncached": 2828
+      },
+      "provider_requests": 3,
+      "seconds": null,
+      "model_tool_calls": {
+        "docatlas_get_docs_context": 2
+      },
+      "actual_mcp_calls": {
+        "docs_status": 1,
+        "get_docs_context": 2
+      },
+      "qwen_pairs": 42,
+      "host_hint_binding_verified": true,
+      "host_timestamp_order_verified": true,
+      "answer": "Не удалось найти в доступной документации подтверждение температуры охлаждения, обязательной для всех общих приборов обсерватории. Поэтому назвать такую температуру или утверждать, что единого требования нет, нельзя.",
+      "answer_source": "recovery-02/B-provider-completion.json + B-session-export.json",
+      "quality": null,
+      "source_facts_found": null,
+      "source_facts_delivered": null,
+      "quality_evidence": [
+        "no-answer-review.json"
+      ],
+      "measurement_gap": "Coordinator killed by outer 120-second tool timeout; provider results complete, CLI incomplete, end-to-end seconds unknown"
+    },
+    {
+      "arm": "C",
+      "task": "V-M4",
+      "usage": {
+        "input": 6638,
+        "output": 337,
+        "cached": 3712,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 2926
+      },
+      "provider_requests": 4,
+      "seconds": 11.531650608000746,
+      "model_tool_calls": {
+        "grep": 1,
+        "glob": 1,
+        "read": 4
+      },
+      "actual_mcp_calls": {},
+      "qwen_pairs": null,
+      "host_hint_binding_verified": null,
+      "host_timestamp_order_verified": null,
+      "answer": "В доступной документации проекта не указана обязательная температура охлаждения для всех общих приборов обсерватории. Проект Meridian описывает планирование работы таких приборов и правила наблюдений, а не требования к их охлаждению ([overview.md:1–7](overview.md#L1-L7)).",
+      "answer_source": "runtime/receipt.json",
+      "quality": null,
+      "source_facts_found": null,
+      "source_facts_delivered": null,
+      "quality_evidence": [
+        "no-answer-review.json"
+      ],
+      "measurement_gap": null
+    }
+  ],
+  "totals": {
+    "A": {
+      "usage": {
+        "input": 26342,
+        "cached": 12544,
+        "uncached": 13798,
+        "output": 1245
+      },
+      "provider_requests": 13,
+      "sessions": 4,
+      "source_facts_found": 19,
+      "source_facts_delivered": 19,
+      "quality": {
+        "full": 15,
+        "partial": 2,
+        "missing": 2,
+        "contradicted": 0
+      },
+      "measured_session_seconds": 66.15084200000001,
+      "timing_complete": true
+    },
+    "B": {
+      "usage": {
+        "input": 18604,
+        "cached": 7424,
+        "uncached": 11180,
+        "output": 1150
+      },
+      "provider_requests": 9,
+      "sessions": 4,
+      "source_facts_found": 19,
+      "source_facts_delivered": 19,
+      "quality": {
+        "full": 15,
+        "partial": 2,
+        "missing": 2,
+        "contradicted": 0
+      },
+      "measured_session_seconds": 45.39553803400031,
+      "timing_complete": false
+    },
+    "C": {
+      "usage": {
+        "input": 22896,
+        "cached": 9856,
+        "uncached": 13040,
+        "output": 1727
+      },
+      "provider_requests": 14,
+      "sessions": 4,
+      "source_facts_found": 19,
+      "source_facts_delivered": 19,
+      "quality": {
+        "full": 15,
+        "partial": 2,
+        "missing": 2,
+        "contradicted": 0
+      },
+      "measured_session_seconds": 49.826121208001496,
+      "timing_complete": true
+    }
+  },
+  "model_retries": 0,
+  "orchestration_agent_usage_included": false
+}

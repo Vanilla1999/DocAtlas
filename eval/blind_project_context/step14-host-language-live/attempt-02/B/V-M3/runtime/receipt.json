@@ -1,0 +1,90 @@
+{
+  "session_status": "finished",
+  "retrieval_status": "succeeded",
+  "answer_status": "produced",
+  "answer": "If the gateway’s **absolute clock offset exceeds two seconds**, it must pause schedule execution, notify the duty operator, and leave queued reservations unchanged. It may resume only after **two consecutive reference-clock checks** each report an offset within two seconds. [ev-7ff924db065d30bda70fa508, `clock.md:5–8`]\n\nIf the reference clock is unavailable, the gateway must remain paused: a local clock reading alone cannot satisfy either recovery check. [ev-7431ef82d2347181ffe5f433, `clock.md:9–12`] It must not use the retired prototype’s recovery behavior of clearing pending reservations and restarting on the first local clock sample. [ev-74eb9cba956360994f654dbe, `architecture.md:9–11`]",
+  "failures": [],
+  "capture_errors": [],
+  "tool_calls": 1,
+  "retrieval_calls": 1,
+  "expected_host_rejections": [],
+  "transport_pass": true,
+  "answer_quality": "not_graded",
+  "termination": null,
+  "returncode": 0,
+  "seconds": 13.467858248000084,
+  "cleanup": {
+    "strategy": "held private group plus explicitly registered MCP pidfds; no foreign-group signals",
+    "group": 223142,
+    "observed_processes": [
+      {
+        "pid": 223142,
+        "state": "Z",
+        "pgid": 223142,
+        "sid": 223142,
+        "start_ticks": 652238,
+        "name": "opencode"
+      },
+      {
+        "pid": 223187,
+        "state": "S",
+        "pgid": 223187,
+        "sid": 223187,
+        "start_ticks": 652301,
+        "name": "python",
+        "role": "transport",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M3/mcp-process.json"
+      },
+      {
+        "pid": 223188,
+        "state": "R",
+        "pgid": 223187,
+        "sid": 223187,
+        "start_ticks": 652303,
+        "name": "doc-atlas",
+        "role": "server",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M3/mcp-process.json"
+      }
+    ],
+    "before_cleanup": [
+      {
+        "pid": 223142,
+        "state": "Z",
+        "pgid": 223142,
+        "sid": 223142,
+        "start_ticks": 652238,
+        "name": "opencode"
+      }
+    ],
+    "signals": [],
+    "remaining_live": [],
+    "escaped_live_observed": [],
+    "registered_processes": [
+      {
+        "role": "transport",
+        "pid": 223187,
+        "pgid": 223187,
+        "sid": 223187,
+        "start_ticks": 652301,
+        "pid_namespace": "pid:[4026531836]",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M3/mcp-process.json",
+        "exit_verified": true
+      },
+      {
+        "role": "server",
+        "pid": 223188,
+        "pgid": 223187,
+        "sid": 223187,
+        "start_ticks": 652303,
+        "pid_namespace": "pid:[4026531836]",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M3/mcp-process.json",
+        "exit_verified": true
+      }
+    ],
+    "registration_errors": {},
+    "no_live_owned_processes": true,
+    "leader_reaped": true,
+    "boundary": "Private group plus explicit MCP launch registrations/observed identities; unseen detached descendants and GPU VRAM are not measured."
+  },
+  "provider_capture_completed_before_cleanup": true
+}

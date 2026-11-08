@@ -1,0 +1,16 @@
+{
+  "phase": "after_explicit_download_and_install_authorization",
+  "supersedes_readiness_in": "local-assets-check.json",
+  "installation_status": "PASS",
+  "model": "Qwen/Qwen3-Reranker-0.6B",
+  "revision": "e61197ed45024b0ed8a2d74b80b4d909f1255473",
+  "root": "/home/viadmin/.local/share/docatlas-eval/step14",
+  "wheel_sha256": "0a7c36ff9f2b3066e6c810bdeca39a2f126458446f3c16a919ba5ac59afccadb",
+  "policy_sha256": "16fb92b9687d68c30cdc8bfa8656b20d512da2b9b8600497ed78a0f5742d0f11",
+  "checks": ["9 pinned assets size and SHA256", "installed scorer.verify_assets", "441 wheel Python files match worktree", "exact scorer.RUNTIME match", "CUDA BF16 matrix multiplication", "dependency check"],
+  "parent_reviewed_logs": ["install/gpu-check.log", "install/wheel-check.log", "install/install-offline.log"],
+  "installation_error": "First install ran out of disk space; offline installation using hardlinked cache succeeded. This is an installation retry, not a model/session retry.",
+  "model_inference_tested": false,
+  "comparison_sessions_run_at_this_phase": 0,
+  "note": "Runtime readiness does not prove retrieval, host preflight, provider token usage or answer quality."
+}

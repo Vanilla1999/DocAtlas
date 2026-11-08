@@ -1,0 +1,49 @@
+{
+  "session_status": "finished",
+  "retrieval_status": "succeeded",
+  "answer_status": "produced",
+  "answer": "Для подтверждённого ночного наблюдения на общем инструменте порядок такой:\n\n1. Получите согласие принимающего наблюдателя и одобрение дежурного оператора.\n2. Пока действует блокировка обслуживания, **оставьте передачу в ожидании**, даже если оба согласия уже получены. Сначала блокировку должна снять команда инструмента.\n3. При передаче сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита. Погодная приостановка при передаче не изменяется. [reservations.md, строки 1–13](reservations.md#transfer)\n\nПогодное решение управляет **выполнением**, а не принадлежностью бронирования. Если наружные наблюдения приостановлены из-за размыкания ветровой блокировки, возобновить их можно только после её замыкания и регистрации разрешения на перезапуск дежурным оператором. Благоприятный прогноз сам по себе не разрешает перезапуск. [weather.md, строки 1–7, 13–15](weather.md#suspension)\n\nИсключение: инструмент, **явно классифицированный как находящийся в помещении**, может продолжать работу во время ветровой приостановки, если его собственные защитные блокировки замкнуты. Изображение закрытой крыши в календаре такой классификации не подтверждает. [weather.md, строки 9–11](weather.md#indoor-instrument)\n\nКалендарь служит только представлением состояния: его обновление не снимает блокировку обслуживания и не разрешает выполнение. Упрощённая передача дневного учебного слота инструктором к подтверждённому наблюдению не применяется. [calendar.md, строки 1–7](calendar.md#colours); [reservations.md, строки 15–17](reservations.md#training-slots)",
+  "failures": [],
+  "capture_errors": [],
+  "tool_calls": 8,
+  "retrieval_calls": 8,
+  "expected_host_rejections": [],
+  "transport_pass": true,
+  "answer_quality": "not_graded",
+  "termination": null,
+  "returncode": 0,
+  "seconds": 17.977134443000068,
+  "cleanup": {
+    "strategy": "held private group plus explicitly registered MCP pidfds; no foreign-group signals",
+    "group": 220388,
+    "observed_processes": [
+      {
+        "pid": 220388,
+        "state": "Z",
+        "pgid": 220388,
+        "sid": 220388,
+        "start_ticks": 645378,
+        "name": "opencode"
+      }
+    ],
+    "before_cleanup": [
+      {
+        "pid": 220388,
+        "state": "Z",
+        "pgid": 220388,
+        "sid": 220388,
+        "start_ticks": 645378,
+        "name": "opencode"
+      }
+    ],
+    "signals": [],
+    "remaining_live": [],
+    "escaped_live_observed": [],
+    "registered_processes": [],
+    "registration_errors": {},
+    "no_live_owned_processes": true,
+    "leader_reaped": true,
+    "boundary": "Private group plus explicit MCP launch registrations/observed identities; unseen detached descendants and GPU VRAM are not measured."
+  },
+  "provider_capture_completed_before_cleanup": true
+}

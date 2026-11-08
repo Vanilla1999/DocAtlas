@@ -1,0 +1,18 @@
+{
+  "status": "IMPLEMENTED_STATIC_CHECKS_PASS_SETUP_BLOCKED",
+  "immutable_input_checker": "PASS",
+  "python_ast": "PASS run.py/account.py/observe_stdio.py/session_runtime.py",
+  "node_check": "PASS observer/index.js",
+  "opencode_version": "opencode v2.2.5",
+  "installed_wheel_assets_runtime_check": "PASS; see attempt-01/qualification.json",
+  "public_prepare_docs_calls": 0,
+  "provider_calls": 0,
+  "model_inference_calls": 0,
+  "setup_failure": "attempt-01/setup-failure.json",
+  "remaining_boundary": "No active snapshot or 12 profiles yet. Storage policy rejects existing 0775 ancestors outside authorized write scope. No live capture/cleanup or model quality claim.",
+  "gpu_observation": "Post-setup nvidia-smi showed only PID 192996, independently identified with ps as pre-existing Blender. No signal was sent to it.",
+  "shared_server_operations": 0,
+  "original_reports_modified": false,
+  "credentials_copied": false,
+  "commit_or_push": false
+}

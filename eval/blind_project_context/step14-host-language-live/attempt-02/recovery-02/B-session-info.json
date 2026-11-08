@@ -1,0 +1,33 @@
+{
+  "data": {
+    "id": "ses_e45ba8e12ffemMNVd4DWE6CSaC",
+    "projectID": "dea28f96172db19a86c7696f69e47e300f6eb77d",
+    "agent": "measure",
+    "model": {
+      "id": "gpt-6.1-terra",
+      "providerID": "openai",
+      "variant": "low"
+    },
+    "cost": 0,
+    "tokens": {
+      "input": 2828,
+      "output": 201,
+      "reasoning": 11,
+      "cache": {
+        "read": 3200,
+        "write": 0
+      }
+    },
+    "outcome": "succeeded",
+    "time": {
+      "created": 1794126475763,
+      "updated": 1794126490167,
+      "busy": 1794126477481,
+      "idle": 1794126490169
+    },
+    "title": "Step14 B V-M4",
+    "location": {
+      "directory": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-02/locations/B/V-M4"
+    }
+  }
+}

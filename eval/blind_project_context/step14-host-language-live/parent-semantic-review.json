@@ -1,0 +1,17 @@
+{
+  "basis": "Parent read actual final answers from runtime/receipt.json, unchanged tasks.json and original Meridian source documents. Fact ordering is 1-based tasks.json order. Historical Step12 partial-stop-duty criterion retained.",
+  "records": [
+    {"arm":"A","task":"V-M1","grades":["partial","full","full","full","full","partial","full","full"],"notes":{"1":"Confirmed-observation versus training distinction conveyed; night-time context already in question need not be repeated mechanically. Shared-instrument restriction absent from both question and answer.","6":"Describes an observation already suspended because of wind interlock opening; no explicit duty to stop."}},
+    {"arm":"B","task":"V-M1","grades":["partial","full","full","full","full","partial","full","full"],"notes":{"1":"Confirmed-observation versus training distinction conveyed; night-time context already in question need not be repeated mechanically. Shared-instrument restriction absent from both question and answer.","6":"Describes already suspended outdoor observations; no explicit duty to stop."}},
+    {"arm":"C","task":"V-M1","grades":["full","full","full","full","full","partial","partial","full"],"notes":{"6":"Already suspended outdoor observations, not explicit stop-duty.","7":"Identifier preservation stated for transfer, not explicitly during suspension."}},
+    {"arm":"A","task":"V-M2","grades":["missing","full","full","full","full","full"],"notes":{"1":"Execution versus ownership distinction omitted."}},
+    {"arm":"B","task":"V-M2","grades":["missing","full","full","full","full","full"],"notes":{"1":"Execution versus ownership distinction omitted."}},
+    {"arm":"C","task":"V-M2","grades":["missing","full","full","full","full","full"],"notes":{"1":"Execution versus ownership distinction omitted."}},
+    {"arm":"A","task":"V-M3","grades":["missing","full","full","full","full"],"notes":{"1":"Pre-execution reference comparison omitted; naming time sources in offset definition does not state when comparison is mandatory."}},
+    {"arm":"B","task":"V-M3","grades":["missing","full","full","full","full"],"notes":{"1":"Pre-execution reference comparison omitted."}},
+    {"arm":"C","task":"V-M3","grades":["missing","full","full","full","full"],"notes":{"1":"Pre-execution comparison duty omitted. A supporting citation including line 3 is not an answer statement."}}
+  ],
+  "per_arm_answerable_totals":{"A":{"full":15,"partial":2,"missing":2,"contradicted":0},"B":{"full":15,"partial":2,"missing":2,"contradicted":0},"C":{"full":15,"partial":2,"missing":2,"contradicted":0}},
+  "delivery": "Separate independent provider-body/source-span audit; do not infer delivery from these answer grades.",
+  "V-M4":"A correctly says requirement was not found and does not claim global absence. B/C pending parent review at this phase."
+}

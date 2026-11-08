@@ -1,0 +1,206 @@
+[
+  {
+    "arm": "A",
+    "task": "V-M1",
+    "provider_requests": 3,
+    "usage": {
+      "input_tokens": 6350,
+      "output_tokens": 490,
+      "cached_tokens": 2944,
+      "uncached_tokens": 3406
+    },
+    "response_ids": [
+      "resp_0f56f582f31f29a6016af030fcb74887d28ff81f4574eec665",
+      "resp_0f56f582f31f29a6016af030fe9ce087d28830b30002dcd7f0",
+      "resp_0f56f582f31f29a6016af0310541ac87d2bd7a61e474521e10"
+    ],
+    "status": "PASS_PROVIDER_IDENTITY_AND_USAGE"
+  },
+  {
+    "arm": "B",
+    "task": "V-M1",
+    "provider_requests": 2,
+    "usage": {
+      "input_tokens": 4454,
+      "output_tokens": 489,
+      "cached_tokens": 1408,
+      "uncached_tokens": 3046
+    },
+    "response_ids": [
+      "resp_0b5538720dc8a568016af03110516887d2966a29a146f12ba0",
+      "resp_0b5538720dc8a568016af03116f51487d2acc95a0f8ddf65d1"
+    ],
+    "status": "PASS_PROVIDER_IDENTITY_AND_USAGE"
+  },
+  {
+    "arm": "C",
+    "task": "V-M1",
+    "provider_requests": 3,
+    "usage": {
+      "input_tokens": 5818,
+      "output_tokens": 769,
+      "cached_tokens": 1152,
+      "uncached_tokens": 4666
+    },
+    "response_ids": [
+      "resp_0e130663e5ae60e9016af0321be29c87d2a2484442a5ca639c",
+      "resp_0e130663e5ae60e9016af0321f070487d29800f52540533033",
+      "resp_0e130663e5ae60e9016af03224417087d2b99c0693e565b6fd"
+    ],
+    "status": "PASS_PROVIDER_IDENTITY_AND_USAGE"
+  },
+  {
+    "arm": "A",
+    "task": "V-M2",
+    "provider_requests": 3,
+    "usage": {
+      "input_tokens": 5843,
+      "output_tokens": 264,
+      "cached_tokens": 2944,
+      "uncached_tokens": 2899
+    },
+    "response_ids": [
+      "resp_06a58d75a554a29f016af0322ec49087d2b637b69212e75c3c",
+      "resp_06a58d75a554a29f016af032309d5087d2a8ca6cbc4c33154e",
+      "resp_06a58d75a554a29f016af03236775c87d29fd8af9e6c71a22f"
+    ],
+    "status": "PASS_PROVIDER_IDENTITY_AND_USAGE"
+  },
+  {
+    "arm": "B",
+    "task": "V-M2",
+    "provider_requests": 2,
+    "usage": {
+      "input_tokens": 3960,
+      "output_tokens": 233,
+      "cached_tokens": 1408,
+      "uncached_tokens": 2552
+    },
+    "response_ids": [
+      "resp_0f4a911bdbf07a53016af0323dd7bc87d2949dec6f241fe1bc",
+      "resp_0f4a911bdbf07a53016af032442a6487d2914eb91ac81c33f8"
+    ],
+    "status": "PASS_PROVIDER_IDENTITY_AND_USAGE"
+  },
+  {
+    "arm": "C",
+    "task": "V-M2",
+    "provider_requests": 3,
+    "usage": {
+      "input_tokens": 4364,
+      "output_tokens": 217,
+      "cached_tokens": 1280,
+      "uncached_tokens": 3084
+    },
+    "response_ids": [
+      "resp_0a80fcb940c0901a016af0324a3cd087d29cf910a5f5338655",
+      "resp_0a80fcb940c0901a016af0324c225c87d286024ad0b17d9100",
+      "resp_0a80fcb940c0901a016af0324db97c87d28856f6780c9e3afd"
+    ],
+    "status": "PASS_PROVIDER_IDENTITY_AND_USAGE"
+  },
+  {
+    "arm": "A",
+    "task": "V-M3",
+    "provider_requests": 3,
+    "usage": {
+      "input_tokens": 6041,
+      "output_tokens": 255,
+      "cached_tokens": 1664,
+      "uncached_tokens": 4377
+    },
+    "response_ids": [
+      "resp_084b4ca3bbedbd65016af03252f68c87d286644ebae29085cd",
+      "resp_084b4ca3bbedbd65016af03254b2fc87d2a6690f8fb1ed9348",
+      "resp_084b4ca3bbedbd65016af0325a308087d2a69d184633dc7e61"
+    ],
+    "status": "PASS_PROVIDER_IDENTITY_AND_USAGE"
+  },
+  {
+    "arm": "B",
+    "task": "V-M3",
+    "provider_requests": 2,
+    "usage": {
+      "input_tokens": 4162,
+      "output_tokens": 216,
+      "cached_tokens": 1408,
+      "uncached_tokens": 2754
+    },
+    "response_ids": [
+      "resp_0b63a50a2ed1c022016af03262172887d28c66dada2aaf6878",
+      "resp_0b63a50a2ed1c022016af03267f0cc87d2958c551e2b68d8b6"
+    ],
+    "status": "PASS_PROVIDER_IDENTITY_AND_USAGE"
+  },
+  {
+    "arm": "C",
+    "task": "V-M3",
+    "provider_requests": 4,
+    "usage": {
+      "input_tokens": 6076,
+      "output_tokens": 404,
+      "cached_tokens": 3712,
+      "uncached_tokens": 2364
+    },
+    "response_ids": [
+      "resp_0f6f6c21e6e0b0f3016af0326dbf2087d2be4cac6a4702e912",
+      "resp_0f6f6c21e6e0b0f3016af0326fc21087d2a1fca5e29db00d6c",
+      "resp_0f6f6c21e6e0b0f3016af03271c1b887d2a5194969396981b4",
+      "resp_0f6f6c21e6e0b0f3016af03275107487d2887ed64cdeb06b9b"
+    ],
+    "status": "PASS_PROVIDER_IDENTITY_AND_USAGE"
+  },
+  {
+    "arm": "A",
+    "task": "V-M4",
+    "provider_requests": 4,
+    "usage": {
+      "input_tokens": 8108,
+      "output_tokens": 236,
+      "cached_tokens": 4992,
+      "uncached_tokens": 3116
+    },
+    "response_ids": [
+      "resp_01169fabe92b06ac016af0327bb19487d2a6021b3c76bd8a51",
+      "resp_01169fabe92b06ac016af0327db78087d290167174c9f835ec",
+      "resp_01169fabe92b06ac016af03283877087d2ac8285c75c881fbf",
+      "resp_01169fabe92b06ac016af03289376087d2ae21523135669fbb"
+    ],
+    "status": "PASS_PROVIDER_IDENTITY_AND_USAGE"
+  },
+  {
+    "arm": "B",
+    "task": "V-M4",
+    "provider_requests": 3,
+    "usage": {
+      "input_tokens": 6028,
+      "output_tokens": 212,
+      "cached_tokens": 3200,
+      "uncached_tokens": 2828
+    },
+    "response_ids": [
+      "resp_0c584dbfad1ba2a4016af0328e31e087d2aaf65907a22342cc",
+      "resp_0c584dbfad1ba2a4016af03294190c87d2bb603c3b4d02ac0f",
+      "resp_0c584dbfad1ba2a4016af03298b1b487d28bc21b10b3883777"
+    ],
+    "status": "PASS_PROVIDER_IDENTITY_AND_USAGE"
+  },
+  {
+    "arm": "C",
+    "task": "V-M4",
+    "provider_requests": 4,
+    "usage": {
+      "input_tokens": 6638,
+      "output_tokens": 337,
+      "cached_tokens": 3712,
+      "uncached_tokens": 2926
+    },
+    "response_ids": [
+      "resp_096edf92e75d2e76016af03374c2d487d28ff353b3219e2505",
+      "resp_096edf92e75d2e76016af0337727a887d2a21bb4cb15627656",
+      "resp_096edf92e75d2e76016af033790d6487d29453a7b705acb07b",
+      "resp_096edf92e75d2e76016af0337d0ab487d2b7a5a78f85331f03"
+    ],
+    "status": "PASS_PROVIDER_IDENTITY_AND_USAGE"
+  }
+]

@@ -1,0 +1,49 @@
+{
+  "session_status": "finished",
+  "retrieval_status": "succeeded",
+  "answer_status": "produced",
+  "answer": "В доступной документации проекта не указана обязательная температура охлаждения для всех общих приборов обсерватории. Проект Meridian описывает планирование работы таких приборов и правила наблюдений, а не требования к их охлаждению ([overview.md:1–7](overview.md#L1-L7)).",
+  "failures": [],
+  "capture_errors": [],
+  "tool_calls": 6,
+  "retrieval_calls": 6,
+  "expected_host_rejections": [],
+  "transport_pass": true,
+  "answer_quality": "not_graded",
+  "termination": null,
+  "returncode": 0,
+  "seconds": 11.531650608000746,
+  "cleanup": {
+    "strategy": "held private group plus explicitly registered MCP pidfds; no foreign-group signals",
+    "group": 232822,
+    "observed_processes": [
+      {
+        "pid": 232822,
+        "state": "Z",
+        "pgid": 232822,
+        "sid": 232822,
+        "start_ticks": 679889,
+        "name": "opencode"
+      }
+    ],
+    "before_cleanup": [
+      {
+        "pid": 232822,
+        "state": "Z",
+        "pgid": 232822,
+        "sid": 232822,
+        "start_ticks": 679889,
+        "name": "opencode"
+      }
+    ],
+    "signals": [],
+    "remaining_live": [],
+    "escaped_live_observed": [],
+    "registered_processes": [],
+    "registration_errors": {},
+    "no_live_owned_processes": true,
+    "leader_reaped": true,
+    "boundary": "Private group plus explicit MCP launch registrations/observed identities; unseen detached descendants and GPU VRAM are not measured."
+  },
+  "provider_capture_completed_before_cleanup": true
+}

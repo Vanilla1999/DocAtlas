@@ -1,0 +1,21 @@
+{
+  "model": "openai/gpt-6.1-terra#low",
+  "monotonic_ns": 6500492981182,
+  "gpu": {
+    "monotonic_ns": 6500440323924,
+    "devices": [
+      [
+        "GPU-846ef7ef-4619-12e7-7ffe-e9ee7cffef35",
+        "1586",
+        "14248"
+      ]
+    ],
+    "compute": [
+      [
+        "GPU-846ef7ef-4619-12e7-7ffe-e9ee7cffef35",
+        "192996",
+        "337"
+      ]
+    ]
+  }
+}

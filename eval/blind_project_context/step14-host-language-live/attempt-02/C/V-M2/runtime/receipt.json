@@ -1,0 +1,49 @@
+{
+  "session_status": "finished",
+  "retrieval_status": "succeeded",
+  "answer_status": "produced",
+  "answer": "- **Stop outdoor observations** when the wind interlock opens. Preserve reservation identifiers during the suspension. (`weather.md`, lines 3–7)\n- **Restart only after** the interlock closes **and** the duty operator records restart approval. A favourable forecast cannot authorize a restart. (`weather.md`, lines 7, 13–15)\n- **An indoor instrument may continue** during the wind suspension if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish indoor classification. (`weather.md`, lines 9–11)",
+  "failures": [],
+  "capture_errors": [],
+  "tool_calls": 2,
+  "retrieval_calls": 2,
+  "expected_host_rejections": [],
+  "transport_pass": true,
+  "answer_quality": "not_graded",
+  "termination": null,
+  "returncode": 0,
+  "seconds": 7.619260710000162,
+  "cleanup": {
+    "strategy": "held private group plus explicitly registered MCP pidfds; no foreign-group signals",
+    "group": 222214,
+    "observed_processes": [
+      {
+        "pid": 222214,
+        "state": "Z",
+        "pgid": 222214,
+        "sid": 222214,
+        "start_ticks": 650049,
+        "name": "opencode"
+      }
+    ],
+    "before_cleanup": [
+      {
+        "pid": 222214,
+        "state": "Z",
+        "pgid": 222214,
+        "sid": 222214,
+        "start_ticks": 650049,
+        "name": "opencode"
+      }
+    ],
+    "signals": [],
+    "remaining_live": [],
+    "escaped_live_observed": [],
+    "registered_processes": [],
+    "registration_errors": {},
+    "no_live_owned_processes": true,
+    "leader_reaped": true,
+    "boundary": "Private group plus explicit MCP launch registrations/observed identities; unseen detached descendants and GPU VRAM are not measured."
+  },
+  "provider_capture_completed_before_cleanup": true
+}

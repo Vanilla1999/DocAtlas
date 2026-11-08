@@ -1,0 +1,90 @@
+{
+  "session_status": "finished",
+  "retrieval_status": "no_evidence",
+  "answer_status": "produced",
+  "answer": "Не удалось найти в документации подтверждение температуры охлаждения, обязательной для всех общих приборов обсерватории. Это не доказывает, что такого требования нет.",
+  "failures": [],
+  "capture_errors": [],
+  "tool_calls": 3,
+  "retrieval_calls": 2,
+  "expected_host_rejections": [],
+  "transport_pass": true,
+  "answer_quality": "not_graded",
+  "termination": null,
+  "returncode": 0,
+  "seconds": 18.135183241999584,
+  "cleanup": {
+    "strategy": "held private group plus explicitly registered MCP pidfds; no foreign-group signals",
+    "group": 224081,
+    "observed_processes": [
+      {
+        "pid": 224081,
+        "state": "Z",
+        "pgid": 224081,
+        "sid": 224081,
+        "start_ticks": 654879,
+        "name": "opencode"
+      },
+      {
+        "pid": 224121,
+        "state": "S",
+        "pgid": 224121,
+        "sid": 224121,
+        "start_ticks": 654944,
+        "name": "python",
+        "role": "transport",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M4/mcp-process.json"
+      },
+      {
+        "pid": 224122,
+        "state": "R",
+        "pgid": 224121,
+        "sid": 224121,
+        "start_ticks": 654945,
+        "name": "doc-atlas",
+        "role": "server",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M4/mcp-process.json"
+      }
+    ],
+    "before_cleanup": [
+      {
+        "pid": 224081,
+        "state": "Z",
+        "pgid": 224081,
+        "sid": 224081,
+        "start_ticks": 654879,
+        "name": "opencode"
+      }
+    ],
+    "signals": [],
+    "remaining_live": [],
+    "escaped_live_observed": [],
+    "registered_processes": [
+      {
+        "role": "transport",
+        "pid": 224121,
+        "pgid": 224121,
+        "sid": 224121,
+        "start_ticks": 654944,
+        "pid_namespace": "pid:[4026531836]",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M4/mcp-process.json",
+        "exit_verified": true
+      },
+      {
+        "role": "server",
+        "pid": 224122,
+        "pgid": 224121,
+        "sid": 224121,
+        "start_ticks": 654945,
+        "pid_namespace": "pid:[4026531836]",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M4/mcp-process.json",
+        "exit_verified": true
+      }
+    ],
+    "registration_errors": {},
+    "no_live_owned_processes": true,
+    "leader_reaped": true,
+    "boundary": "Private group plus explicit MCP launch registrations/observed identities; unseen detached descendants and GPU VRAM are not measured."
+  },
+  "provider_capture_completed_before_cleanup": true
+}

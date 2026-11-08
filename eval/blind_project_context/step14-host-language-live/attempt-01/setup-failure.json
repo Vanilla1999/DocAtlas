@@ -1,0 +1,12 @@
+{
+  "status": "SETUP_FAILED_BEFORE_PUBLIC_PREPARATION",
+  "reason": "storage ancestors must not permit foreign namespace replacement",
+  "ancestors": {
+    "/home/viadmin/.local/share/docatlas-eval": "0775",
+    "/home/viadmin/.local/share/docatlas-eval/step14": "0775"
+  },
+  "prepare_docs_calls": 0,
+  "provider_calls": 0,
+  "inference_calls": 0,
+  "boundary": "Wheel/assets/runtime metadata checks passed; no active index or client profiles were prepared. Original attempt retained. Ancestor permissions were not changed by this runner."
+}

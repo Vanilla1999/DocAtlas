@@ -1,0 +1,45 @@
+{
+  "status": "EXISTING_USER_PATH_TOPOLOGY_VERIFIED_NO_PROVIDER_CALLS",
+  "auth": "existing-user",
+  "default_auth": true,
+  "verification": [
+    "opencode debug paths in the original environment",
+    "opencode debug paths with exact runner client_environment, using already existing attempt-01 work directories",
+    "OpenCode models catalog: provider openai, query gpt-6.1-terra"
+  ],
+  "catalog": {
+    "model": "openai/gpt-6.1-terra",
+    "variant": "low",
+    "status": "active",
+    "boundary": "Current OpenCode availability catalog, not a provider request or inference result"
+  },
+  "shared": {
+    "HOME": "/home/viadmin",
+    "XDG_DATA_HOME": "/home/viadmin/.local/share",
+    "data": "/home/viadmin/.local/share/opencode",
+    "db": "/home/viadmin/.local/share/opencode/opencode.db",
+    "log": "/home/viadmin/.local/share/opencode/log",
+    "credentials": "Existing user connection selected by built-in OpenCode provider; secret values not inspected"
+  },
+  "isolated_verified": {
+    "config": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-01/client-config/opencode",
+    "state": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-01/client-state/opencode",
+    "cache": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-01/client-cache/opencode",
+    "tmp": "/home/viadmin/.local/share/docatlas-eval/step14/work/attempt-01/tmp/opencode"
+  },
+  "launch": "opencode run --standalone; private held process group plus registered MCP pidfds",
+  "data_boundary": "Normal standalone may write shared session DB/logs and refresh existing credentials. This is private process isolation, not data-store isolation. No direct DB changes/copy, no global config edits, no shared-service stop.",
+  "provider_calls": 0,
+  "model_inference_calls": 0,
+  "new_setup_calls": 0,
+  "login_started": false,
+  "credential_values_accessed": false,
+  "credentials_copied": false,
+  "api_key_environment_forwarded": false,
+  "references": [
+    "https://opencode.ai/v2/docs/cli",
+    "https://opencode.ai/v2/docs/troubleshooting",
+    "https://opencode.ai/v2/docs/providers",
+    "https://opencode.ai/v2/openapi.json"
+  ]
+}

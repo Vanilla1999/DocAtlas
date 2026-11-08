@@ -1,0 +1,118 @@
+{
+  "capture_version": "wall-v2",
+  "original_setup_sha256": "5ed89fc9337d13c913d74b63844446c4466a8064e383512133d6c8f50157c0e1",
+  "changes": {
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/run.py": {
+      "old_sha256": "64a8e83552ecb1512244bbb61c7f9dff361e534da1c8524989782ca8cbcf5989",
+      "new_sha256": "76ae061e73c3d5fa5061ee210f54be7966dd34194457f7a8f65231af8c9614e7"
+    },
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/observe_stdio.py": {
+      "old_sha256": "d151e1f5ddb5eeb82faf733903a96f8a4032b3340f0b4f08a5cbf02ba95098ed",
+      "new_sha256": "40d185f421cc05b493a3415ed132679e8a17ef5661612b5bff55f4675795e865"
+    },
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/account.py": {
+      "old_sha256": "072c21a4179fbe746a804f936e7624067f8092b0fc178e1ef6244ed1733bc3d5",
+      "new_sha256": "93c3f6bcba1b3cd78598229b5dc81eb5817ea6b9007d33ab574ff68ac80808e1"
+    },
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/observer/index.js": {
+      "old_sha256": "9d7b1a6aeb8a7506b79ff65b979b9395b8b94b6ce21d9b14713ebfe466bca643",
+      "new_sha256": "acdfbc423b247a0ae7d0ed177f7c257594da4508d995014cbf8ee87a08f9584a"
+    }
+  },
+  "continuation_script_sha256": "f83c91fb5c45b8a99cf4c8e4f3bdda1e20e6fc0cf075a370c415802f901b8c7d",
+  "preserved_evidence": {
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M1/mcp.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M1/stdio-events.jsonl": "1b85ccddfbf9f6897a4e2d3648cf1dcc9932a81190a877a8e6d2d992eeb79d0e",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M1/gpu-after.json": "5ee89b6e650a033656c93be1092d027cb310ece1e88d0f4141abdbf611803291",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M1/mcp-process.json": "60c6416aaae462eb35467d1c8cbdebee52a678d68a1d514ae10699f1e44db273",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M1/mcp-started.json": "e984ddb307639df08977f57d9830041c8d832e9975c176ae104c7d1aa988bc04",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M1/accounting.json": "c1078f00dd1f493ed88cef655c822dd76d23dc25b20621045a930ef8266e0e32",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M1/started.json": "9e58dafab25febbbf1e6516c3ce2feabeec46570126f6e1f36e8a8657ed321db",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M1/state-after.json": "41c1725647c8d94e9142f6a6b6f534f784aa32d48c6451409fc0511dda5fb2e1",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M1/config.json": "a37ed780cdaaa0824b9d943c2b836863eb9e2cf98e5d6f53b9167a285e8ddb73",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M1/profile.json": "2eba5c6154855cac53afe36aa17a7695f0f5a66715a42d0fb3e58c19a3d70eb8",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M1/capture/state.json": "9339e23752be2a5e78020e0c2df41626d2c8e3267c419e3ac421fe1c65add5aa",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M1/capture/events.jsonl": "8433db1d08be0a9519c03cf9380c74c6339368e0de7abc023d09e517b5534c82",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M1/capture/first-provider-request.json": "91fce256723eb26f01a7b409c6f730409a8c42d77543b28792d6db7e01026762",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M1/runtime/launch.json": "6405a38cec29c2f80c1b1758a1efe04ba4c025274558f6537a6b60f3854ed8d4",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M1/runtime/receipt.json": "e923b1df27d5e8e39f38461445aa58a737ee40ba3a2050bbf8efbb4efc5bcda6",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M1/runtime/raw.jsonl": "7a20a8bcfefc3c6f084c0f4afbb44e2538c2b0c892b22561ca17ffe699eec805",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M1/runtime/stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M1/mcp.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M1/stdio-events.jsonl": "caa6083aafada40b60234920c4cd6988906d5698d7691ef48440ae3afc66a334",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M1/gpu-after.json": "3331ec91c3d2c0a959367d2498143640ab62c01b75ccf401c41c7d4ea80cb080",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M1/mcp-process.json": "f7437ebb47ef19fe45febc03578e215e1eb044c049621c952a642f1053fbc445",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M1/mcp-started.json": "3fa417c65653b7c927a608444bc0d6b0d4e71fa2e2a409e201844ec405f92d5f",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M1/accounting.json": "626afeef0685839539ed0b0b175aa78b8b43c77da5be06d3cf5622ec9d9e8347",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M1/started.json": "9bbe9023ba25e903a081feff641cf8ee04ce5b248ac22760056e0deab58bc2df",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M1/state-after.json": "41c1725647c8d94e9142f6a6b6f534f784aa32d48c6451409fc0511dda5fb2e1",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M1/config.json": "7564a536b99922b6762ef8486b632cb28680dc4e40d535b28d4bab21723a9e6e",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M1/profile.json": "89ca6b65a53fb834bfdc6f79a6d7f1b80437e8c16ca2ba301cb7d6086a6384a4",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M1/capture/state.json": "913c81d71f72f7ebfd6c4dc624ed58c56b330f2471e6da91e136f6d319022584",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M1/capture/events.jsonl": "36977591f7ef7bef6728e2c7d82d352c5756b3013b98718c6f5637e62da0ef1e",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M1/capture/first-provider-request.json": "de56cddd6dda6b053b04760cc7b0cded77b3560988b023fec6d58fca4441e8e9",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M1/runtime/launch.json": "29ddfa73bc80c8bbae81b5276990dd7da894ed9825550e19c2e52c77e01b2d96",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M1/runtime/receipt.json": "0f687e490c726f622fa8d2b9b2bbfc3b64405b4c5c4f3d3836057fd9cd47ab50",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M1/runtime/raw.jsonl": "f15797dc346e6bf7688ecffcdf8ad6f6a6b11a0ea7c26c64c80a50d24dd689e8",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/B/V-M1/runtime/stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/run-started.json": "f1313dbe5913a631da73a18a8a6cc2ee1393966ecafeac990d8384549dbb221c",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/run-exception.json": "91797e3ebe25f1ef0107b73d83887ce13918ce1604bd88b9b4b54dc8952e0bc4",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/setup-complete.json": "5ed89fc9337d13c913d74b63844446c4466a8064e383512133d6c8f50157c0e1",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/sources.json": "26053834e8ebc02b870ab36e6131b5c2b4ea3b1268fe188762820925fe47e985"
+  },
+  "completed": [
+    [
+      "A",
+      "V-M1"
+    ],
+    [
+      "B",
+      "V-M1"
+    ]
+  ],
+  "remaining": [
+    [
+      "C",
+      "V-M1"
+    ],
+    [
+      "A",
+      "V-M2"
+    ],
+    [
+      "B",
+      "V-M2"
+    ],
+    [
+      "C",
+      "V-M2"
+    ],
+    [
+      "A",
+      "V-M3"
+    ],
+    [
+      "B",
+      "V-M3"
+    ],
+    [
+      "C",
+      "V-M3"
+    ],
+    [
+      "A",
+      "V-M4"
+    ],
+    [
+      "B",
+      "V-M4"
+    ],
+    [
+      "C",
+      "V-M4"
+    ]
+  ],
+  "reason": "B/V-M1 transport succeeded; Bun hrtime epoch is incompatible with Python monotonic. Preserve old ordering as UNKNOWN; do not rerun A/B.",
+  "required_review": "Parent must review exact changes and pass this manifest SHA256 explicitly.",
+  "boundary": "New B sessions still require hint/binding AND strict captured wall-time ordering. No source/config/policy/production edits."
+}

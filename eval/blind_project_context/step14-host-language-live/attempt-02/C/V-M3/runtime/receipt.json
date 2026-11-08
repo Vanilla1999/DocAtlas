@@ -1,0 +1,49 @@
+{
+  "session_status": "finished",
+  "retrieval_status": "succeeded",
+  "answer_status": "produced",
+  "answer": "If the absolute offset between instrument time and the observatory reference **exceeds two seconds**, the gateway must pause schedule execution, notify the duty operator, and leave queued reservations unchanged. It may resume only after **two consecutive reference checks** each report an offset within two seconds. [clock.md:3–7](clock.md#L3-L7)\n\nIf the reference clock is unavailable, execution must remain paused: a local clock reading alone cannot satisfy either recovery check. [clock.md:9–11](clock.md#L9-L11)\n\nThe gateway must not use the retired prototype’s recovery behavior of clearing pending reservations or restarting on the first local clock sample. A planner may compute a plan while execution is suspended, but that plan does not bypass the clock check or a weather interlock. [architecture.md:5–11](architecture.md#L5-L11)",
+  "failures": [],
+  "capture_errors": [],
+  "tool_calls": 5,
+  "retrieval_calls": 5,
+  "expected_host_rejections": [],
+  "transport_pass": true,
+  "answer_quality": "not_graded",
+  "termination": null,
+  "returncode": 0,
+  "seconds": 12.69807544700052,
+  "cleanup": {
+    "strategy": "held private group plus explicitly registered MCP pidfds; no foreign-group signals",
+    "group": 223668,
+    "observed_processes": [
+      {
+        "pid": 223668,
+        "state": "Z",
+        "pgid": 223668,
+        "sid": 223668,
+        "start_ticks": 653596,
+        "name": "opencode"
+      }
+    ],
+    "before_cleanup": [
+      {
+        "pid": 223668,
+        "state": "Z",
+        "pgid": 223668,
+        "sid": 223668,
+        "start_ticks": 653596,
+        "name": "opencode"
+      }
+    ],
+    "signals": [],
+    "remaining_live": [],
+    "escaped_live_observed": [],
+    "registered_processes": [],
+    "registration_errors": {},
+    "no_live_owned_processes": true,
+    "leader_reaped": true,
+    "boundary": "Private group plus explicit MCP launch registrations/observed identities; unseen detached descendants and GPU VRAM are not measured."
+  },
+  "provider_capture_completed_before_cleanup": true
+}

@@ -1,0 +1,452 @@
+{
+  "arm": "C",
+  "task": "V-M1",
+  "status": "CAPTURED",
+  "provider_requests": 3,
+  "provider_requests_by_kind": {
+    "primary": 3
+  },
+  "session_ids": [
+    "ses_e45bc487effeZvmguKSpYLQCHi"
+  ],
+  "session_ids_count": 1,
+  "requests_with_usage": 3,
+  "usage": {
+    "input": 5818,
+    "output": 769,
+    "cached": 1152,
+    "cache_write": 0,
+    "reasoning": 0,
+    "uncached": 4666
+  },
+  "usage_coverage_complete": true,
+  "provider_records": [
+    {
+      "id": "resp_0e130663e5ae60e9016af0321be29c87d2a2484442a5ca639c",
+      "usage": {
+        "input_tokens": 1258,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0
+        },
+        "output_tokens": 123,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 1381,
+        "attribution": {
+          "items": {
+            "fc_0e130663e5ae60e9016af0321cad2487d2ba775fa16e650ca5": {
+              "input_tokens": 2,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 79
+            },
+            "fc_0e130663e5ae60e9016af0321e8c6887d28d7a94a60440b381": {
+              "input_tokens": 0,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 44
+            },
+            "msg_0e130663e5ae60e9016af0321be2bc87d2873081df82616f94": {
+              "input_tokens": 35,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 35,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            }
+          },
+          "request_fields": {
+            "instructions": {
+              "input_tokens": 752,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "tools": {
+              "input_tokens": 469,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "resp_0e130663e5ae60e9016af0321f070487d29800f52540533033",
+      "usage": {
+        "input_tokens": 1597,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0
+        },
+        "output_tokens": 235,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 1832,
+        "attribution": {
+          "items": {
+            "fc_0e130663e5ae60e9016af0321cad2487d2ba775fa16e650ca5": {
+              "input_tokens": 81,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_0e130663e5ae60e9016af0321e8c6887d28d7a94a60440b381": {
+              "input_tokens": 44,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_0e130663e5ae60e9016af0321f072c87d297c3a69d7b67ddbb": {
+              "input_tokens": 202,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 202,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "fc_0e130663e5ae60e9016af0321f072c87d2b15f6e3808591d13": {
+              "input_tokens": 12,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 12,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "fc_0e130663e5ae60e9016af0321fcd9c87d2919925c750242c85": {
+              "input_tokens": 2,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 56
+            },
+            "fc_0e130663e5ae60e9016af03223ba4887d2a744175f8f979332": {
+              "input_tokens": 0,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 36
+            },
+            "fc_0e130663e5ae60e9016af03223ba4887d2aac21f10722d4995": {
+              "input_tokens": 0,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 35
+            },
+            "fc_0e130663e5ae60e9016af03223ba4887d2aed7c41a4dd3feef": {
+              "input_tokens": 0,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 36
+            },
+            "fc_0e130663e5ae60e9016af03223ba4887d2beb0ea8df6f223fe": {
+              "input_tokens": 0,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 35
+            },
+            "fc_0e130663e5ae60e9016af03223ba4c87d2921dffce55e0a5d3": {
+              "input_tokens": 0,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 37
+            },
+            "msg_0e130663e5ae60e9016af0321be2bc87d2873081df82616f94": {
+              "input_tokens": 35,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 35,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            }
+          },
+          "request_fields": {
+            "instructions": {
+              "input_tokens": 752,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "tools": {
+              "input_tokens": 469,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "resp_0e130663e5ae60e9016af03224417087d2b99c0693e565b6fd",
+      "usage": {
+        "input_tokens": 2963,
+        "input_tokens_details": {
+          "cached_tokens": 1152,
+          "cache_write_tokens": 0
+        },
+        "output_tokens": 411,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 3374,
+        "attribution": {
+          "items": {
+            "fc_0e130663e5ae60e9016af0321cad2487d2ba775fa16e650ca5": {
+              "input_tokens": 81,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_0e130663e5ae60e9016af0321e8c6887d28d7a94a60440b381": {
+              "input_tokens": 44,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_0e130663e5ae60e9016af0321f072c87d297c3a69d7b67ddbb": {
+              "input_tokens": 202,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 202,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "fc_0e130663e5ae60e9016af0321f072c87d2b15f6e3808591d13": {
+              "input_tokens": 12,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 12,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "fc_0e130663e5ae60e9016af0321fcd9c87d2919925c750242c85": {
+              "input_tokens": 58,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_0e130663e5ae60e9016af03223ba4887d2a744175f8f979332": {
+              "input_tokens": 36,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_0e130663e5ae60e9016af03223ba4887d2aac21f10722d4995": {
+              "input_tokens": 35,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_0e130663e5ae60e9016af03223ba4887d2aed7c41a4dd3feef": {
+              "input_tokens": 36,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_0e130663e5ae60e9016af03223ba4887d2beb0ea8df6f223fe": {
+              "input_tokens": 35,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_0e130663e5ae60e9016af03223ba4c87d2921dffce55e0a5d3": {
+              "input_tokens": 37,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_0e130663e5ae60e9016af03224419887d286a1016f2301ec28": {
+              "input_tokens": 162,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 162,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "fc_0e130663e5ae60e9016af03224419887d2943320c800c43115": {
+              "input_tokens": 178,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 178,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "fc_0e130663e5ae60e9016af03224419887d2a9512e6785b220d2": {
+              "input_tokens": 193,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 193,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "fc_0e130663e5ae60e9016af03224419887d2aa3f2a40b466adc2": {
+              "input_tokens": 163,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 163,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "fc_0e130663e5ae60e9016af03224419887d2afdef1ce7c4a003f": {
+              "input_tokens": 191,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 191,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "fc_0e130663e5ae60e9016af03224419887d2b1f25f37e39681b3": {
+              "input_tokens": 242,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 242,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "msg_0e130663e5ae60e9016af0321be2bc87d2873081df82616f94": {
+              "input_tokens": 35,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 35,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "msg_0e130663e5ae60e9016af03224b6b487d2903f77d9be5a7068": {
+              "input_tokens": 2,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 411,
+              "content": [
+                {
+                  "input_tokens": 2,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 411
+                }
+              ]
+            }
+          },
+          "request_fields": {
+            "instructions": {
+              "input_tokens": 752,
+              "cached_tokens": 683,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "tools": {
+              "input_tokens": 469,
+              "cached_tokens": 469,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            }
+          }
+        }
+      }
+    }
+  ],
+  "retries": 0,
+  "capture_errors": [],
+  "first_provider_monotonic_ns": 1329696879,
+  "first_provider_language_hints": [],
+  "first_provider_wall_time_ms": 1794126363650,
+  "original_question_in_first_request": true,
+  "status_observations": [],
+  "host_preflight_verified": null,
+  "host_hint_binding_verified": null,
+  "host_timestamp_order_verified": null,
+  "host_timestamp_reason": null,
+  "model_tool_calls": {
+    "grep": 1,
+    "glob": 1,
+    "read": 6
+  },
+  "actual_mcp_calls": {},
+  "mcp_missing_responses": 0,
+  "qwen_receipts": [],
+  "qwen_pairs": null,
+  "answer": "Для подтверждённого ночного наблюдения на общем инструменте порядок такой:\n\n1. Получите согласие принимающего наблюдателя и одобрение дежурного оператора.\n2. Пока действует блокировка обслуживания, **оставьте передачу в ожидании**, даже если оба согласия уже получены. Сначала блокировку должна снять команда инструмента.\n3. При передаче сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита. Погодная приостановка при передаче не изменяется. [reservations.md, строки 1–13](reservations.md#transfer)\n\nПогодное решение управляет **выполнением**, а не принадлежностью бронирования. Если наружные наблюдения приостановлены из-за размыкания ветровой блокировки, возобновить их можно только после её замыкания и регистрации разрешения на перезапуск дежурным оператором. Благоприятный прогноз сам по себе не разрешает перезапуск. [weather.md, строки 1–7, 13–15](weather.md#suspension)\n\nИсключение: инструмент, **явно классифицированный как находящийся в помещении**, может продолжать работу во время ветровой приостановки, если его собственные защитные блокировки замкнуты. Изображение закрытой крыши в календаре такой классификации не подтверждает. [weather.md, строки 9–11](weather.md#indoor-instrument)\n\nКалендарь служит только представлением состояния: его обновление не снимает блокировку обслуживания и не разрешает выполнение. Упрощённая передача дневного учебного слота инструктором к подтверждённому наблюдению не применяется. [calendar.md, строки 1–7](calendar.md#colours); [reservations.md, строки 15–17](reservations.md#training-slots)",
+  "answer_quality": "NOT_GRADED",
+  "source_facts_quality": "NOT_GRADED",
+  "timing_boundary": "wall-v2: Python time.time_ns versus JS Date.now, same-host epoch clock; JS millisecond resolution, wall-clock steps not excluded. Monotonic clocks are process-local only. Legacy Python wall time is never reconstructed. Not remote arrival."
+}

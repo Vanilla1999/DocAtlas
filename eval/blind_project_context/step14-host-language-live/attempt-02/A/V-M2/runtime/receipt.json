@@ -1,0 +1,90 @@
+{
+  "session_status": "finished",
+  "retrieval_status": "succeeded",
+  "answer_status": "produced",
+  "answer": "- **Stop:** Suspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during the suspension. [ev-159aa46f19575f991571621c, `weather.md:5–8`]\n- **Restart:** Resume only after the interlock closes **and** the duty operator records restart approval. A favourable forecast cannot authorize a restart. [ev-159aa46f19575f991571621c, `weather.md:5–8`; ev-d7ad6e3c0ae0215b63ed8bb6, `weather.md:13–15`]\n- **Indoor instrument:** It may continue during a wind suspension if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish indoor classification. [ev-0999a181d992f67ebae5ac73, `weather.md:9–12`]",
+  "failures": [],
+  "capture_errors": [],
+  "tool_calls": 2,
+  "retrieval_calls": 1,
+  "expected_host_rejections": [],
+  "transport_pass": true,
+  "answer_quality": "not_graded",
+  "termination": null,
+  "returncode": 0,
+  "seconds": 14.700132217999453,
+  "cleanup": {
+    "strategy": "held private group plus explicitly registered MCP pidfds; no foreign-group signals",
+    "group": 221038,
+    "observed_processes": [
+      {
+        "pid": 221038,
+        "state": "Z",
+        "pgid": 221038,
+        "sid": 221038,
+        "start_ticks": 647189,
+        "name": "opencode"
+      },
+      {
+        "pid": 221153,
+        "state": "S",
+        "pgid": 221153,
+        "sid": 221153,
+        "start_ticks": 647253,
+        "name": "python",
+        "role": "transport",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M2/mcp-process.json"
+      },
+      {
+        "pid": 221154,
+        "state": "R",
+        "pgid": 221153,
+        "sid": 221153,
+        "start_ticks": 647255,
+        "name": "doc-atlas",
+        "role": "server",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M2/mcp-process.json"
+      }
+    ],
+    "before_cleanup": [
+      {
+        "pid": 221038,
+        "state": "Z",
+        "pgid": 221038,
+        "sid": 221038,
+        "start_ticks": 647189,
+        "name": "opencode"
+      }
+    ],
+    "signals": [],
+    "remaining_live": [],
+    "escaped_live_observed": [],
+    "registered_processes": [
+      {
+        "role": "transport",
+        "pid": 221153,
+        "pgid": 221153,
+        "sid": 221153,
+        "start_ticks": 647253,
+        "pid_namespace": "pid:[4026531836]",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M2/mcp-process.json",
+        "exit_verified": true
+      },
+      {
+        "role": "server",
+        "pid": 221154,
+        "pgid": 221153,
+        "sid": 221153,
+        "start_ticks": 647255,
+        "pid_namespace": "pid:[4026531836]",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/attempt-02/A/V-M2/mcp-process.json",
+        "exit_verified": true
+      }
+    ],
+    "registration_errors": {},
+    "no_live_owned_processes": true,
+    "leader_reaped": true,
+    "boundary": "Private group plus explicit MCP launch registrations/observed identities; unseen detached descendants and GPU VRAM are not measured."
+  },
+  "provider_capture_completed_before_cleanup": true
+}

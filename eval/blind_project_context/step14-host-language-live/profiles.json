@@ -1,0 +1,33 @@
+{
+  "status": "NOT_READY_SPECIFICATION_ONLY",
+  "profile_builder": "integrations/opencode-v2-compact/documentation_profile.py:build_profile",
+  "shared": {
+    "instruction_variant": "concise-v1",
+    "model": "openai/gpt-6.1-terra#low",
+    "agent_name": "measure",
+    "frozen": true,
+    "max_steps": 12,
+    "timeout_seconds": 900,
+    "scope": "project",
+    "server_environment": {
+      "DOCATLAS_OFFLINE": "1",
+      "DOCATLAS_AUTO_VECTORS": "0",
+      "DOCATLAS_CONTEXT_COMPRESSION": "off",
+      "ORT_DISABLE_TELEMETRY": "1"
+    }
+  },
+  "mcp_environment": {
+    "DOCATLAS_EXPERIMENT_MINIMAL_CONTEXT": "1",
+    "DOCATLAS_MINIMAL_CONTEXT_RECIPE": "qwen3-contextual-own-body-evidence-v1",
+    "DOCATLAS_EXPERIMENT_EVIDENCE_MODEL_PATH": "UNRESOLVED_LOCAL_QWEN_ASSETS",
+    "DOCATLAS_MINIMAL_CONTEXT_POLICY": "eval/blind_project_context/step10-qwen-validation/provenance/original-policy.json",
+    "DOCATLAS_CONTEXT_LINKS": "one-hop-v1"
+  },
+  "arms": {
+    "A": {"backend": "mcp", "language_preflight": "model"},
+    "B": {"backend": "mcp", "language_preflight": "host-v1"},
+    "C": {"backend": "files", "language_preflight": "model"}
+  },
+  "required_runtime_values": ["absolute project root", "12 separate absolute workspaces", "installed doc-atlas executable", "matching installed Python", "isolated DOCATLAS_HOME", "absolute frozen policy path", "verified Qwen assets", "separate per-session observer capture paths"],
+  "warning": "This is a configuration recipe, not an OpenCode config or generated profile. No runtime validation or active snapshot exists."
+}

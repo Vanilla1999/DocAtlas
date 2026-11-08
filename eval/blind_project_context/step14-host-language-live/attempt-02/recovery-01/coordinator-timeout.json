@@ -1,0 +1,10 @@
+{
+  "cause": "Parent reports outer shell timeout of 120 seconds killed continuation coordinator while B/V-M4 was executing",
+  "attribution": "external harness timeout, not a model retry",
+  "observed_wall_time_ns": 1794126662129301042,
+  "missing_runtime_receipt": "B/V-M4/runtime/receipt.json",
+  "fabricated_receipt": false,
+  "authorization": "Recover existing evidence, then run only never-started C/V-M4",
+  "reviewed_manifest_sha256": "34cf80203ab975649bc312bab63d20d9865ce81831bc14c950fdb32a80bf81fb",
+  "recovery_script_sha256": "84c6ee609217b17fe62c2a04a7c9f5c2c5f70b8a771dd169ca8196ba833761f4"
+}

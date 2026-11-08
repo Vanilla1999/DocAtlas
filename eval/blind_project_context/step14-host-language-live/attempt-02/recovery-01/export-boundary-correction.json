@@ -1,0 +1,9 @@
+{
+  "status": "RECOVERY_PRECHECK_STOPPED_BEFORE_C",
+  "cause": "sanitize=true intentionally replaces exported message text; the strict answer equality check therefore could not succeed",
+  "model_failure": false,
+  "new_provider_requests": 0,
+  "C_started": false,
+  "next": "Preserve recovery-01; read-only export sanitize=false for this exact session, independently revalidate all inputs and then launch only C/V-M4 from recovery-02",
+  "original_B_evidence_modified": false
+}

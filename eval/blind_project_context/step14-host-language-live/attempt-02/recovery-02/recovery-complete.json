@@ -1,0 +1,26 @@
+{
+  "status": "COMPLETED_WITH_B_CLI_CAPTURE_GAP",
+  "prior_receipts": {
+    "A/V-M1": "successful recorded transport and cleanup",
+    "B/V-M1": "successful recorded transport and cleanup",
+    "C/V-M1": "successful recorded transport and cleanup",
+    "A/V-M2": "successful recorded transport and cleanup",
+    "B/V-M2": "successful recorded transport and cleanup",
+    "C/V-M2": "successful recorded transport and cleanup",
+    "A/V-M3": "successful recorded transport and cleanup",
+    "B/V-M3": "successful recorded transport and cleanup",
+    "C/V-M3": "successful recorded transport and cleanup",
+    "A/V-M4": "successful recorded transport and cleanup"
+  },
+  "preserved_prior_files_unchanged": true,
+  "new_sessions": 1,
+  "only_new_case": "C/V-M4",
+  "C_transport_pass": true,
+  "B_provider_responses_completed": 3,
+  "B_durable_answer_verified": true,
+  "B_runtime_receipt_reconstructed": false,
+  "total_started_sessions": 12,
+  "accounting": "attempt-02/accounting-final.json",
+  "accounting_boundary": "B/V-M4 CLI-derived answer/tool counters incomplete; actual provider usage/answer and MCP calls retained separately. B/V-M1 timestamp ordering remains unknown.",
+  "answer_quality": "NOT_GRADED"
+}

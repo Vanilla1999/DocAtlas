@@ -1,0 +1,1 @@
+0a7c36ff9f2b3066e6c810bdeca39a2f126458446f3c16a919ba5ac59afccadb  /home/viadmin/.local/share/docatlas-eval/step14/wheel/doc_atlas-1.3.2-py3-none-any.whl

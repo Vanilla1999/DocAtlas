@@ -1,0 +1,238 @@
+{
+  "data": {
+    "info": {
+      "id": "ses_e45ba8e12ffemMNVd4DWE6CSaC",
+      "projectID": "dea28f96172db19a86c7696f69e47e300f6eb77d",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 2828,
+        "output": 201,
+        "reasoning": 11,
+        "cache": {
+          "read": 3200,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1794126475763,
+        "updated": 1794126490167,
+        "busy": 1794126477481,
+        "idle": 1794126490169
+      },
+      "title": "[redacted:session-title:ses_e45ba8e12ffemMNVd4DWE6CSaC]",
+      "location": {
+        "directory": "/[redacted:session-directory:ses_e45ba8e12ffemMNVd4DWE6CSaC]"
+      }
+    },
+    "messages": [
+      {
+        "id": "msg_1ba4572d20015gTYAamioXk9qv",
+        "time": {
+          "created": 1794126475986
+        },
+        "type": "agent-switched",
+        "agent": "measure",
+        "previous": "measure"
+      },
+      {
+        "id": "msg_1ba4572d0001hak4NYzAhWi03X",
+        "metadata": {
+          "redacted": "message-metadata:msg_1ba4572d0001hak4NYzAhWi03X"
+        },
+        "time": {
+          "created": 1794126477486
+        },
+        "text": "[redacted:text:msg_1ba4572d0001hak4NYzAhWi03X]",
+        "files": [],
+        "type": "user"
+      },
+      {
+        "id": "msg_1ba4578b40015FyPe3l5GLZcSi",
+        "time": {
+          "created": 1794126477496,
+          "streamed": 1794126479874,
+          "completed": 1794126483723
+        },
+        "type": "assistant",
+        "agent": "measure",
+        "model": {
+          "id": "gpt-6.1-terra",
+          "providerID": "openai",
+          "variant": "low"
+        },
+        "content": [
+          {
+            "type": "tool",
+            "id": "call_74710626489e4a7facf7fb8b98458dc2",
+            "name": "docatlas_get_docs_context",
+            "executed": false,
+            "native": {
+              "redacted": "tool-native:msg_1ba4578b40015FyPe3l5GLZcSi"
+            },
+            "state": {
+              "status": "completed",
+              "input": {
+                "redacted": "tool-input:msg_1ba4578b40015FyPe3l5GLZcSi"
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "[redacted:tool-output:msg_1ba4578b40015FyPe3l5GLZcSi]"
+                }
+              ],
+              "metadata": {
+                "redacted": "tool-metadata:msg_1ba4578b40015FyPe3l5GLZcSi"
+              }
+            },
+            "time": {
+              "created": 1794126479063,
+              "ran": 1794126479848,
+              "completed": 1794126483721
+            }
+          }
+        ],
+        "finish": "tool-calls",
+        "native": {
+          "responseId": "resp_0c584dbfad1ba2a4016af0328e31e087d2aaf65907a22342cc",
+          "serviceTier": "default"
+        },
+        "cost": 0,
+        "tokens": {
+          "input": 1570,
+          "output": 60,
+          "reasoning": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
+          }
+        }
+      },
+      {
+        "id": "msg_1ba459111001x7h7qXLaPzqCqM",
+        "time": {
+          "created": 1794126483899,
+          "streamed": 1794126486711,
+          "completed": 1794126487999
+        },
+        "type": "assistant",
+        "agent": "measure",
+        "model": {
+          "id": "gpt-6.1-terra",
+          "providerID": "openai",
+          "variant": "low"
+        },
+        "content": [
+          {
+            "type": "reasoning",
+            "text": "",
+            "native": {
+              "redacted": "reasoning-native:msg_1ba459111001x7h7qXLaPzqCqM"
+            },
+            "time": {
+              "created": 1794126484705,
+              "completed": 1794126486655
+            }
+          },
+          {
+            "type": "tool",
+            "id": "call_907bf42a85124938a4d665282253f1e5",
+            "name": "docatlas_get_docs_context",
+            "executed": false,
+            "native": {
+              "redacted": "tool-native:msg_1ba459111001x7h7qXLaPzqCqM"
+            },
+            "state": {
+              "status": "completed",
+              "input": {
+                "redacted": "tool-input:msg_1ba459111001x7h7qXLaPzqCqM"
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "[redacted:tool-output:msg_1ba459111001x7h7qXLaPzqCqM]"
+                }
+              ],
+              "metadata": {
+                "redacted": "tool-metadata:msg_1ba459111001x7h7qXLaPzqCqM"
+              }
+            },
+            "time": {
+              "created": 1794126486662,
+              "ran": 1794126486688,
+              "completed": 1794126487998
+            }
+          }
+        ],
+        "finish": "tool-calls",
+        "native": {
+          "responseId": "resp_0c584dbfad1ba2a4016af03294190c87d2bb603c3b4d02ac0f",
+          "serviceTier": "default"
+        },
+        "cost": 0,
+        "tokens": {
+          "input": 589,
+          "output": 93,
+          "reasoning": 11,
+          "cache": {
+            "read": 1408,
+            "write": 0
+          }
+        }
+      },
+      {
+        "id": "msg_1ba45a1c5001NDjEBcro6ebVqs",
+        "time": {
+          "created": 1794126488178,
+          "streamed": 1794126490166,
+          "completed": 1794126490167
+        },
+        "type": "assistant",
+        "agent": "measure",
+        "model": {
+          "id": "gpt-6.1-terra",
+          "providerID": "openai",
+          "variant": "low"
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "[redacted:text:msg_1ba45a1c5001NDjEBcro6ebVqs]",
+            "native": {
+              "redacted": "text-native:msg_1ba45a1c5001NDjEBcro6ebVqs"
+            }
+          }
+        ],
+        "finish": "stop",
+        "native": {
+          "responseId": "resp_0c584dbfad1ba2a4016af03298b1b487d28bc21b10b3883777",
+          "serviceTier": "default"
+        },
+        "cost": 0,
+        "tokens": {
+          "input": 669,
+          "output": 48,
+          "reasoning": 0,
+          "cache": {
+            "read": 1792,
+            "write": 0
+          }
+        }
+      },
+      {
+        "id": "msg_1ba45aa39001zXi2boOdHQPnLX",
+        "time": {
+          "created": 1794126490169
+        },
+        "type": "idle",
+        "outcome": "succeeded"
+      }
+    ]
+  }
+}

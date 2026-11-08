@@ -1,0 +1,58 @@
+schema_version: 1
+code_files: []
+documentation_languages:
+  overview.md:
+  - en
+  reservations.md:
+  - en
+  weather.md:
+  - en
+  clock.md:
+  - en
+  calendar.md:
+  - en
+  architecture.md:
+  - en
+documents:
+- path: overview.md
+  role: other
+  scope: project
+  authority: source_of_truth
+  status: active
+  impact: track
+  description: Documentation source
+- path: reservations.md
+  role: other
+  scope: project
+  authority: source_of_truth
+  status: active
+  impact: track
+  description: Documentation source
+- path: weather.md
+  role: other
+  scope: project
+  authority: source_of_truth
+  status: active
+  impact: track
+  description: Documentation source
+- path: clock.md
+  role: other
+  scope: project
+  authority: source_of_truth
+  status: active
+  impact: track
+  description: Documentation source
+- path: calendar.md
+  role: other
+  scope: project
+  authority: source_of_truth
+  status: active
+  impact: track
+  description: Documentation source
+- path: architecture.md
+  role: other
+  scope: project
+  authority: source_of_truth
+  status: active
+  impact: track
+  description: Documentation source

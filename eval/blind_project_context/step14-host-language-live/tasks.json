@@ -1,0 +1,168 @@
+[
+  {
+    "id": "V-M1",
+    "project": "meridian",
+    "question": "Как передать подтверждённое ночное наблюдение другому наблюдателю при активной блокировке обслуживания и погодной приостановке?",
+    "direct": [
+      "reservations.md#Transfer",
+      "reservations.md#Locked instrument"
+    ],
+    "structural": [
+      "reservations.md#Confirmed reservations",
+      "weather.md#Weather decisions",
+      "weather.md#Suspension"
+    ],
+    "optional_support": [
+      "reservations.md#Training slots",
+      "calendar.md#Colours",
+      "weather.md#Indoor instrument",
+      "weather.md#Forecast display",
+      "architecture.md#Planner",
+      "overview.md#Meridian scheduler",
+      "overview.md#Services"
+    ],
+    "hard_negatives": [
+      "clock.md#Clock offset"
+    ],
+    "facts": [
+      [
+        "reservations.md#Confirmed reservations",
+        "These rules apply to confirmed night-time reservations on shared instruments."
+      ],
+      [
+        "reservations.md#Transfer",
+        "Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer."
+      ],
+      [
+        "reservations.md#Transfer",
+        "Retain the original reservation identifier and record both observers in the audit trail."
+      ],
+      [
+        "reservations.md#Locked instrument",
+        "leave the transfer pending even after observer acceptance and operator approval"
+      ],
+      [
+        "reservations.md#Locked instrument",
+        "The lock must be cleared by the instrument team first."
+      ],
+      [
+        "weather.md#Suspension",
+        "Suspend outdoor observations when the wind interlock opens."
+      ],
+      [
+        "weather.md#Suspension",
+        "Preserve reservation identifiers during suspension."
+      ],
+      [
+        "weather.md#Suspension",
+        "Resume only after the interlock closes and the duty operator records a restart approval."
+      ]
+    ]
+  },
+  {
+    "id": "V-M2",
+    "project": "meridian",
+    "question": "When should wind stop observations, what is required to restart, and may an indoor instrument continue?",
+    "direct": [
+      "weather.md#Suspension",
+      "weather.md#Indoor instrument"
+    ],
+    "structural": [
+      "weather.md#Weather decisions"
+    ],
+    "optional_support": [
+      "weather.md#Forecast display",
+      "calendar.md#Colours",
+      "reservations.md#Transfer",
+      "architecture.md#Planner",
+      "overview.md#Services"
+    ],
+    "hard_negatives": [
+      "clock.md#Simulation clock"
+    ],
+    "facts": [
+      [
+        "weather.md#Weather decisions",
+        "Weather decisions govern execution, not ownership of reservations."
+      ],
+      [
+        "weather.md#Suspension",
+        "Suspend outdoor observations when the wind interlock opens."
+      ],
+      [
+        "weather.md#Suspension",
+        "Preserve reservation identifiers during suspension."
+      ],
+      [
+        "weather.md#Suspension",
+        "Resume only after the interlock closes and the duty operator records a restart approval."
+      ],
+      [
+        "weather.md#Indoor instrument",
+        "An instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed."
+      ],
+      [
+        "weather.md#Indoor instrument",
+        "A roof visible as closed on the calendar does not establish indoor classification."
+      ]
+    ]
+  },
+  {
+    "id": "V-M3",
+    "project": "meridian",
+    "question": "What must the gateway do after excessive clock drift, including recovery when the reference clock is unavailable?",
+    "direct": [
+      "clock.md#Clock offset",
+      "clock.md#Missing reference"
+    ],
+    "structural": [
+      "clock.md#Time coordination"
+    ],
+    "optional_support": [
+      "clock.md#Simulation clock",
+      "architecture.md#Prototype recovery",
+      "calendar.md#Timezones",
+      "architecture.md#Planner",
+      "overview.md#Services"
+    ],
+    "hard_negatives": [
+      "reservations.md#Transfer"
+    ],
+    "facts": [
+      [
+        "clock.md#Time coordination",
+        "The gateway compares instrument time with the observatory reference before executing a schedule."
+      ],
+      [
+        "clock.md#Clock offset",
+        "If the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator."
+      ],
+      [
+        "clock.md#Clock offset",
+        "Keep queued reservations unchanged."
+      ],
+      [
+        "clock.md#Clock offset",
+        "Resume only after two consecutive reference checks report an offset within two seconds."
+      ],
+      [
+        "clock.md#Missing reference",
+        "If the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check."
+      ]
+    ]
+  },
+  {
+    "id": "V-M4",
+    "project": "meridian",
+    "question": "Какая температура охлаждения обязательна для всех общих приборов обсерватории?",
+    "direct": [],
+    "structural": [],
+    "facts": [],
+    "no_answer": true,
+    "hard_negatives": [
+      "weather.md#Indoor instrument",
+      "weather.md#Forecast display"
+    ],
+    "excluded_temptation": "modules/laser/private.md#Alignment temperature"
+  }
+]
