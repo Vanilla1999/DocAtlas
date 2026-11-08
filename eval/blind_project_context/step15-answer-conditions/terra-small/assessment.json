@@ -1,0 +1,209 @@
+{
+  "boundary": {
+    "evidence": "Only the designated input packet and authorized ASSESSMENT_INSTRUCTION.txt were read. No other files, ID mapping, external evidence, policy inference, or delegation were used.",
+    "completion": "complete_after_authorized_delivery_recovery",
+    "delivery_recovery": "The initial read requested 2000 lines but returned only lines 1–675; the instruction on line 2 was also truncated at 2000 characters. An initial partial assessment recorded that limitation. The user then authorized reading the multiline ASSESSMENT_INSTRUCTION.txt and only the missing packet tail at offset 676, limit 600. That read delivered lines 676–1089. This continuation completes candidates 09–16 without rereading valid evidence or repeating generation. Substantive grades and negative findings for 01–08 are preserved; fields are normalized to the recovered schema.",
+    "assessment_type": "Semantic LLM assessment, not human review or product acceptance. All 16 anonymous candidates and their gold facts assessed independently; no policy ranking.",
+    "rubric": "Visible gold requirements retained. Historical wind suspension phrased as already occurring is partial; transfer-only identifier preservation is partial for preservation during suspension. Night context need not be repeated. Connected weather relevance is recorded separately without removing facts."
+  },
+  "assessments": [
+    {
+      "id": "answer-01",
+      "facts": [
+        {"fact_id":"print-applicability","status":"full","quote":"For a **RillPrint 4 queue already in maintenance mode**","reason":"Explicitly restricts applicability to the specified version and pre-existing maintenance mode."},
+        {"fact_id":"print-manifest-before-purge","status":"full","quote":"Before purging, export the job manifest.","reason":"Mandatory imperative explicitly precedes purge."},
+        {"fact_id":"print-purge-conjunction","status":"full","quote":"Purge only when the upstream feeder is stopped **and** the device buffer is empty.","reason":"Both necessary conditions and their conjunction are preserved."},
+        {"fact_id":"print-held-job-exception","status":"full","quote":"If any job is marked `held`, **stop recovery and leave the queue paused**. Do not purge or resume it.","reason":"Any held job blocks recovery, purge, and resume while preserving paused state."},
+        {"fact_id":"print-verification-gate","status":"full","quote":"After the purge, run `spool-verify` successfully before resuming the queue.","reason":"Preserves post-purge ordering and successful verification before resume."},
+        {"fact_id":"print-optional-diagnostics","status":"full","quote":"Uploading a diagnostic bundle is optional.","reason":"Explicitly optional."},
+        {"fact_id":"print-receipt-invariant","status":"full","quote":"Keep archived job receipts unchanged throughout recovery.","reason":"Preserves the whole-recovery invariant."}
+      ],
+      "unsupported_additions": [],
+      "citations": {"status":"valid","note":"docs/rillprint/recover-stalled-queue.md lines 1–9 include applicability at 3, manifest at 4, conjunction at 5, held exception at 6, verification at 7, optional upload at 8, and receipt invariant at 9. The bounded statement that these excerpts give no purge commands or non-maintenance recovery method is supported by inspection."},
+      "relevance": {"status":"relevant","note":"Direct procedural answer; the bounded documentation limitation is relevant and does not invent command syntax."},
+      "abstention": {"status":"not_applicable","note":"Answerable case; supplies the documented procedure and only bounds unavailable implementation details."}
+    },
+    {
+      "id": "answer-02",
+      "facts": [
+        {"fact_id":"V-M1-fact-1","status":"full","quote":"Для подтверждённого ночного бронирования общего инструмента порядок такой:","reason":"Confirmed, night-time, and shared-instrument applicability all appear."},
+        {"fact_id":"V-M1-fact-2","status":"full","quote":"Получите согласие принимающего наблюдателя и одобрение дежурного оператора.","reason":"In the ordered transfer procedure, both receiving-observer consent and duty-operator approval are required."},
+        {"fact_id":"V-M1-fact-3","status":"full","quote":"Сохраните исходный идентификатор бронирования и укажите обоих наблюдателей в журнале аудита.","reason":"Both original identifier retention and audit entries for both observers are required."},
+        {"fact_id":"V-M1-fact-4","status":"full","quote":"**Пока активна блокировка обслуживания, оставьте передачу в ожидании**, даже если согласие и одобрение уже получены.","reason":"Active maintenance lock overrides both approvals and keeps transfer pending."},
+        {"fact_id":"V-M1-fact-5","status":"full","quote":"Сначала команда инструмента должна снять блокировку.","reason":"Preserves responsible team and prerequisite ordering."},
+        {"fact_id":"V-M1-fact-6","status":"partial","quote":"Если наружные наблюдения приостановлены из-за размыкания ветровой блокировки","reason":"Describes suspension as already occurring, not the duty to suspend when the interlock opens, per historical rubric."},
+        {"fact_id":"V-M1-fact-7","status":"full","quote":"Идентификатор бронирования при приостановке сохраняется.","reason":"Explicitly preserves identifier during suspension."},
+        {"fact_id":"V-M1-fact-8","status":"full","quote":"возобновить их можно только после её замыкания и записи дежурным оператором одобрения на возобновление.","reason":"Resumption requires both interlock closure and recorded restart approval by the duty operator."}
+      ],
+      "unsupported_additions": [],
+      "citations": {"status":"valid","note":"Cited paths, ranges, and refs match supplied evidence: reservations.md 1–4 (ev-f0eb1e549fed1aca3d464c2e) supports applicability; 7–10 (ev-c921e34c76fdfa492bebb68b) supports transfer, identifier, audit, and unchanged weather suspension; 11–14 (ev-8c0b8ec623baa336612c0ae6) supports lock handling; weather.md 1–4 (ev-56d4c522edb788db6d1f445e) and 5–8 (ev-159aa46f19575f991571621c) support execution versus ownership and weather conditions. calendar.md 1–4 (ev-525706a82d989ad63f985d9b), 5–8 (ev-af3fb3da8c27448bc32cb3fd), and reservations.md 15–17 (ev-db6c99cd7162ee2e647282c4) support the final calendar and training claims. Citations do not repair the incomplete statement of the suspension duty."},
+      "relevance": {"status":"relevant_with_peripheral_detail","note":"Transfer and lock handling directly answer the question. Weather initiation and restart are connected but borderline extra detail because suspension is already active; retain all eight gold facts. Calendar refresh and training shortcut exclusions are supported peripheral detail. The limited absence of UI and lock-request instructions is accurate."},
+      "abstention": {"status":"not_applicable","note":"Answers the documented conditions; its final limitation concerns only implementation details absent from the excerpts."}
+    },
+    {
+      "id": "answer-03",
+      "facts": [
+        {"fact_id":"V-M1-fact-1","status":"full","quote":"Для подтверждённого ночного бронирования **общего инструмента**:","reason":"All applicability qualifiers are preserved."},
+        {"fact_id":"V-M1-fact-2","status":"full","quote":"Получите согласие принимающего наблюдателя и одобрение передачи от дежурного оператора.","reason":"Both approvals are mandatory in the transfer procedure."},
+        {"fact_id":"V-M1-fact-3","status":"full","quote":"Сохраните исходный идентификатор бронирования и укажите обоих наблюдателей в журнале аудита.","reason":"Original identifier and both observers in audit are preserved."},
+        {"fact_id":"V-M1-fact-4","status":"full","quote":"Пока активна блокировка обслуживания, **оставьте передачу в ожидании**, даже если согласие и одобрение уже получены.","reason":"Explicitly keeps transfer pending despite approvals while maintenance lock is active."},
+        {"fact_id":"V-M1-fact-5","status":"full","quote":"Сначала блокировку должна снять команда инструмента.","reason":"Instrument team must clear the lock first."},
+        {"fact_id":"V-M1-fact-6","status":"partial","quote":"Если наружные наблюдения приостановлены из-за размыкания ветровой блокировки","reason":"An already-suspended premise does not fully express the trigger-based duty to suspend."},
+        {"fact_id":"V-M1-fact-7","status":"full","quote":"идентификатор бронирования при приостановке сохраняется.","reason":"Preservation is explicitly scoped to suspension."},
+        {"fact_id":"V-M1-fact-8","status":"full","quote":"их можно возобновить только после её замыкания и записи дежурным оператором разрешения на возобновление","reason":"Only permits resumption after both closure and recorded duty-operator approval."}
+      ],
+      "unsupported_additions": [],
+      "citations": {"status":"valid","note":"reservations.md 1–10 with ev-f0eb1e549fed1aca3d464c2e and ev-c921e34c76fdfa492bebb68b supports applicability and transfer duties; 11–14 with ev-8c0b8ec623baa336612c0ae6 supports the maintenance gate. reservations.md 7–10 supports unchanged weather suspension. weather.md 1–8 with ev-56d4c522edb788db6d1f445e and ev-159aa46f19575f991571621c supports execution versus ownership and weather conditions. All cited ranges cover the actual supporting text. A valid citation does not complete the unstated suspension duty."},
+      "relevance": {"status":"relevant_with_borderline_weather_detail","note":"Focused on transfer, maintenance, and connected weather conditions. Weather initiation and restart are borderline peripheral to transfer under an already active suspension; all eight gold facts remain in the denominator."},
+      "abstention": {"status":"not_applicable","note":"Answerable case with substantive answer."}
+    },
+    {
+      "id": "answer-04",
+      "facts": [
+        {"fact_id":"V-M1-fact-1","status":"full","quote":"Для подтверждённого ночного наблюдения на общем инструменте:","reason":"Confirmed night observation on shared instrument supplies the full applicability scope."},
+        {"fact_id":"V-M1-fact-2","status":"full","quote":"Получите согласие принимающего наблюдателя и одобрение передачи дежурным оператором. Передача допустима только после обоих действий.","reason":"Expressly requires both actions before transfer."},
+        {"fact_id":"V-M1-fact-3","status":"full","quote":"При передаче сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита.","reason":"Both transfer preservation and audit requirements are explicit."},
+        {"fact_id":"V-M1-fact-4","status":"full","quote":"**Оставьте передачу в ожидании, пока действует блокировка обслуживания**, даже если согласие и одобрение уже получены.","reason":"Pending state persists despite approvals during active maintenance lock."},
+        {"fact_id":"V-M1-fact-5","status":"full","quote":"Сначала команда инструмента должна снять блокировку.","reason":"Correct responsible team and first-clear ordering."},
+        {"fact_id":"V-M1-fact-6","status":"partial","quote":"Если наружные наблюдения приостановлены из-за разомкнутой ветровой блокировки","reason":"Describes a suspended condition rather than imposing suspension when the interlock opens."},
+        {"fact_id":"V-M1-fact-7","status":"partial","quote":"При передаче сохраните исходный идентификатор бронирования","reason":"Identifier preservation is limited to transfer; does not express the invariant during weather suspension. The weather citation alone cannot supply it."},
+        {"fact_id":"V-M1-fact-8","status":"full","quote":"возобновлять их можно только после её замыкания и записи дежурным оператором разрешения на возобновление.","reason":"Both closure and duty-operator recorded approval gate resumption."}
+      ],
+      "unsupported_additions": [],
+      "citations": {"status":"valid_with_uncited_applicability","note":"Transfer and audit cite reservations.md 7–10 / ev-c921e34c76fdfa492bebb68b; maintenance handling cites 11–14 / ev-8c0b8ec623baa336612c0ae6. Weather cites reservations.md 7–10 and weather.md 1–4 / ev-56d4c522edb788db6d1f445e plus 5–8 / ev-159aa46f19575f991571621c, all substantively supporting the attached claims. Calendar and training cite calendar.md 1–4 / ev-525706a82d989ad63f985d9b, 5–8 / ev-af3fb3da8c27448bc32cb3fd, and reservations.md 15–17 / ev-db6c99cd7162ee2e647282c4 correctly. Opening applicability is supported by supplied reservations.md 1–6 but that range is not explicitly cited. No cited passage substitutes for expressing the missing temporal scope of identifier preservation."},
+      "relevance": {"status":"relevant_with_peripheral_detail","note":"Direct transfer guidance with supported peripheral calendar and training warnings. Weather trigger and restart conditions are connected, borderline additional detail for transfer during an existing suspension; all eight gold facts retained. Bounded absence of interface instructions is accurate."},
+      "abstention": {"status":"not_applicable","note":"Gives supported procedural conditions and limits only undocumented UI details."}
+    },
+    {
+      "id": "answer-05",
+      "facts": [
+        {"fact_id":"attachment-size-limit","status":"full","quote":"In a standard RelayPost mailbox, one attachment can be at most **18 MiB**.","reason":"Preserves maximum, binary unit, mailbox class, and per-attachment scope, without unrequested upload procedure."}
+      ],
+      "unsupported_additions": [],
+      "citations": {"status":"valid","note":"docs/relaypost/attachments.md lines 1–3 contains the exact size rule at line 3; the displayed citation and #L1-L3 fragment match this range."},
+      "relevance": {"status":"relevant","note":"Precisely answers the narrow factual question without extra procedure or total-message claims."},
+      "abstention": {"status":"not_applicable","note":"Source provides the requested limit."}
+    },
+    {
+      "id": "answer-06",
+      "facts": [
+        {"fact_id":"print-applicability","status":"full","quote":"For a **RillPrint 4 queue already in maintenance mode**","reason":"Restricts to version 4 queues already in the required mode."},
+        {"fact_id":"print-manifest-before-purge","status":"full","quote":"Before purging, export the job manifest.","reason":"Mandatory manifest export is placed before purge."},
+        {"fact_id":"print-purge-conjunction","status":"full","quote":"Purge only when the upstream feeder is stopped **and** the device buffer is empty.","reason":"Preserves both necessary conditions as a conjunction."},
+        {"fact_id":"print-held-job-exception","status":"full","quote":"If any job is marked `held`, **stop recovery and leave the queue paused**. Do not purge or resume it.","reason":"Held job blocks recovery, purge, and resume and keeps the queue paused."},
+        {"fact_id":"print-verification-gate","status":"full","quote":"After the purge, run `spool-verify` successfully before resuming the queue.","reason":"Successful verification is required after purge and before resume."},
+        {"fact_id":"print-optional-diagnostics","status":"full","quote":"Uploading a diagnostic bundle is optional.","reason":"Expressly retains optional status."},
+        {"fact_id":"print-receipt-invariant","status":"full","quote":"Keep archived job receipts unchanged throughout recovery.","reason":"Explicit whole-recovery preservation requirement."}
+      ],
+      "unsupported_additions": [],
+      "citations": {"status":"valid","note":"docs/rillprint/recover-stalled-queue.md lines 1–9 supports all steps: applicability line 3, export line 4, purge gate line 5, held exception line 6, successful verification line 7, diagnostics line 8, and receipts line 9. No command syntax or recovery method outside maintenance mode occurs in this supplied passage, supporting the bounded limitation."},
+      "relevance": {"status":"relevant","note":"Direct recovery procedure with relevant limits on what the supplied documentation specifies."},
+      "abstention": {"status":"not_applicable","note":"Answers the documented procedure; no blanket abstention."}
+    },
+    {
+      "id": "answer-07",
+      "facts": [],
+      "unsupported_additions": [],
+      "citations": {"status":"valid","note":"docs/mostik/access-journal.md lines 1–6 lists journal fields, UTC, 24-hour device reconciliation at line 5, and CSV export. It supplies neither a retention period nor an automatic-deletion rule, supporting the evidence-limited answer."},
+      "relevance": {"status":"relevant","note":"Directly identifies unavailable retention evidence and clarifies the tempting but irrelevant 24-hour interval."},
+      "abstention": {"status":"valid_evidence_limited","note":"Quote: «В предоставленной документации срок автоматического удаления записей журнала проходов не указан.» Does not invent a period or infer indefinite retention. Explicitly limits absence to the fragment and states that this does not establish absence in other documentation."}
+    },
+    {
+      "id": "answer-08",
+      "facts": [],
+      "unsupported_additions": [],
+      "citations": {"status":"valid","note":"The link and displayed citation identify docs/mostik/access-journal.md lines 1–6 correctly. Line 5 assigns 24 hours to device reconciliation; the complete supplied excerpt has no retention or deletion rule. The citation supports both the bounded absence statement and distinction from reconciliation."},
+      "relevance": {"status":"relevant","note":"Answers the evidence limitation succinctly and avoids mistaking reconciliation frequency for retention."},
+      "abstention": {"status":"valid_evidence_limited","note":"Quote: «В предоставленной документации срок автоматического удаления записей журнала проходов не указан.» No invented deadline or global absence claim. Explicitly says this source cannot establish whether the period is specified elsewhere."}
+    },
+    {
+      "id":"answer-09",
+      "facts":[],
+      "unsupported_additions":[],
+      "citations":{"status":"valid","note":"docs/mostik/access-journal.md lines 1–6 supports the bounded lack of a deletion period; line 5 specifically concerns 24-hour device reconciliation, not retention. Displayed path and linked path agree."},
+      "relevance":{"status":"relevant","note":"Direct evidence limitation with useful clarification of the 24-hour interval; no invented retention rule."},
+      "abstention":{"status":"valid_evidence_limited","note":"Quote: «В предоставленном фрагменте документации срок автоматического удаления записей журнала проходов не указан.» Limits absence to the supplied fragment and explicitly leaves other documentation unresolved."}
+    },
+    {
+      "id":"answer-10",
+      "facts":[
+        {"fact_id":"V-M1-fact-1","status":"full","quote":"Для подтверждённого ночного наблюдения на общем инструменте порядок такой:","reason":"Preserves confirmed, night-time, shared-instrument scope."},
+        {"fact_id":"V-M1-fact-2","status":"full","quote":"Получите согласие принимающего наблюдателя и одобрение передачи дежурным оператором.","reason":"Both receiving-observer consent and duty-operator approval are prerequisites in the transfer procedure."},
+        {"fact_id":"V-M1-fact-3","status":"full","quote":"Сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита.","reason":"Requires original identifier retention and both observers in audit."},
+        {"fact_id":"V-M1-fact-4","status":"full","quote":"**Не завершайте передачу, пока действует блокировка обслуживания:** даже после согласия и одобрения она должна оставаться в ожидании.","reason":"Explicitly keeps transfer pending under the lock despite both approvals."},
+        {"fact_id":"V-M1-fact-5","status":"full","quote":"Сначала команда инструмента должна снять блокировку.","reason":"Instrument team must clear the lock first."},
+        {"fact_id":"V-M1-fact-6","status":"partial","quote":"Если наружные наблюдения приостановлены из-за разомкнутой ветровой блокировки","reason":"Already-suspended premise does not impose the duty to suspend when the interlock opens."},
+        {"fact_id":"V-M1-fact-7","status":"partial","quote":"Сохраните исходный идентификатор бронирования","reason":"Preserves identifier in the transfer step only; no suspension-wide invariant is expressed."},
+        {"fact_id":"V-M1-fact-8","status":"full","quote":"возобновлять их можно только после её замыкания и записи дежурным оператором разрешения на возобновление.","reason":"Requires both interlock closure and recorded duty-operator restart approval."}
+      ],
+      "unsupported_additions":[],
+      "citations":{"status":"valid_with_uncited_applicability","note":"reservations.md 7–10 / ev-c921e34c76fdfa492bebb68b supports transfer prerequisites, identifier, audit, and unchanged weather suspension; 11–14 / ev-8c0b8ec623baa336612c0ae6 supports maintenance handling. weather.md 1–4 / ev-56d4c522edb788db6d1f445e and 5–8 / ev-159aa46f19575f991571621c support ownership versus execution and weather conditions. calendar.md 1–4 / ev-525706a82d989ad63f985d9b and 5–8 / ev-af3fb3da8c27448bc32cb3fd support read-only display and ineffective refresh; reservations.md 15–17 / ev-db6c99cd7162ee2e647282c4 supports the training exclusion. Applicability is supported by supplied reservations.md 1–6 but not explicitly cited. Citations do not supply the incompletely expressed suspension duty or identifier invariant."},
+      "relevance":{"status":"relevant_with_peripheral_detail","note":"Direct transfer and lock guidance. Calendar and training exclusions are supported peripheral detail. Weather initiation and restart are connected but borderline extra detail during an existing suspension; all eight gold facts retained. Bounded absence of UI instructions is supported."},
+      "abstention":{"status":"not_applicable","note":"Answers the documented conditions; limits only absent interface details."}
+    },
+    {
+      "id":"answer-11",
+      "facts":[{"fact_id":"attachment-size-limit","status":"full","quote":"In a standard RelayPost mailbox, one attachment may be at most **18 MiB**.","reason":"Correct maximum, MiB unit, standard-mailbox and single-attachment scope; no upload procedure."}],
+      "unsupported_additions":[],
+      "citations":{"status":"valid","note":"docs/relaypost/attachments.md lines 1–3 contains the stated rule at line 3."},
+      "relevance":{"status":"relevant","note":"Direct narrow answer without extra procedure or total-message claims."},
+      "abstention":{"status":"not_applicable","note":"Requested limit is documented."}
+    },
+    {
+      "id":"answer-12",
+      "facts":[{"fact_id":"attachment-size-limit","status":"full","quote":"In a standard RelayPost mailbox, one attachment can be at most **18 MiB**.","reason":"Preserves upper limit, binary unit, and per-attachment standard-mailbox scope; omits unasked procedure."}],
+      "unsupported_additions":[],
+      "citations":{"status":"valid","note":"docs/relaypost/attachments.md lines 1–3 and linked #L1-L3 agree; line 3 supports the entire factual claim."},
+      "relevance":{"status":"relevant","note":"Precisely answers the size question without unrelated detail."},
+      "abstention":{"status":"not_applicable","note":"Source supplies the requested maximum."}
+    },
+    {
+      "id":"answer-13",
+      "facts":[
+        {"fact_id":"print-applicability","status":"full","quote":"For a **RillPrint 4 queue already in maintenance mode**","reason":"Restricts applicability to the documented version and pre-existing mode."},
+        {"fact_id":"print-manifest-before-purge","status":"full","quote":"Before purging, export the job manifest.","reason":"Mandatory export precedes purge."},
+        {"fact_id":"print-purge-conjunction","status":"full","quote":"Purge only when the upstream feeder is stopped **and** the device buffer is empty.","reason":"Both necessary conditions are conjoined."},
+        {"fact_id":"print-held-job-exception","status":"full","quote":"If any job is marked `held`, stop recovery and leave the queue paused. **Do not purge or resume it.**","reason":"Any held job blocks recovery, purge, and resume while keeping the queue paused."},
+        {"fact_id":"print-verification-gate","status":"full","quote":"After purging, run `spool-verify` successfully before resuming the queue.","reason":"Successful post-purge verification gates resumption."},
+        {"fact_id":"print-optional-diagnostics","status":"full","quote":"Uploading a diagnostic bundle is optional.","reason":"Explicitly optional."},
+        {"fact_id":"print-receipt-invariant","status":"full","quote":"Archived job receipts must remain unchanged throughout recovery.","reason":"Preserves the invariant for the whole recovery."}
+      ],
+      "unsupported_additions":[],
+      "citations":{"status":"valid","note":"docs/rillprint/recover-stalled-queue.md lines 1–9 supports applicability at 3, export at 4, conjunctive gate at 5, held exception at 6, verification at 7, diagnostics at 8, and receipt preservation at 9. The supplied text gives neither maintenance-entry instructions nor purge commands, supporting the bounded limitation."},
+      "relevance":{"status":"relevant","note":"Complete documented recovery conditions with a relevant limit on undocumented commands."},
+      "abstention":{"status":"not_applicable","note":"Answers available procedure; only bounds missing command details."}
+    },
+    {
+      "id":"answer-14",
+      "facts":[
+        {"fact_id":"print-applicability","status":"full","quote":"For a stalled **RillPrint 4 queue already in maintenance mode**:","reason":"Restricts procedure to the correct version and existing maintenance mode."},
+        {"fact_id":"print-manifest-before-purge","status":"full","quote":"Otherwise, export the job manifest before purging.","reason":"Mandatory pre-purge export follows only the non-held branch."},
+        {"fact_id":"print-purge-conjunction","status":"full","quote":"Purge only when **both** the upstream feeder is stopped and the device buffer is empty.","reason":"Explicitly requires both conditions."},
+        {"fact_id":"print-held-job-exception","status":"full","quote":"If any job is marked `held`, stop recovery and leave the queue paused. Do not purge or resume it.","reason":"Correct blocking exception and paused state, with neither purge nor resume allowed."},
+        {"fact_id":"print-verification-gate","status":"full","quote":"After the purge, run `spool-verify` successfully before resuming the queue.","reason":"Post-purge successful verification is required before resumption."},
+        {"fact_id":"print-optional-diagnostics","status":"full","quote":"Uploading a diagnostic bundle is optional.","reason":"Retains explicit optionality."},
+        {"fact_id":"print-receipt-invariant","status":"full","quote":"Archived job receipts must remain unchanged throughout recovery.","reason":"Whole-recovery preservation is explicit."}
+      ],
+      "unsupported_additions":[],
+      "citations":{"status":"valid","note":"docs/rillprint/recover-stalled-queue.md lines 1–9 supports each condition at lines 3–9 respectively: applicability, export, conjunction, held exception, verification, optional diagnostics, receipts. Its restricted applicability and lack of other instructions support the bounded statement about non-maintenance recovery."},
+      "relevance":{"status":"relevant","note":"Direct complete procedure with relevant applicability limitation; no invented command syntax."},
+      "abstention":{"status":"not_applicable","note":"Provides documented recovery while bounding the unsupported non-maintenance case."}
+    },
+    {
+      "id":"answer-15",
+      "facts":[{"fact_id":"attachment-size-limit","status":"full","quote":"In a standard RelayPost mailbox, one attachment can be at most **18 MiB**.","reason":"Correct per-attachment maximum and unit for the specified mailbox class; no unasked upload steps."}],
+      "unsupported_additions":[],
+      "citations":{"status":"valid","note":"docs/relaypost/attachments.md lines 1–3 contains the exact supporting size rule at line 3."},
+      "relevance":{"status":"relevant","note":"Only the requested size limit and source, without extra procedure."},
+      "abstention":{"status":"not_applicable","note":"Source supplies the requested fact."}
+    },
+    {
+      "id":"answer-16",
+      "facts":[],
+      "unsupported_additions":[],
+      "citations":{"status":"valid","note":"docs/mostik/access-journal.md lines 1–6 gives fields, UTC, reconciliation, and export, with no retention period or automatic deletion rule. Line 5 supports the distinction between 24-hour reconciliation and retention."},
+      "relevance":{"status":"relevant","note":"Directly states the evidence gap and explains why the 24-hour value cannot answer the question."},
+      "abstention":{"status":"valid_evidence_limited","note":"Quote: «В предоставленной документации срок автоматического удаления записей журнала проходов сервиса «Мостик» не указан.» Does not invent retention or claim global absence; explicitly allows that other materials may specify the period."}
+    }
+  ]
+}

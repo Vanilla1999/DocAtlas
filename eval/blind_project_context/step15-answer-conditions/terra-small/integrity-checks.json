@@ -1,0 +1,41 @@
+{
+  "boundary": "Public experiment-artifact CLI on isolated copies of actual Terra run, not product integration or unit tests. No model calls.",
+  "positive": {
+    "answers": 16,
+    "revision_roster": 4,
+    "metrics": "text-metrics.json",
+    "status": "PASS"
+  },
+  "negative_checks": [
+    {
+      "case": "missing_revision_roster",
+      "exit_code": 1,
+      "diagnostic": "ValueError: Revision inputs differ from frozen roster, sources, instruction or baseline",
+      "metrics_written": false
+    },
+    {
+      "case": "changed_revision_prompt",
+      "exit_code": 1,
+      "diagnostic": "ValueError: Revision inputs differ from frozen roster, sources, instruction or baseline",
+      "metrics_written": false
+    },
+    {
+      "case": "changed_final_baseline",
+      "exit_code": 1,
+      "diagnostic": "ValueError: One-pass answer changed after revision preparation",
+      "metrics_written": false
+    },
+    {
+      "case": "missing_revision_answer",
+      "exit_code": 1,
+      "diagnostic": "ValueError: Missing, duplicate or unexpected generated answer",
+      "metrics_written": false
+    },
+    {
+      "case": "changed_sealed_baseline",
+      "exit_code": 1,
+      "diagnostic": "ValueError: Sealed revision input changed: baseline-answers.json",
+      "metrics_written": false
+    }
+  ]
+}

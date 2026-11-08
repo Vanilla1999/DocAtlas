@@ -1,0 +1,214 @@
+{
+  "status": "TEXT_SIZES_NOT_TOKENS",
+  "rows": [
+    {
+      "id": "trial-001",
+      "case_id": "V-M1",
+      "policy": "current",
+      "answer_sha256": "3cb87e87b3a4b1f013b8c67f4eca87cd989896dd2f36be736525c7d49795568b",
+      "answer_words": 162,
+      "answer_utf8_bytes": 2555,
+      "logical_answer_calls": 1,
+      "baseline_id": null,
+      "provider_usage": null
+    },
+    {
+      "id": "trial-002",
+      "case_id": "V-M1",
+      "policy": "rule-contract-v1",
+      "answer_sha256": "238346fcd4734c04d75d0197edd2866ff564a255d0ce1b59aef1fd16efe468c3",
+      "answer_words": 109,
+      "answer_utf8_bytes": 1776,
+      "logical_answer_calls": 1,
+      "baseline_id": null,
+      "provider_usage": null
+    },
+    {
+      "id": "trial-003",
+      "case_id": "V-M1",
+      "policy": "evidence-led-v1",
+      "answer_sha256": "968e40725ceae7bdec046c2465fefc66a3d41424c72a7fd1a3119c735f74f15d",
+      "answer_words": 161,
+      "answer_utf8_bytes": 2592,
+      "logical_answer_calls": 1,
+      "baseline_id": null,
+      "provider_usage": null
+    },
+    {
+      "id": "trial-013",
+      "case_id": "fresh-en-print-queue-recovery",
+      "policy": "rule-contract-v1",
+      "answer_sha256": "aa51c5264a6d08ebaa10ab763817e93d254ac2a045aa824d83ae90dbac8b4495",
+      "answer_words": 100,
+      "answer_utf8_bytes": 670,
+      "logical_answer_calls": 1,
+      "baseline_id": null,
+      "provider_usage": null
+    },
+    {
+      "id": "trial-014",
+      "case_id": "fresh-en-print-queue-recovery",
+      "policy": "evidence-led-v1",
+      "answer_sha256": "e1491f253a829f6297c09a1809362b40bdbd43f8d3cfb6a6534084c0f1ebe247",
+      "answer_words": 98,
+      "answer_utf8_bytes": 675,
+      "logical_answer_calls": 1,
+      "baseline_id": null,
+      "provider_usage": null
+    },
+    {
+      "id": "trial-015",
+      "case_id": "fresh-en-print-queue-recovery",
+      "policy": "current",
+      "answer_sha256": "5899b0f24c1086877e4a8f3c5be66f252f970e81e6f12ccd02f14f113b574b50",
+      "answer_words": 105,
+      "answer_utf8_bytes": 702,
+      "logical_answer_calls": 1,
+      "baseline_id": null,
+      "provider_usage": null
+    },
+    {
+      "id": "trial-019",
+      "case_id": "fresh-en-single-attachment-limit",
+      "policy": "current",
+      "answer_sha256": "97aa7d7111fb09ee4b09a51643e895d63a12dd513ae538a1cfdf468b45dcaebd",
+      "answer_words": 17,
+      "answer_utf8_bytes": 168,
+      "logical_answer_calls": 1,
+      "baseline_id": null,
+      "provider_usage": null
+    },
+    {
+      "id": "trial-020",
+      "case_id": "fresh-en-single-attachment-limit",
+      "policy": "rule-contract-v1",
+      "answer_sha256": "d85814c3a059225a310bc0806207503eadfc793df7e5e4af0ed3740b80324078",
+      "answer_words": 16,
+      "answer_utf8_bytes": 121,
+      "logical_answer_calls": 1,
+      "baseline_id": null,
+      "provider_usage": null
+    },
+    {
+      "id": "trial-021",
+      "case_id": "fresh-en-single-attachment-limit",
+      "policy": "evidence-led-v1",
+      "answer_sha256": "b162e8d49f66d6ba576f031deb3303b8b31192647fec3b23ee8dabc969cb8925",
+      "answer_words": 16,
+      "answer_utf8_bytes": 121,
+      "logical_answer_calls": 1,
+      "baseline_id": null,
+      "provider_usage": null
+    },
+    {
+      "id": "trial-022",
+      "case_id": "fresh-ru-undocumented-journal-retention",
+      "policy": "rule-contract-v1",
+      "answer_sha256": "6467c22b4c45aaa158faadda07dc06b2516147cff8254ed801bca429efb392b0",
+      "answer_words": 42,
+      "answer_utf8_bytes": 569,
+      "logical_answer_calls": 1,
+      "baseline_id": null,
+      "provider_usage": null
+    },
+    {
+      "id": "trial-023",
+      "case_id": "fresh-ru-undocumented-journal-retention",
+      "policy": "evidence-led-v1",
+      "answer_sha256": "7d9babfc541c2bc1a0b8ac013743e80aec3ae2db21967b967fff4855b40ba1d4",
+      "answer_words": 39,
+      "answer_utf8_bytes": 526,
+      "logical_answer_calls": 1,
+      "baseline_id": null,
+      "provider_usage": null
+    },
+    {
+      "id": "trial-024",
+      "case_id": "fresh-ru-undocumented-journal-retention",
+      "policy": "current",
+      "answer_sha256": "c78077195ae6f2e83aaa221d713a063e5dded001a90c45a6d3a9779c83166a80",
+      "answer_words": 38,
+      "answer_utf8_bytes": 558,
+      "logical_answer_calls": 1,
+      "baseline_id": null,
+      "provider_usage": null
+    },
+    {
+      "id": "trial-025",
+      "case_id": "V-M1",
+      "policy": "source-revision-v1",
+      "answer_sha256": "eb70ca10308fb3602c70dc969cec278dcf158f12eb685d39c570c458686eede6",
+      "answer_words": 168,
+      "answer_utf8_bytes": 2681,
+      "logical_answer_calls": 2,
+      "baseline_id": "trial-001",
+      "provider_usage": null
+    },
+    {
+      "id": "trial-029",
+      "case_id": "fresh-en-print-queue-recovery",
+      "policy": "source-revision-v1",
+      "answer_sha256": "02d2a0e1766571ee887324ce2d48da48a2a837c87c0849a484fd65baffd063e0",
+      "answer_words": 105,
+      "answer_utf8_bytes": 703,
+      "logical_answer_calls": 2,
+      "baseline_id": "trial-015",
+      "provider_usage": null
+    },
+    {
+      "id": "trial-031",
+      "case_id": "fresh-en-single-attachment-limit",
+      "policy": "source-revision-v1",
+      "answer_sha256": "043f6b483abf49d1d6dcc2c45ff63c8ac49025435f452aa81fdf24f0e9a7331b",
+      "answer_words": 16,
+      "answer_utf8_bytes": 160,
+      "logical_answer_calls": 2,
+      "baseline_id": "trial-019",
+      "provider_usage": null
+    },
+    {
+      "id": "trial-032",
+      "case_id": "fresh-ru-undocumented-journal-retention",
+      "policy": "source-revision-v1",
+      "answer_sha256": "21422e82702dad2bdd6ab6beb21000a30d5b9c4036f403ce4db84cb997c89331",
+      "answer_words": 38,
+      "answer_utf8_bytes": 562,
+      "logical_answer_calls": 2,
+      "baseline_id": "trial-024",
+      "provider_usage": null
+    }
+  ],
+  "totals": {
+    "current": {
+      "answers": 4,
+      "final_words": 322,
+      "generated_words_including_draft": 322,
+      "logical_answer_calls": 4,
+      "provider_usage": null
+    },
+    "rule-contract-v1": {
+      "answers": 4,
+      "final_words": 267,
+      "generated_words_including_draft": 267,
+      "logical_answer_calls": 4,
+      "provider_usage": null
+    },
+    "evidence-led-v1": {
+      "answers": 4,
+      "final_words": 314,
+      "generated_words_including_draft": 314,
+      "logical_answer_calls": 4,
+      "provider_usage": null
+    },
+    "source-revision-v1": {
+      "answers": 4,
+      "final_words": 327,
+      "generated_words_including_draft": 649,
+      "logical_answer_calls": 8,
+      "provider_usage": null
+    }
+  },
+  "actual_generation_count": 16,
+  "cached_baseline_reuse": 4,
+  "boundary": "See run manifest for model/effort. Provider usage and latency unavailable. No inference of billing from word count."
+}

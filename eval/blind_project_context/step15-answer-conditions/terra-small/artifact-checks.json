@@ -1,0 +1,8 @@
+{
+  "unchanged_selected_cases_gold_prompts": true,
+  "source_hashes_and_historical_spans_match": true,
+  "answers_match_returned_text_files": true,
+  "unique_session_ids": 16,
+  "assessment_packet_seal_matches": true,
+  "boundary": "Static artifact consistency; does not attest hidden harness context, provider model routing or provider usage."
+}

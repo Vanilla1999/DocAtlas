@@ -401,7 +401,17 @@ These candidates are hypotheses, not a completeness guarantee. An answer-only
 comparison can isolate use of already supplied evidence, but does not establish
 native OpenCode/MCP acceptance, Terra Low quality, or provider-billing savings.
 No default should be promoted solely because an instruction is more explicit.
-The [Step15 answer-only report](../../eval/blind_project_context/step15-answer-conditions/RESULTS_RU.md)
+
+A subsequent reduced answer-only run explicitly selected GPT-6.1 Terra (without
+an effort override): four questions, all four policies, 16 generated answers.
+Blind session assessment found 14/16 full facts for current and revision, versus
+15/16 for each one-pass alternative; all four retained a partial stop-duty
+condition. This small result does not justify changing the default. See
+`eval/blind_project_context/step15-answer-conditions/terra-small/RESULTS_RU.md`
+for the unchanged rubric, raw answers, citation gaps and execution limitations.
+
+The original [Step15 answer-only report](../../eval/blind_project_context/step15-answer-conditions/RESULTS_RU.md)
 records 24 available-model responses: both opt-in policies changed which
 condition was missed without increasing the count of fully preserved facts.
-The two-call revision candidate and a Terra Low check remain untested.
+That original eight-question revision run and a specifically Terra Low check
+remain unexecuted; the reduced Terra run above is separate.

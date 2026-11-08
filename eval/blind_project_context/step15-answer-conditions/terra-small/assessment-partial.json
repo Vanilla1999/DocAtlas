@@ -1,0 +1,191 @@
+{
+  "boundary": {
+    "evidence": "Only the single authorized read of /tmp/opencode/step15-assessment-input.json was used. No other files, tools, external evidence, or delegation were used before saving.",
+    "completion": "incomplete_due_to_read_output_truncation",
+    "limitation": "The read requested 2000 lines but returned only lines 1–675, then instructed continuation at 676. The instruction on line 2 was also truncated at 2000 characters. The user permits only the initial read and the saving patch, so no continuation was performed. Candidates 01–08 are fully assessed; candidate 09's answer and candidates 10–16 were not visible. Entries for 09–16 record unavailable evidence, not substantive assessments. No unseen answers, gold facts, or required schema details have been invented.",
+    "rubric": "Visible gold requirements retained. Historical wind suspension phrased as already occurring is partial; transfer-only identifier preservation is partial for preservation during suspension. Night context need not be repeated. Connected weather relevance is recorded separately without removing facts."
+  },
+  "assessments": [
+    {
+      "id": "answer-01",
+      "facts": [
+        {"fact_id":"print-applicability","status":"full","quote":"For a **RillPrint 4 queue already in maintenance mode**","reason":"Explicitly restricts applicability to the specified version and pre-existing maintenance mode."},
+        {"fact_id":"print-manifest-before-purge","status":"full","quote":"Before purging, export the job manifest.","reason":"Mandatory imperative explicitly precedes purge."},
+        {"fact_id":"print-purge-conjunction","status":"full","quote":"Purge only when the upstream feeder is stopped **and** the device buffer is empty.","reason":"Both necessary conditions and their conjunction are preserved."},
+        {"fact_id":"print-held-job-exception","status":"full","quote":"If any job is marked `held`, **stop recovery and leave the queue paused**. Do not purge or resume it.","reason":"Any held job blocks recovery, purge, and resume while preserving paused state."},
+        {"fact_id":"print-verification-gate","status":"full","quote":"After the purge, run `spool-verify` successfully before resuming the queue.","reason":"Preserves post-purge ordering and successful verification before resume."},
+        {"fact_id":"print-optional-diagnostics","status":"full","quote":"Uploading a diagnostic bundle is optional.","reason":"Explicitly optional."},
+        {"fact_id":"print-receipt-invariant","status":"full","quote":"Keep archived job receipts unchanged throughout recovery.","reason":"Preserves the whole-recovery invariant."}
+      ],
+      "unsupported_additions": [],
+      "citation_validity": {"status":"valid","reason":"docs/rillprint/recover-stalled-queue.md lines 1–9 include applicability at 3, manifest at 4, conjunction at 5, held exception at 6, verification at 7, optional upload at 8, and receipt invariant at 9. The bounded statement that these excerpts give no purge commands or non-maintenance recovery method is supported by inspection."},
+      "relevance": "Direct procedural answer; the bounded documentation limitation is relevant and does not invent command syntax.",
+      "abstention": {"status":"not_applicable","reason":"Answerable case; supplies the documented procedure and only bounds unavailable implementation details."}
+    },
+    {
+      "id": "answer-02",
+      "facts": [
+        {"fact_id":"V-M1-fact-1","status":"full","quote":"Для подтверждённого ночного бронирования общего инструмента порядок такой:","reason":"Confirmed, night-time, and shared-instrument applicability all appear."},
+        {"fact_id":"V-M1-fact-2","status":"full","quote":"Получите согласие принимающего наблюдателя и одобрение дежурного оператора.","reason":"In the ordered transfer procedure, both receiving-observer consent and duty-operator approval are required."},
+        {"fact_id":"V-M1-fact-3","status":"full","quote":"Сохраните исходный идентификатор бронирования и укажите обоих наблюдателей в журнале аудита.","reason":"Both original identifier retention and audit entries for both observers are required."},
+        {"fact_id":"V-M1-fact-4","status":"full","quote":"**Пока активна блокировка обслуживания, оставьте передачу в ожидании**, даже если согласие и одобрение уже получены.","reason":"Active maintenance lock overrides both approvals and keeps transfer pending."},
+        {"fact_id":"V-M1-fact-5","status":"full","quote":"Сначала команда инструмента должна снять блокировку.","reason":"Preserves responsible team and prerequisite ordering."},
+        {"fact_id":"V-M1-fact-6","status":"partial","quote":"Если наружные наблюдения приостановлены из-за размыкания ветровой блокировки","reason":"Describes suspension as already occurring, not the duty to suspend when the interlock opens, per historical rubric."},
+        {"fact_id":"V-M1-fact-7","status":"full","quote":"Идентификатор бронирования при приостановке сохраняется.","reason":"Explicitly preserves identifier during suspension."},
+        {"fact_id":"V-M1-fact-8","status":"full","quote":"возобновить их можно только после её замыкания и записи дежурным оператором одобрения на возобновление.","reason":"Resumption requires both interlock closure and recorded restart approval by the duty operator."}
+      ],
+      "unsupported_additions": [],
+      "citation_validity": {"status":"valid","reason":"Cited paths, ranges, and refs match supplied evidence: reservations.md 1–4 (ev-f0eb1e549fed1aca3d464c2e) supports applicability; 7–10 (ev-c921e34c76fdfa492bebb68b) supports transfer, identifier, audit, and unchanged weather suspension; 11–14 (ev-8c0b8ec623baa336612c0ae6) supports lock handling; weather.md 1–4 (ev-56d4c522edb788db6d1f445e) and 5–8 (ev-159aa46f19575f991571621c) support execution versus ownership and weather conditions. calendar.md 1–4 (ev-525706a82d989ad63f985d9b), 5–8 (ev-af3fb3da8c27448bc32cb3fd), and reservations.md 15–17 (ev-db6c99cd7162ee2e647282c4) support the final calendar and training claims. Citations do not repair the incomplete statement of the suspension duty."},
+      "relevance": "Transfer and lock handling directly answer the question. Weather initiation and restart are connected but borderline extra detail because suspension is already active; retain all eight gold facts. Calendar refresh and training shortcut exclusions are supported peripheral detail. The limited absence of UI and lock-request instructions is accurate.",
+      "abstention": {"status":"not_applicable","reason":"Answers the documented conditions; its final limitation concerns only implementation details absent from the excerpts."}
+    },
+    {
+      "id": "answer-03",
+      "facts": [
+        {"fact_id":"V-M1-fact-1","status":"full","quote":"Для подтверждённого ночного бронирования **общего инструмента**:","reason":"All applicability qualifiers are preserved."},
+        {"fact_id":"V-M1-fact-2","status":"full","quote":"Получите согласие принимающего наблюдателя и одобрение передачи от дежурного оператора.","reason":"Both approvals are mandatory in the transfer procedure."},
+        {"fact_id":"V-M1-fact-3","status":"full","quote":"Сохраните исходный идентификатор бронирования и укажите обоих наблюдателей в журнале аудита.","reason":"Original identifier and both observers in audit are preserved."},
+        {"fact_id":"V-M1-fact-4","status":"full","quote":"Пока активна блокировка обслуживания, **оставьте передачу в ожидании**, даже если согласие и одобрение уже получены.","reason":"Explicitly keeps transfer pending despite approvals while maintenance lock is active."},
+        {"fact_id":"V-M1-fact-5","status":"full","quote":"Сначала блокировку должна снять команда инструмента.","reason":"Instrument team must clear the lock first."},
+        {"fact_id":"V-M1-fact-6","status":"partial","quote":"Если наружные наблюдения приостановлены из-за размыкания ветровой блокировки","reason":"An already-suspended premise does not fully express the trigger-based duty to suspend."},
+        {"fact_id":"V-M1-fact-7","status":"full","quote":"идентификатор бронирования при приостановке сохраняется.","reason":"Preservation is explicitly scoped to suspension."},
+        {"fact_id":"V-M1-fact-8","status":"full","quote":"их можно возобновить только после её замыкания и записи дежурным оператором разрешения на возобновление","reason":"Only permits resumption after both closure and recorded duty-operator approval."}
+      ],
+      "unsupported_additions": [],
+      "citation_validity": {"status":"valid","reason":"reservations.md 1–10 with ev-f0eb1e549fed1aca3d464c2e and ev-c921e34c76fdfa492bebb68b supports applicability and transfer duties; 11–14 with ev-8c0b8ec623baa336612c0ae6 supports the maintenance gate. reservations.md 7–10 supports unchanged weather suspension. weather.md 1–8 with ev-56d4c522edb788db6d1f445e and ev-159aa46f19575f991571621c supports execution versus ownership and weather conditions. All cited ranges cover the actual supporting text. A valid citation does not complete the unstated suspension duty."},
+      "relevance": "Focused on transfer, maintenance, and connected weather conditions. Weather initiation and restart are borderline peripheral to transfer under an already active suspension; all eight gold facts remain in the denominator.",
+      "abstention": {"status":"not_applicable","reason":"Answerable case with substantive answer."}
+    },
+    {
+      "id": "answer-04",
+      "facts": [
+        {"fact_id":"V-M1-fact-1","status":"full","quote":"Для подтверждённого ночного наблюдения на общем инструменте:","reason":"Confirmed night observation on shared instrument supplies the full applicability scope."},
+        {"fact_id":"V-M1-fact-2","status":"full","quote":"Получите согласие принимающего наблюдателя и одобрение передачи дежурным оператором. Передача допустима только после обоих действий.","reason":"Expressly requires both actions before transfer."},
+        {"fact_id":"V-M1-fact-3","status":"full","quote":"При передаче сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита.","reason":"Both transfer preservation and audit requirements are explicit."},
+        {"fact_id":"V-M1-fact-4","status":"full","quote":"**Оставьте передачу в ожидании, пока действует блокировка обслуживания**, даже если согласие и одобрение уже получены.","reason":"Pending state persists despite approvals during active maintenance lock."},
+        {"fact_id":"V-M1-fact-5","status":"full","quote":"Сначала команда инструмента должна снять блокировку.","reason":"Correct responsible team and first-clear ordering."},
+        {"fact_id":"V-M1-fact-6","status":"partial","quote":"Если наружные наблюдения приостановлены из-за разомкнутой ветровой блокировки","reason":"Describes a suspended condition rather than imposing suspension when the interlock opens."},
+        {"fact_id":"V-M1-fact-7","status":"partial","quote":"При передаче сохраните исходный идентификатор бронирования","reason":"Identifier preservation is limited to transfer; does not express the invariant during weather suspension. The weather citation alone cannot supply it."},
+        {"fact_id":"V-M1-fact-8","status":"full","quote":"возобновлять их можно только после её замыкания и записи дежурным оператором разрешения на возобновление.","reason":"Both closure and duty-operator recorded approval gate resumption."}
+      ],
+      "unsupported_additions": [],
+      "citation_validity": {"status":"valid_with_uncited_applicability","reason":"Transfer and audit cite reservations.md 7–10 / ev-c921e34c76fdfa492bebb68b; maintenance handling cites 11–14 / ev-8c0b8ec623baa336612c0ae6. Weather cites reservations.md 7–10 and weather.md 1–4 / ev-56d4c522edb788db6d1f445e plus 5–8 / ev-159aa46f19575f991571621c, all substantively supporting the attached claims. Calendar and training cite calendar.md 1–4 / ev-525706a82d989ad63f985d9b, 5–8 / ev-af3fb3da8c27448bc32cb3fd, and reservations.md 15–17 / ev-db6c99cd7162ee2e647282c4 correctly. Opening applicability is supported by supplied reservations.md 1–6 but that range is not explicitly cited. No cited passage substitutes for expressing the missing temporal scope of identifier preservation."},
+      "relevance": "Direct transfer guidance with supported peripheral calendar and training warnings. Weather trigger and restart conditions are connected, borderline additional detail for transfer during an existing suspension; all eight gold facts retained. Bounded absence of interface instructions is accurate.",
+      "abstention": {"status":"not_applicable","reason":"Gives supported procedural conditions and limits only undocumented UI details."}
+    },
+    {
+      "id": "answer-05",
+      "facts": [
+        {"fact_id":"attachment-size-limit","status":"full","quote":"In a standard RelayPost mailbox, one attachment can be at most **18 MiB**.","reason":"Preserves maximum, binary unit, mailbox class, and per-attachment scope, without unrequested upload procedure."}
+      ],
+      "unsupported_additions": [],
+      "citation_validity": {"status":"valid","reason":"docs/relaypost/attachments.md lines 1–3 contains the exact size rule at line 3; the displayed citation and #L1-L3 fragment match this range."},
+      "relevance": "Precisely answers the narrow factual question without extra procedure or total-message claims.",
+      "abstention": {"status":"not_applicable","reason":"Source provides the requested limit."}
+    },
+    {
+      "id": "answer-06",
+      "facts": [
+        {"fact_id":"print-applicability","status":"full","quote":"For a **RillPrint 4 queue already in maintenance mode**","reason":"Restricts to version 4 queues already in the required mode."},
+        {"fact_id":"print-manifest-before-purge","status":"full","quote":"Before purging, export the job manifest.","reason":"Mandatory manifest export is placed before purge."},
+        {"fact_id":"print-purge-conjunction","status":"full","quote":"Purge only when the upstream feeder is stopped **and** the device buffer is empty.","reason":"Preserves both necessary conditions as a conjunction."},
+        {"fact_id":"print-held-job-exception","status":"full","quote":"If any job is marked `held`, **stop recovery and leave the queue paused**. Do not purge or resume it.","reason":"Held job blocks recovery, purge, and resume and keeps the queue paused."},
+        {"fact_id":"print-verification-gate","status":"full","quote":"After the purge, run `spool-verify` successfully before resuming the queue.","reason":"Successful verification is required after purge and before resume."},
+        {"fact_id":"print-optional-diagnostics","status":"full","quote":"Uploading a diagnostic bundle is optional.","reason":"Expressly retains optional status."},
+        {"fact_id":"print-receipt-invariant","status":"full","quote":"Keep archived job receipts unchanged throughout recovery.","reason":"Explicit whole-recovery preservation requirement."}
+      ],
+      "unsupported_additions": [],
+      "citation_validity": {"status":"valid","reason":"docs/rillprint/recover-stalled-queue.md lines 1–9 supports all steps: applicability line 3, export line 4, purge gate line 5, held exception line 6, successful verification line 7, diagnostics line 8, and receipts line 9. No command syntax or recovery method outside maintenance mode occurs in this supplied passage, supporting the bounded limitation."},
+      "relevance": "Direct recovery procedure with relevant limits on what the supplied documentation specifies.",
+      "abstention": {"status":"not_applicable","reason":"Answers the documented procedure; no blanket abstention."}
+    },
+    {
+      "id": "answer-07",
+      "facts": [],
+      "unsupported_additions": [],
+      "citation_validity": {"status":"valid","reason":"docs/mostik/access-journal.md lines 1–6 lists journal fields, UTC, 24-hour device reconciliation at line 5, and CSV export. It supplies neither a retention period nor an automatic-deletion rule, supporting the evidence-limited answer."},
+      "relevance": "Directly identifies unavailable retention evidence and clarifies the tempting but irrelevant 24-hour interval.",
+      "abstention": {"status":"valid_evidence_limited","quote":"В предоставленной документации срок автоматического удаления записей журнала проходов не указан.","reason":"Does not invent a period or infer indefinite retention. Explicitly limits absence to the fragment and states that this does not establish absence in other documentation."}
+    },
+    {
+      "id": "answer-08",
+      "facts": [],
+      "unsupported_additions": [],
+      "citation_validity": {"status":"valid","reason":"The link and displayed citation identify docs/mostik/access-journal.md lines 1–6 correctly. Line 5 assigns 24 hours to device reconciliation; the complete supplied excerpt has no retention or deletion rule. The citation supports both the bounded absence statement and distinction from reconciliation."},
+      "relevance": "Answers the evidence limitation succinctly and avoids mistaking reconciliation frequency for retention.",
+      "abstention": {"status":"valid_evidence_limited","quote":"В предоставленной документации срок автоматического удаления записей журнала проходов не указан.","reason":"No invented deadline or global absence claim. Explicitly says this source cannot establish whether the period is specified elsewhere."}
+    },
+    {
+      "id":"answer-09",
+      "assessment_status":"unavailable",
+      "facts":[],
+      "unsupported_additions":null,
+      "citation_validity":{"status":"unassessed","reason":"Candidate answer fell beyond the authorized read's truncated output."},
+      "relevance":"Unassessed: question, source, empty gold facts, and no_answer=true were visible, but candidate answer was not.",
+      "abstention":{"status":"unassessed","reason":"Cannot evaluate evidence-limited abstention without the candidate answer."}
+    },
+    {
+      "id":"answer-10",
+      "assessment_status":"unavailable",
+      "facts":[],
+      "unsupported_additions":null,
+      "citation_validity":{"status":"unassessed","reason":"Candidate and evidence were beyond read output truncation."},
+      "relevance":"Unassessed; no candidate content was visible. Empty facts is a placeholder, not a finding of no gold facts.",
+      "abstention":{"status":"unassessed","reason":"No visible question, gold requirements, or answer."}
+    },
+    {
+      "id":"answer-11",
+      "assessment_status":"unavailable",
+      "facts":[],
+      "unsupported_additions":null,
+      "citation_validity":{"status":"unassessed","reason":"Candidate and evidence were beyond read output truncation."},
+      "relevance":"Unassessed; no candidate content was visible. Empty facts is a placeholder, not a finding of no gold facts.",
+      "abstention":{"status":"unassessed","reason":"No visible question, gold requirements, or answer."}
+    },
+    {
+      "id":"answer-12",
+      "assessment_status":"unavailable",
+      "facts":[],
+      "unsupported_additions":null,
+      "citation_validity":{"status":"unassessed","reason":"Candidate and evidence were beyond read output truncation."},
+      "relevance":"Unassessed; no candidate content was visible. Empty facts is a placeholder, not a finding of no gold facts.",
+      "abstention":{"status":"unassessed","reason":"No visible question, gold requirements, or answer."}
+    },
+    {
+      "id":"answer-13",
+      "assessment_status":"unavailable",
+      "facts":[],
+      "unsupported_additions":null,
+      "citation_validity":{"status":"unassessed","reason":"Candidate and evidence were beyond read output truncation."},
+      "relevance":"Unassessed; no candidate content was visible. Empty facts is a placeholder, not a finding of no gold facts.",
+      "abstention":{"status":"unassessed","reason":"No visible question, gold requirements, or answer."}
+    },
+    {
+      "id":"answer-14",
+      "assessment_status":"unavailable",
+      "facts":[],
+      "unsupported_additions":null,
+      "citation_validity":{"status":"unassessed","reason":"Candidate and evidence were beyond read output truncation."},
+      "relevance":"Unassessed; no candidate content was visible. Empty facts is a placeholder, not a finding of no gold facts.",
+      "abstention":{"status":"unassessed","reason":"No visible question, gold requirements, or answer."}
+    },
+    {
+      "id":"answer-15",
+      "assessment_status":"unavailable",
+      "facts":[],
+      "unsupported_additions":null,
+      "citation_validity":{"status":"unassessed","reason":"Candidate and evidence were beyond read output truncation."},
+      "relevance":"Unassessed; no candidate content was visible. Empty facts is a placeholder, not a finding of no gold facts.",
+      "abstention":{"status":"unassessed","reason":"No visible question, gold requirements, or answer."}
+    },
+    {
+      "id":"answer-16",
+      "assessment_status":"unavailable",
+      "facts":[],
+      "unsupported_additions":null,
+      "citation_validity":{"status":"unassessed","reason":"Candidate and evidence were beyond read output truncation."},
+      "relevance":"Unassessed; no candidate content was visible. Empty facts is a placeholder, not a finding of no gold facts.",
+      "abstention":{"status":"unassessed","reason":"No visible question, gold requirements, or answer."}
+    }
+  ]
+}

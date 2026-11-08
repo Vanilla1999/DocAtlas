@@ -1,0 +1,421 @@
+{
+  "boundary": "Mechanical aggregation of independent semantic assessment; not a second evaluator. Full and partial kept separate.",
+  "assessment_session": "ses_e4526f6b0ffeyiJykpr52Vy8Dc",
+  "assessment_sha256": "113971a666c84b1a097019b9bd339bbedffa443ca58eaaf81a7e65b73e50902b",
+  "all_16_assessed": true,
+  "all_64_fact_verdicts_present": true,
+  "quotes_are_exact_answer_substrings": true,
+  "first_eight_fact_verdicts_unchanged": true,
+  "by_policy": {
+    "current": {
+      "full": 14,
+      "partial": 2,
+      "missing": 0,
+      "contradicted": 0,
+      "no_answer": [
+        {
+          "status": "valid_evidence_limited",
+          "note": "Quote: «В предоставленной документации срок автоматического удаления записей журнала проходов не указан.» No invented deadline or global absence claim. Explicitly says this source cannot establish whether the period is specified elsewhere."
+        }
+      ],
+      "unsupported_additions": [],
+      "citations": [
+        {
+          "trial_id": "trial-015",
+          "status": "valid",
+          "note": "docs/rillprint/recover-stalled-queue.md lines 1–9 include applicability at 3, manifest at 4, conjunction at 5, held exception at 6, verification at 7, optional upload at 8, and receipt invariant at 9. The bounded statement that these excerpts give no purge commands or non-maintenance recovery method is supported by inspection."
+        },
+        {
+          "trial_id": "trial-024",
+          "status": "valid",
+          "note": "The link and displayed citation identify docs/mostik/access-journal.md lines 1–6 correctly. Line 5 assigns 24 hours to device reconciliation; the complete supplied excerpt has no retention or deletion rule. The citation supports both the bounded absence statement and distinction from reconciliation."
+        },
+        {
+          "trial_id": "trial-001",
+          "status": "valid_with_uncited_applicability",
+          "note": "reservations.md 7–10 / ev-c921e34c76fdfa492bebb68b supports transfer prerequisites, identifier, audit, and unchanged weather suspension; 11–14 / ev-8c0b8ec623baa336612c0ae6 supports maintenance handling. weather.md 1–4 / ev-56d4c522edb788db6d1f445e and 5–8 / ev-159aa46f19575f991571621c support ownership versus execution and weather conditions. calendar.md 1–4 / ev-525706a82d989ad63f985d9b and 5–8 / ev-af3fb3da8c27448bc32cb3fd support read-only display and ineffective refresh; reservations.md 15–17 / ev-db6c99cd7162ee2e647282c4 supports the training exclusion. Applicability is supported by supplied reservations.md 1–6 but not explicitly cited. Citations do not supply the incompletely expressed suspension duty or identifier invariant."
+        },
+        {
+          "trial_id": "trial-019",
+          "status": "valid",
+          "note": "docs/relaypost/attachments.md lines 1–3 and linked #L1-L3 agree; line 3 supports the entire factual claim."
+        }
+      ]
+    },
+    "evidence-led-v1": {
+      "full": 15,
+      "partial": 1,
+      "missing": 0,
+      "contradicted": 0,
+      "no_answer": [
+        {
+          "status": "valid_evidence_limited",
+          "note": "Quote: «В предоставленной документации срок автоматического удаления записей журнала проходов сервиса «Мостик» не указан.» Does not invent retention or claim global absence; explicitly allows that other materials may specify the period."
+        }
+      ],
+      "unsupported_additions": [],
+      "citations": [
+        {
+          "trial_id": "trial-003",
+          "status": "valid",
+          "note": "Cited paths, ranges, and refs match supplied evidence: reservations.md 1–4 (ev-f0eb1e549fed1aca3d464c2e) supports applicability; 7–10 (ev-c921e34c76fdfa492bebb68b) supports transfer, identifier, audit, and unchanged weather suspension; 11–14 (ev-8c0b8ec623baa336612c0ae6) supports lock handling; weather.md 1–4 (ev-56d4c522edb788db6d1f445e) and 5–8 (ev-159aa46f19575f991571621c) support execution versus ownership and weather conditions. calendar.md 1–4 (ev-525706a82d989ad63f985d9b), 5–8 (ev-af3fb3da8c27448bc32cb3fd), and reservations.md 15–17 (ev-db6c99cd7162ee2e647282c4) support the final calendar and training claims. Citations do not repair the incomplete statement of the suspension duty."
+        },
+        {
+          "trial_id": "trial-021",
+          "status": "valid",
+          "note": "docs/relaypost/attachments.md lines 1–3 contains the stated rule at line 3."
+        },
+        {
+          "trial_id": "trial-014",
+          "status": "valid",
+          "note": "docs/rillprint/recover-stalled-queue.md lines 1–9 supports applicability at 3, export at 4, conjunctive gate at 5, held exception at 6, verification at 7, diagnostics at 8, and receipt preservation at 9. The supplied text gives neither maintenance-entry instructions nor purge commands, supporting the bounded limitation."
+        },
+        {
+          "trial_id": "trial-023",
+          "status": "valid",
+          "note": "docs/mostik/access-journal.md lines 1–6 gives fields, UTC, reconciliation, and export, with no retention period or automatic deletion rule. Line 5 supports the distinction between 24-hour reconciliation and retention."
+        }
+      ]
+    },
+    "rule-contract-v1": {
+      "full": 15,
+      "partial": 1,
+      "missing": 0,
+      "contradicted": 0,
+      "no_answer": [
+        {
+          "status": "valid_evidence_limited",
+          "note": "Quote: «В предоставленной документации срок автоматического удаления записей журнала проходов не указан.» Does not invent a period or infer indefinite retention. Explicitly limits absence to the fragment and states that this does not establish absence in other documentation."
+        }
+      ],
+      "unsupported_additions": [],
+      "citations": [
+        {
+          "trial_id": "trial-002",
+          "status": "valid",
+          "note": "reservations.md 1–10 with ev-f0eb1e549fed1aca3d464c2e and ev-c921e34c76fdfa492bebb68b supports applicability and transfer duties; 11–14 with ev-8c0b8ec623baa336612c0ae6 supports the maintenance gate. reservations.md 7–10 supports unchanged weather suspension. weather.md 1–8 with ev-56d4c522edb788db6d1f445e and ev-159aa46f19575f991571621c supports execution versus ownership and weather conditions. All cited ranges cover the actual supporting text. A valid citation does not complete the unstated suspension duty."
+        },
+        {
+          "trial_id": "trial-022",
+          "status": "valid",
+          "note": "docs/mostik/access-journal.md lines 1–6 lists journal fields, UTC, 24-hour device reconciliation at line 5, and CSV export. It supplies neither a retention period nor an automatic-deletion rule, supporting the evidence-limited answer."
+        },
+        {
+          "trial_id": "trial-013",
+          "status": "valid",
+          "note": "docs/rillprint/recover-stalled-queue.md lines 1–9 supports each condition at lines 3–9 respectively: applicability, export, conjunction, held exception, verification, optional diagnostics, receipts. Its restricted applicability and lack of other instructions support the bounded statement about non-maintenance recovery."
+        },
+        {
+          "trial_id": "trial-020",
+          "status": "valid",
+          "note": "docs/relaypost/attachments.md lines 1–3 contains the exact supporting size rule at line 3."
+        }
+      ]
+    },
+    "source-revision-v1": {
+      "full": 14,
+      "partial": 2,
+      "missing": 0,
+      "contradicted": 0,
+      "no_answer": [
+        {
+          "status": "valid_evidence_limited",
+          "note": "Quote: «В предоставленном фрагменте документации срок автоматического удаления записей журнала проходов не указан.» Limits absence to the supplied fragment and explicitly leaves other documentation unresolved."
+        }
+      ],
+      "unsupported_additions": [],
+      "citations": [
+        {
+          "trial_id": "trial-025",
+          "status": "valid_with_uncited_applicability",
+          "note": "Transfer and audit cite reservations.md 7–10 / ev-c921e34c76fdfa492bebb68b; maintenance handling cites 11–14 / ev-8c0b8ec623baa336612c0ae6. Weather cites reservations.md 7–10 and weather.md 1–4 / ev-56d4c522edb788db6d1f445e plus 5–8 / ev-159aa46f19575f991571621c, all substantively supporting the attached claims. Calendar and training cite calendar.md 1–4 / ev-525706a82d989ad63f985d9b, 5–8 / ev-af3fb3da8c27448bc32cb3fd, and reservations.md 15–17 / ev-db6c99cd7162ee2e647282c4 correctly. Opening applicability is supported by supplied reservations.md 1–6 but that range is not explicitly cited. No cited passage substitutes for expressing the missing temporal scope of identifier preservation."
+        },
+        {
+          "trial_id": "trial-031",
+          "status": "valid",
+          "note": "docs/relaypost/attachments.md lines 1–3 contains the exact size rule at line 3; the displayed citation and #L1-L3 fragment match this range."
+        },
+        {
+          "trial_id": "trial-029",
+          "status": "valid",
+          "note": "docs/rillprint/recover-stalled-queue.md lines 1–9 supports all steps: applicability line 3, export line 4, purge gate line 5, held exception line 6, successful verification line 7, diagnostics line 8, and receipts line 9. No command syntax or recovery method outside maintenance mode occurs in this supplied passage, supporting the bounded limitation."
+        },
+        {
+          "trial_id": "trial-032",
+          "status": "valid",
+          "note": "docs/mostik/access-journal.md lines 1–6 supports the bounded lack of a deletion period; line 5 specifically concerns 24-hour device reconciliation, not retention. Displayed path and linked path agree."
+        }
+      ]
+    }
+  },
+  "by_trial": [
+    {
+      "trial_id": "trial-001",
+      "anonymous_id": "answer-10",
+      "case_id": "V-M1",
+      "policy": "current",
+      "counts": {
+        "full": 6,
+        "partial": 2
+      },
+      "abstention": {
+        "status": "not_applicable",
+        "note": "Answers the documented conditions; limits only absent interface details."
+      },
+      "citations": {
+        "status": "valid_with_uncited_applicability",
+        "note": "reservations.md 7–10 / ev-c921e34c76fdfa492bebb68b supports transfer prerequisites, identifier, audit, and unchanged weather suspension; 11–14 / ev-8c0b8ec623baa336612c0ae6 supports maintenance handling. weather.md 1–4 / ev-56d4c522edb788db6d1f445e and 5–8 / ev-159aa46f19575f991571621c support ownership versus execution and weather conditions. calendar.md 1–4 / ev-525706a82d989ad63f985d9b and 5–8 / ev-af3fb3da8c27448bc32cb3fd support read-only display and ineffective refresh; reservations.md 15–17 / ev-db6c99cd7162ee2e647282c4 supports the training exclusion. Applicability is supported by supplied reservations.md 1–6 but not explicitly cited. Citations do not supply the incompletely expressed suspension duty or identifier invariant."
+      }
+    },
+    {
+      "trial_id": "trial-002",
+      "anonymous_id": "answer-03",
+      "case_id": "V-M1",
+      "policy": "rule-contract-v1",
+      "counts": {
+        "full": 7,
+        "partial": 1
+      },
+      "abstention": {
+        "status": "not_applicable",
+        "note": "Answerable case with substantive answer."
+      },
+      "citations": {
+        "status": "valid",
+        "note": "reservations.md 1–10 with ev-f0eb1e549fed1aca3d464c2e and ev-c921e34c76fdfa492bebb68b supports applicability and transfer duties; 11–14 with ev-8c0b8ec623baa336612c0ae6 supports the maintenance gate. reservations.md 7–10 supports unchanged weather suspension. weather.md 1–8 with ev-56d4c522edb788db6d1f445e and ev-159aa46f19575f991571621c supports execution versus ownership and weather conditions. All cited ranges cover the actual supporting text. A valid citation does not complete the unstated suspension duty."
+      }
+    },
+    {
+      "trial_id": "trial-003",
+      "anonymous_id": "answer-02",
+      "case_id": "V-M1",
+      "policy": "evidence-led-v1",
+      "counts": {
+        "full": 7,
+        "partial": 1
+      },
+      "abstention": {
+        "status": "not_applicable",
+        "note": "Answers the documented conditions; its final limitation concerns only implementation details absent from the excerpts."
+      },
+      "citations": {
+        "status": "valid",
+        "note": "Cited paths, ranges, and refs match supplied evidence: reservations.md 1–4 (ev-f0eb1e549fed1aca3d464c2e) supports applicability; 7–10 (ev-c921e34c76fdfa492bebb68b) supports transfer, identifier, audit, and unchanged weather suspension; 11–14 (ev-8c0b8ec623baa336612c0ae6) supports lock handling; weather.md 1–4 (ev-56d4c522edb788db6d1f445e) and 5–8 (ev-159aa46f19575f991571621c) support execution versus ownership and weather conditions. calendar.md 1–4 (ev-525706a82d989ad63f985d9b), 5–8 (ev-af3fb3da8c27448bc32cb3fd), and reservations.md 15–17 (ev-db6c99cd7162ee2e647282c4) support the final calendar and training claims. Citations do not repair the incomplete statement of the suspension duty."
+      }
+    },
+    {
+      "trial_id": "trial-013",
+      "anonymous_id": "answer-14",
+      "case_id": "fresh-en-print-queue-recovery",
+      "policy": "rule-contract-v1",
+      "counts": {
+        "full": 7
+      },
+      "abstention": {
+        "status": "not_applicable",
+        "note": "Provides documented recovery while bounding the unsupported non-maintenance case."
+      },
+      "citations": {
+        "status": "valid",
+        "note": "docs/rillprint/recover-stalled-queue.md lines 1–9 supports each condition at lines 3–9 respectively: applicability, export, conjunction, held exception, verification, optional diagnostics, receipts. Its restricted applicability and lack of other instructions support the bounded statement about non-maintenance recovery."
+      }
+    },
+    {
+      "trial_id": "trial-014",
+      "anonymous_id": "answer-13",
+      "case_id": "fresh-en-print-queue-recovery",
+      "policy": "evidence-led-v1",
+      "counts": {
+        "full": 7
+      },
+      "abstention": {
+        "status": "not_applicable",
+        "note": "Answers available procedure; only bounds missing command details."
+      },
+      "citations": {
+        "status": "valid",
+        "note": "docs/rillprint/recover-stalled-queue.md lines 1–9 supports applicability at 3, export at 4, conjunctive gate at 5, held exception at 6, verification at 7, diagnostics at 8, and receipt preservation at 9. The supplied text gives neither maintenance-entry instructions nor purge commands, supporting the bounded limitation."
+      }
+    },
+    {
+      "trial_id": "trial-015",
+      "anonymous_id": "answer-01",
+      "case_id": "fresh-en-print-queue-recovery",
+      "policy": "current",
+      "counts": {
+        "full": 7
+      },
+      "abstention": {
+        "status": "not_applicable",
+        "note": "Answerable case; supplies the documented procedure and only bounds unavailable implementation details."
+      },
+      "citations": {
+        "status": "valid",
+        "note": "docs/rillprint/recover-stalled-queue.md lines 1–9 include applicability at 3, manifest at 4, conjunction at 5, held exception at 6, verification at 7, optional upload at 8, and receipt invariant at 9. The bounded statement that these excerpts give no purge commands or non-maintenance recovery method is supported by inspection."
+      }
+    },
+    {
+      "trial_id": "trial-019",
+      "anonymous_id": "answer-12",
+      "case_id": "fresh-en-single-attachment-limit",
+      "policy": "current",
+      "counts": {
+        "full": 1
+      },
+      "abstention": {
+        "status": "not_applicable",
+        "note": "Source supplies the requested maximum."
+      },
+      "citations": {
+        "status": "valid",
+        "note": "docs/relaypost/attachments.md lines 1–3 and linked #L1-L3 agree; line 3 supports the entire factual claim."
+      }
+    },
+    {
+      "trial_id": "trial-020",
+      "anonymous_id": "answer-15",
+      "case_id": "fresh-en-single-attachment-limit",
+      "policy": "rule-contract-v1",
+      "counts": {
+        "full": 1
+      },
+      "abstention": {
+        "status": "not_applicable",
+        "note": "Source supplies the requested fact."
+      },
+      "citations": {
+        "status": "valid",
+        "note": "docs/relaypost/attachments.md lines 1–3 contains the exact supporting size rule at line 3."
+      }
+    },
+    {
+      "trial_id": "trial-021",
+      "anonymous_id": "answer-11",
+      "case_id": "fresh-en-single-attachment-limit",
+      "policy": "evidence-led-v1",
+      "counts": {
+        "full": 1
+      },
+      "abstention": {
+        "status": "not_applicable",
+        "note": "Requested limit is documented."
+      },
+      "citations": {
+        "status": "valid",
+        "note": "docs/relaypost/attachments.md lines 1–3 contains the stated rule at line 3."
+      }
+    },
+    {
+      "trial_id": "trial-022",
+      "anonymous_id": "answer-07",
+      "case_id": "fresh-ru-undocumented-journal-retention",
+      "policy": "rule-contract-v1",
+      "counts": {},
+      "abstention": {
+        "status": "valid_evidence_limited",
+        "note": "Quote: «В предоставленной документации срок автоматического удаления записей журнала проходов не указан.» Does not invent a period or infer indefinite retention. Explicitly limits absence to the fragment and states that this does not establish absence in other documentation."
+      },
+      "citations": {
+        "status": "valid",
+        "note": "docs/mostik/access-journal.md lines 1–6 lists journal fields, UTC, 24-hour device reconciliation at line 5, and CSV export. It supplies neither a retention period nor an automatic-deletion rule, supporting the evidence-limited answer."
+      }
+    },
+    {
+      "trial_id": "trial-023",
+      "anonymous_id": "answer-16",
+      "case_id": "fresh-ru-undocumented-journal-retention",
+      "policy": "evidence-led-v1",
+      "counts": {},
+      "abstention": {
+        "status": "valid_evidence_limited",
+        "note": "Quote: «В предоставленной документации срок автоматического удаления записей журнала проходов сервиса «Мостик» не указан.» Does not invent retention or claim global absence; explicitly allows that other materials may specify the period."
+      },
+      "citations": {
+        "status": "valid",
+        "note": "docs/mostik/access-journal.md lines 1–6 gives fields, UTC, reconciliation, and export, with no retention period or automatic deletion rule. Line 5 supports the distinction between 24-hour reconciliation and retention."
+      }
+    },
+    {
+      "trial_id": "trial-024",
+      "anonymous_id": "answer-08",
+      "case_id": "fresh-ru-undocumented-journal-retention",
+      "policy": "current",
+      "counts": {},
+      "abstention": {
+        "status": "valid_evidence_limited",
+        "note": "Quote: «В предоставленной документации срок автоматического удаления записей журнала проходов не указан.» No invented deadline or global absence claim. Explicitly says this source cannot establish whether the period is specified elsewhere."
+      },
+      "citations": {
+        "status": "valid",
+        "note": "The link and displayed citation identify docs/mostik/access-journal.md lines 1–6 correctly. Line 5 assigns 24 hours to device reconciliation; the complete supplied excerpt has no retention or deletion rule. The citation supports both the bounded absence statement and distinction from reconciliation."
+      }
+    },
+    {
+      "trial_id": "trial-025",
+      "anonymous_id": "answer-04",
+      "case_id": "V-M1",
+      "policy": "source-revision-v1",
+      "counts": {
+        "full": 6,
+        "partial": 2
+      },
+      "abstention": {
+        "status": "not_applicable",
+        "note": "Gives supported procedural conditions and limits only undocumented UI details."
+      },
+      "citations": {
+        "status": "valid_with_uncited_applicability",
+        "note": "Transfer and audit cite reservations.md 7–10 / ev-c921e34c76fdfa492bebb68b; maintenance handling cites 11–14 / ev-8c0b8ec623baa336612c0ae6. Weather cites reservations.md 7–10 and weather.md 1–4 / ev-56d4c522edb788db6d1f445e plus 5–8 / ev-159aa46f19575f991571621c, all substantively supporting the attached claims. Calendar and training cite calendar.md 1–4 / ev-525706a82d989ad63f985d9b, 5–8 / ev-af3fb3da8c27448bc32cb3fd, and reservations.md 15–17 / ev-db6c99cd7162ee2e647282c4 correctly. Opening applicability is supported by supplied reservations.md 1–6 but that range is not explicitly cited. No cited passage substitutes for expressing the missing temporal scope of identifier preservation."
+      }
+    },
+    {
+      "trial_id": "trial-029",
+      "anonymous_id": "answer-06",
+      "case_id": "fresh-en-print-queue-recovery",
+      "policy": "source-revision-v1",
+      "counts": {
+        "full": 7
+      },
+      "abstention": {
+        "status": "not_applicable",
+        "note": "Answers the documented procedure; no blanket abstention."
+      },
+      "citations": {
+        "status": "valid",
+        "note": "docs/rillprint/recover-stalled-queue.md lines 1–9 supports all steps: applicability line 3, export line 4, purge gate line 5, held exception line 6, successful verification line 7, diagnostics line 8, and receipts line 9. No command syntax or recovery method outside maintenance mode occurs in this supplied passage, supporting the bounded limitation."
+      }
+    },
+    {
+      "trial_id": "trial-031",
+      "anonymous_id": "answer-05",
+      "case_id": "fresh-en-single-attachment-limit",
+      "policy": "source-revision-v1",
+      "counts": {
+        "full": 1
+      },
+      "abstention": {
+        "status": "not_applicable",
+        "note": "Source provides the requested limit."
+      },
+      "citations": {
+        "status": "valid",
+        "note": "docs/relaypost/attachments.md lines 1–3 contains the exact size rule at line 3; the displayed citation and #L1-L3 fragment match this range."
+      }
+    },
+    {
+      "trial_id": "trial-032",
+      "anonymous_id": "answer-09",
+      "case_id": "fresh-ru-undocumented-journal-retention",
+      "policy": "source-revision-v1",
+      "counts": {},
+      "abstention": {
+        "status": "valid_evidence_limited",
+        "note": "Quote: «В предоставленном фрагменте документации срок автоматического удаления записей журнала проходов не указан.» Limits absence to the supplied fragment and explicitly leaves other documentation unresolved."
+      },
+      "citations": {
+        "status": "valid",
+        "note": "docs/mostik/access-journal.md lines 1–6 supports the bounded lack of a deletion period; line 5 specifically concerns 24-hour device reconciliation, not retention. Displayed path and linked path agree."
+      }
+    }
+  ]
+}
