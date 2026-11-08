@@ -130,5 +130,49 @@
     "provider_usage": null,
     "status": "completed",
     "attempt": 1
+  },
+  {
+    "id": "trial-025",
+    "prompt_sha256": "5d70c5fb4f6ffb993d2d6698b14de090a79535aebee6892908f715873a1d8d13",
+    "answer": "Для подтверждённого ночного наблюдения на общем инструменте:\n\n1. Получите согласие принимающего наблюдателя и одобрение передачи дежурным оператором. Передача допустима только после обоих действий. [ev-c921e34c76fdfa492bebb68b, `reservations.md`, строки 7–10]\n2. **Оставьте передачу в ожидании, пока действует блокировка обслуживания**, даже если согласие и одобрение уже получены. Сначала команда инструмента должна снять блокировку. [ev-8c0b8ec623baa336612c0ae6, `reservations.md`, строки 11–14]\n3. При передаче сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита. [ev-c921e34c76fdfa492bebb68b, `reservations.md`, строки 7–10]\n\nПередача **не изменяет погодную приостановку**: погодные решения регулируют выполнение наблюдений, а не владение бронированием. Если наружные наблюдения приостановлены из-за разомкнутой ветровой блокировки, возобновлять их можно только после её замыкания и записи дежурным оператором разрешения на возобновление. [ev-c921e34c76fdfa492bebb68b, `reservations.md`, строки 7–10; ev-56d4c522edb788db6d1f445e, `weather.md`, строки 1–4; ev-159aa46f19575f991571621c, `weather.md`, строки 5–8]\n\nКалендарь доступен только для просмотра; его визуальное обновление не снимает блокировку обслуживания. Упрощённое переназначение инструктором для дневных учебных слотов к подтверждённым наблюдениям не применяется. [ev-525706a82d989ad63f985d9b, `calendar.md`, строки 1–4; ev-af3fb3da8c27448bc32cb3fd, `calendar.md`, строки 5–8; ev-db6c99cd7162ee2e647282c4, `reservations.md`, строки 15–17]\n\nПредоставленные выдержки не описывают конкретные действия в интерфейсе для оформления или завершения передачи.",
+    "session_id": "ses_e45291e2dffeg8pTZZR3N7hKhy",
+    "requested_model": "openai/gpt-6.1-terra",
+    "effort_override": null,
+    "provider_usage": null,
+    "status": "completed",
+    "attempt": 1
+  },
+  {
+    "id": "trial-029",
+    "prompt_sha256": "c286dfb7c50c7b1a554f3b82a7edffe3e6815755e630f41316cbc5e65983fb77",
+    "answer": "For a **RillPrint 4 queue already in maintenance mode**, the documented recovery procedure is:\n\n1. If any job is marked `held`, **stop recovery and leave the queue paused**. Do not purge or resume it.\n2. Before purging, export the job manifest.\n3. Purge only when the upstream feeder is stopped **and** the device buffer is empty.\n4. After the purge, run `spool-verify` successfully before resuming the queue.\n\nKeep archived job receipts unchanged throughout recovery. Uploading a diagnostic bundle is optional.\n\nThe supplied documentation does not specify purge commands or how to recover a queue that is not already in maintenance mode.\n\nSource: `docs/rillprint/recover-stalled-queue.md`, lines 1–9.",
+    "session_id": "ses_e45291e23ffemDf9YOIFjOz7cU",
+    "requested_model": "openai/gpt-6.1-terra",
+    "effort_override": null,
+    "provider_usage": null,
+    "status": "completed",
+    "attempt": 1
+  },
+  {
+    "id": "trial-031",
+    "prompt_sha256": "285087026915b90bde73a917a5a8558aa586da98207a86ad2e403442768c2355",
+    "answer": "In a standard RelayPost mailbox, one attachment can be at most **18 MiB**. ([`docs/relaypost/attachments.md`, lines 1–3](docs/relaypost/attachments.md#L1-L3))",
+    "session_id": "ses_e45291e22fferHhLGPyFOpaijv",
+    "requested_model": "openai/gpt-6.1-terra",
+    "effort_override": null,
+    "provider_usage": null,
+    "status": "completed",
+    "attempt": 1
+  },
+  {
+    "id": "trial-032",
+    "prompt_sha256": "3b6a9b462a16fd9944113c7372fb1260b4516831e5de7f9d681a807aa347b24f",
+    "answer": "В предоставленном фрагменте документации срок автоматического удаления записей журнала проходов не указан. **24 часа** — это периодичность сверки устройств, а не срок хранения журнала ([docs/mostik/access-journal.md, строки 1–6](docs/mostik/access-journal.md)).\n\nПо этому источнику нельзя установить, указан ли срок в другой документации.",
+    "session_id": "ses_e45291e1dffeyqQPHhy7lkHLrn",
+    "requested_model": "openai/gpt-6.1-terra",
+    "effort_override": null,
+    "provider_usage": null,
+    "status": "completed",
+    "attempt": 1
   }
 ]
