@@ -401,3 +401,7 @@ These candidates are hypotheses, not a completeness guarantee. An answer-only
 comparison can isolate use of already supplied evidence, but does not establish
 native OpenCode/MCP acceptance, Terra Low quality, or provider-billing savings.
 No default should be promoted solely because an instruction is more explicit.
+The [Step15 answer-only report](../../eval/blind_project_context/step15-answer-conditions/RESULTS_RU.md)
+records 24 available-model responses: both opt-in policies changed which
+condition was missed without increasing the count of fully preserved facts.
+The two-call revision candidate and a Terra Low check remain untested.
