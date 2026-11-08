@@ -15,6 +15,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 HISTORICAL = HERE.parent / "step14-host-language-live"
 INTEGRATION = ROOT / "integrations/opencode-v2-compact"
+RUN = HERE
 ONE_PASS = ("current", "rule-contract-v1", "evidence-led-v1")
 BOUNDARY = (
     "This is an answer-only task. The following evidence is the entire supplied "
@@ -163,17 +164,32 @@ def prepare() -> None:
 
 
 def verify_inputs() -> dict:
-    manifest = read(HERE / "manifest.json")
+    manifest = read(RUN / "manifest.json")
     for relative, expected in manifest["files"].items():
         if digest((ROOT / relative).read_bytes()) != expected:
             raise ValueError(f"Frozen input changed: {relative}")
     return manifest
 
 
-def revision_inputs() -> None:
-    manifest = verify_inputs()
-    answers = {a["id"]: a for a in read(HERE / "answers.json")}
-    cases = {c["id"]: c for c in read(HERE / "cases.json")}
+def checked_answers(inputs: list, path: Path) -> dict:
+    answers = read(path)
+    keyed = {a["id"]: a for a in answers}
+    if len(keyed) != len(answers) or set(keyed) != {r["id"] for r in inputs}:
+        raise ValueError("Missing, duplicate or unexpected generated answer")
+    for trial in inputs:
+        answer = keyed[trial["id"]]
+        if digest(trial["prompt"].encode("utf-8")) != trial["prompt_sha256"]:
+            raise ValueError("Prompt text hash mismatch")
+        if answer["prompt_sha256"] != trial["prompt_sha256"]:
+            raise ValueError("Generation input hash mismatch")
+        if not isinstance(answer["answer"], str) or not answer["answer"].strip():
+            raise ValueError("Empty or invalid answer; record generation failure separately")
+    return keyed
+
+
+def expected_revisions(manifest: dict, answers: dict) -> list:
+    cases = {c["id"]: c for c in read(RUN / "cases.json")}
+    one_pass = {r["id"]: r for r in read(RUN / "inputs.json")}
     policies = policy_module()
     base, _ = policies.load_common_prompt("current")
     if base.split("\n\n").count(policies.SOURCE_TO_DRAFT_PARAGRAPH) != 1:
@@ -182,21 +198,49 @@ def revision_inputs() -> None:
                                (HERE / "source-revision.txt").read_text(encoding="utf-8").strip(), 1)
     inputs = []
     for row in manifest["revision_roster"]:
+        baseline = one_pass[row["baseline_id"]]
+        if baseline["policy"] != "current" or baseline["case_id"] != row["case_id"]:
+            raise ValueError("Revision baseline must be current for the same case")
         draft = answers[row["baseline_id"]]["answer"]
         prompt = make_prompt(instruction, cases[row["case_id"]], draft)
         inputs.append({**row, "prompt": prompt, "prompt_sha256": digest(prompt.encode("utf-8")),
                        "draft_sha256": digest(draft.encode("utf-8"))})
-    write_new(HERE / "revision-inputs.json", inputs)
+    return inputs
+
+
+def verified_revisions(manifest: dict) -> tuple[list, dict]:
+    seal = read(RUN / "revision-seal.json")
+    for name in ("baseline-answers.json", "revision-inputs.json"):
+        if digest((RUN / name).read_bytes()) != seal[name]:
+            raise ValueError(f"Sealed revision input changed: {name}")
+    baselines = checked_answers(read(RUN / "inputs.json"), RUN / "baseline-answers.json")
+    revisions = read(RUN / "revision-inputs.json")
+    if revisions != expected_revisions(manifest, baselines):
+        raise ValueError("Revision inputs differ from frozen roster, sources, instruction or baseline")
+    return revisions, baselines
+
+
+def revision_inputs() -> None:
+    manifest = verify_inputs()
+    answers = checked_answers(read(RUN / "inputs.json"), RUN / "answers.json")
+    inputs = expected_revisions(manifest, answers)
+    names = ("baseline-answers.json", "revision-inputs.json", "revision-seal.json")
+    if any((RUN / name).exists() for name in names):
+        raise ValueError("Refusing to rewrite sealed revision inputs")
+    write_new(RUN / "baseline-answers.json", list(answers.values()))
+    write_new(RUN / "revision-inputs.json", inputs)
+    write_new(RUN / "revision-seal.json", {
+        name: digest((RUN / name).read_bytes()) for name in names[:2]})
     print(json.dumps({"status": "revision_inputs_prepared", "count": len(inputs)}))
 
 
 def summarize() -> None:
     manifest = verify_inputs()
-    inputs = read(HERE / "inputs.json") + read(HERE / "revision-inputs.json")
-    answers = read(HERE / "answers.json")
-    keyed = {a["id"]: a for a in answers}
-    if len(keyed) != len(answers) or set(keyed) != {r["id"] for r in inputs}:
-        raise ValueError("Missing, duplicate or unexpected generated answer")
+    revisions, baselines = verified_revisions(manifest)
+    inputs = read(RUN / "inputs.json") + revisions
+    keyed = checked_answers(inputs, RUN / "answers.json")
+    if any(keyed[key] != value for key, value in baselines.items()):
+        raise ValueError("One-pass answer changed after revision preparation")
     rows = []
     for trial in inputs:
         answer = keyed[trial["id"]]
@@ -214,24 +258,32 @@ def summarize() -> None:
         draft_words = sum(len(keyed[row["baseline_id"]]["answer"].split()) for row in selected if row["baseline_id"])
         totals[policy] = {"answers": len(selected), "final_words": final_words, "generated_words_including_draft": final_words + draft_words,
                           "logical_answer_calls": sum(row["logical_answer_calls"] for row in selected), "provider_usage": None}
-    write_new(HERE / "text-metrics.json", {"status": "TEXT_SIZES_NOT_TOKENS", "rows": rows, "totals": totals,
-               "actual_generation_count": len(answers), "cached_baseline_reuse": len(manifest["revision_roster"]),
-               "boundary": "Model/effort inherited; provider usage and latency unavailable. No inference of billing from word count."})
-    print(json.dumps({"status": "summarized", "answers": len(answers), "totals": totals}))
+    write_new(RUN / "text-metrics.json", {"status": "TEXT_SIZES_NOT_TOKENS", "rows": rows, "totals": totals,
+               "actual_generation_count": len(keyed), "cached_baseline_reuse": len(manifest["revision_roster"]),
+               "boundary": "See run manifest for model/effort. Provider usage and latency unavailable. No inference of billing from word count."})
+    print(json.dumps({"status": "summarized", "answers": len(keyed), "totals": totals}))
 
 
 def main() -> None:
+    global RUN
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("prepare", "verify", "revision-inputs", "summarize"))
+    parser.add_argument("--run-dir", type=Path, default=HERE,
+                        help="Explicit frozen run directory; does not change source instructions")
     args = parser.parse_args()
+    RUN = args.run_dir.resolve(strict=True)
     if args.action == "prepare":
+        if RUN != HERE:
+            parser.error("prepare only supports the original study directory")
         prepare()
     elif args.action == "revision-inputs":
         revision_inputs()
     elif args.action == "summarize":
         summarize()
     else:
-        verify_inputs()
+        manifest = verify_inputs()
+        if (RUN / "revision-seal.json").exists():
+            verified_revisions(manifest)
         print("Frozen input hashes match")
 
 

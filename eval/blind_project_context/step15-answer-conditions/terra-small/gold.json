@@ -1,0 +1,152 @@
+[
+  {
+    "id": "V-M1",
+    "facts": [
+      {
+        "id": "V-M1-fact-1",
+        "source": "reservations.md",
+        "quote": "These rules apply to confirmed night-time reservations on shared instruments.",
+        "requirement": "These rules apply to confirmed night-time reservations on shared instruments.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M1-fact-2",
+        "source": "reservations.md",
+        "quote": "Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer.",
+        "requirement": "Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M1-fact-3",
+        "source": "reservations.md",
+        "quote": "Retain the original reservation identifier and record both observers in the audit trail.",
+        "requirement": "Retain the original reservation identifier and record both observers in the audit trail.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M1-fact-4",
+        "source": "reservations.md",
+        "quote": "leave the transfer pending even after observer acceptance and operator approval",
+        "requirement": "leave the transfer pending even after observer acceptance and operator approval",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M1-fact-5",
+        "source": "reservations.md",
+        "quote": "The lock must be cleared by the instrument team first.",
+        "requirement": "The lock must be cleared by the instrument team first.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M1-fact-6",
+        "source": "weather.md",
+        "quote": "Suspend outdoor observations when the wind interlock opens.",
+        "requirement": "Suspend outdoor observations when the wind interlock opens.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M1-fact-7",
+        "source": "weather.md",
+        "quote": "Preserve reservation identifiers during suspension.",
+        "requirement": "Preserve reservation identifiers during suspension.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M1-fact-8",
+        "source": "weather.md",
+        "quote": "Resume only after the interlock closes and the duty operator records a restart approval.",
+        "requirement": "Resume only after the interlock closes and the duty operator records a restart approval.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      }
+    ],
+    "no_answer": false,
+    "unsupported_claims": [
+      "No new requirements or unsupported global-absence claims."
+    ]
+  },
+  {
+    "id": "fresh-en-print-queue-recovery",
+    "facts": [
+      {
+        "id": "print-applicability",
+        "source": "docs/rillprint/recover-stalled-queue.md",
+        "quote": "This procedure applies only to RillPrint 4 queues that are already in maintenance mode.",
+        "requirement": "Restrict the procedure to RillPrint 4 queues already in maintenance mode; do not present it as an unconditional recovery procedure for any stalled queue.",
+        "materiality": "critical: changes when the procedure is applicable"
+      },
+      {
+        "id": "print-manifest-before-purge",
+        "source": "docs/rillprint/recover-stalled-queue.md",
+        "quote": "Before any purge, export the job manifest.",
+        "requirement": "Treat the manifest export as mandatory and place it before any purge.",
+        "materiality": "critical: loses a mandatory pre-purge action if omitted or reordered"
+      },
+      {
+        "id": "print-purge-conjunction",
+        "source": "docs/rillprint/recover-stalled-queue.md",
+        "quote": "A purge is permitted only when the upstream feeder is stopped AND the device buffer is empty.",
+        "requirement": "Preserve the conjunction: a stopped upstream feeder and an empty device buffer are both necessary for a purge; either one alone is insufficient.",
+        "materiality": "critical: changes the permission condition if AND is weakened to OR"
+      },
+      {
+        "id": "print-held-job-exception",
+        "source": "docs/rillprint/recover-stalled-queue.md",
+        "quote": "If any job is marked `held`, stop recovery and leave the queue paused; do not purge or resume it.",
+        "requirement": "Make any held job a blocking exception: stop recovery, keep the queue paused, and perform neither purge nor resume.",
+        "materiality": "critical: otherwise authorizes an explicitly prohibited recovery branch"
+      },
+      {
+        "id": "print-verification-gate",
+        "source": "docs/rillprint/recover-stalled-queue.md",
+        "quote": "After the purge, a successful `spool-verify` run is required before the queue may be resumed.",
+        "requirement": "Place verification after the purge and make its success a prerequisite to resuming; merely attempting verification is not enough.",
+        "materiality": "critical: changes both ordering and the success gate for resume"
+      },
+      {
+        "id": "print-optional-diagnostics",
+        "source": "docs/rillprint/recover-stalled-queue.md",
+        "quote": "Uploading a diagnostic bundle is optional.",
+        "requirement": "Keep the diagnostic upload explicitly optional, rather than converting it into a required recovery step.",
+        "materiality": "material: introduces a nonexistent obligation if made mandatory"
+      },
+      {
+        "id": "print-receipt-invariant",
+        "source": "docs/rillprint/recover-stalled-queue.md",
+        "quote": "Archived job receipts must remain unchanged throughout recovery.",
+        "requirement": "Preserve the invariant that archived job receipts remain unchanged for the entire recovery.",
+        "materiality": "critical: loses an explicit preservation constraint"
+      }
+    ],
+    "no_answer": false,
+    "unsupported_claims": [
+      "The source does not provide commands for entering maintenance mode, exporting the manifest, or purging; do not invent command syntax.",
+      "The source does not authorize deleting held jobs, clearing their held status, modifying archived receipts, or resuming after failed verification."
+    ]
+  },
+  {
+    "id": "fresh-en-single-attachment-limit",
+    "facts": [
+      {
+        "id": "attachment-size-limit",
+        "source": "docs/relaypost/attachments.md",
+        "quote": "In a standard mailbox, a single attachment may be at most 18 MiB.",
+        "requirement": "Give the direct factual answer: at most 18 MiB per attachment in a standard mailbox. Preserve the unit and per-attachment scope, and omit the unasked upload procedure.",
+        "materiality": "critical: a different unit or scope changes the limit; a procedure dump fails the narrow question"
+      }
+    ],
+    "no_answer": false,
+    "unsupported_claims": [
+      "The source does not state a total-message size limit or a limit for any other mailbox class.",
+      "18 MiB must not silently become 18 decimal MB. The separate upload procedure is not requested by this question."
+    ]
+  },
+  {
+    "id": "fresh-ru-undocumented-journal-retention",
+    "facts": [],
+    "no_answer": true,
+    "unsupported_claims": [
+      "В приведённом источнике не указаны ни срок хранения журнала, ни правило автоматического удаления. Ответ должен обозначить отсутствие этих сведений, а не придумывать срок.",
+      "Период сверки устройств в 24 часа не является сроком хранения. Возможность ручной выгрузки не доказывает удаление после выгрузки или бессрочное хранение."
+    ]
+  }
+]

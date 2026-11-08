@@ -155,7 +155,7 @@
     "eval/blind_project_context/step15-answer-conditions/cases.json": "a709d7c2252c0c07b5651eec1f9bd93b28018d2efc49053b1f0978c64e68c9fc",
     "eval/blind_project_context/step15-answer-conditions/gold.json": "fdce71ddcd9b0b95861fdc8c476e0b9cc6944b959a48529d48a627f735e904e6",
     "eval/blind_project_context/step15-answer-conditions/inputs.json": "70c90074182b4b6c98252ceabab12cd5de1c7c13d26c3f3fd80ff45cf2b24464",
-    "eval/blind_project_context/step15-answer-conditions/study.py": "2aa6857dc0718ec66e0ceba098c7562b439d9f9f7a65b5ebc74074e3f0f3240c",
+    "eval/blind_project_context/step15-answer-conditions/study.py": "5560ae6750d3e1381462d51beb7c658b324fd6aebea757847da00162bf7173d8",
     "eval/blind_project_context/step14-host-language-live/tasks.json": "d091e3e94bb56a9d67a1514d23fc9417bb0dc8ee1718b69c4dad63ab8f0505eb",
     "integrations/opencode-v2-compact/answer_policy.py": "2101ad889aa9a5c7ad9322b394fc863c72b23ae86fd204095e28468047c0a0fb",
     "integrations/opencode-v2-compact/profile/common.txt": "3dca2da563a7f156c7bc94594dc7c486834b95982278e3d707c931e1571ee5e1",
@@ -164,5 +164,10 @@
   },
   "generation": "Fresh isolated available-agent sessions, no model/effort override, no parent history. One exact input load then no tools. Not Terra Low.",
   "provider_usage": null,
-  "production_acceptance": false
+  "production_acceptance": false,
+  "tooling_amendment": {
+    "initial_commit": "7565db8b69bc448e836a7746f517b7925ef53b2f",
+    "previous_study_sha256": "2aa6857dc0718ec66e0ceba098c7562b439d9f9f7a65b5ebc74074e3f0f3240c",
+    "reason": "Pre-generation integrity fix; prompts, sources, gold and original roster unchanged. See terra-small/AMENDMENT_RU.md"
+  }
 }

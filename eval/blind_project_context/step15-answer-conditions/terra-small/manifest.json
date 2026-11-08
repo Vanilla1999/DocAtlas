@@ -1,0 +1,60 @@
+{
+  "status": "FROZEN_BEFORE_GENERATION",
+  "initial_commit": "7565db8b69bc448e836a7746f517b7925ef53b2f",
+  "model": "openai/gpt-6.1-terra",
+  "effort_override": null,
+  "case_ids": [
+    "V-M1",
+    "fresh-en-print-queue-recovery",
+    "fresh-en-single-attachment-limit",
+    "fresh-ru-undocumented-journal-retention"
+  ],
+  "one_pass_trials": 12,
+  "revision_roster": [
+    {
+      "id": "trial-025",
+      "case_id": "V-M1",
+      "policy": "source-revision-v1",
+      "baseline_id": "trial-001"
+    },
+    {
+      "id": "trial-029",
+      "case_id": "fresh-en-print-queue-recovery",
+      "policy": "source-revision-v1",
+      "baseline_id": "trial-015"
+    },
+    {
+      "id": "trial-031",
+      "case_id": "fresh-en-single-attachment-limit",
+      "policy": "source-revision-v1",
+      "baseline_id": "trial-019"
+    },
+    {
+      "id": "trial-032",
+      "case_id": "fresh-ru-undocumented-journal-retention",
+      "policy": "source-revision-v1",
+      "baseline_id": "trial-024"
+    }
+  ],
+  "files": {
+    "eval/blind_project_context/step15-answer-conditions/PLAN_RU.md": "9eab6018debb5d0bde82d98d7c9549576d02fe361bc4a1d14aef49e0a57c6e3f",
+    "eval/blind_project_context/step15-answer-conditions/fresh-cases.json": "59699f349805603f119d0d2b5d85ce206c8bdb59934cbd18837b80e25a18a83c",
+    "eval/blind_project_context/step15-answer-conditions/source-revision.txt": "a8f71c3513578ad5ac172efcb75c54aa00471e59ede1158d93ab42c657130f13",
+    "eval/blind_project_context/step15-answer-conditions/cases.json": "a709d7c2252c0c07b5651eec1f9bd93b28018d2efc49053b1f0978c64e68c9fc",
+    "eval/blind_project_context/step15-answer-conditions/gold.json": "fdce71ddcd9b0b95861fdc8c476e0b9cc6944b959a48529d48a627f735e904e6",
+    "eval/blind_project_context/step15-answer-conditions/inputs.json": "70c90074182b4b6c98252ceabab12cd5de1c7c13d26c3f3fd80ff45cf2b24464",
+    "eval/blind_project_context/step15-answer-conditions/study.py": "5560ae6750d3e1381462d51beb7c658b324fd6aebea757847da00162bf7173d8",
+    "eval/blind_project_context/step14-host-language-live/tasks.json": "d091e3e94bb56a9d67a1514d23fc9417bb0dc8ee1718b69c4dad63ab8f0505eb",
+    "integrations/opencode-v2-compact/answer_policy.py": "2101ad889aa9a5c7ad9322b394fc863c72b23ae86fd204095e28468047c0a0fb",
+    "integrations/opencode-v2-compact/profile/common.txt": "3dca2da563a7f156c7bc94594dc7c486834b95982278e3d707c931e1571ee5e1",
+    "integrations/opencode-v2-compact/profile/answer-rule-contract.txt": "e93d15b635fcd25fddbf596b1c5ca9d1fae7ac8218d160b52bec9f8533655d78",
+    "integrations/opencode-v2-compact/profile/answer-evidence-led.txt": "7c6bbfe85770d9b8050a30a283d667c4597a4e2950be30b5f48e52b8a79737d3",
+    "eval/blind_project_context/step15-answer-conditions/manifest.json": "c19f58964cdc48523e8a763d9230bdff905a1a1f75138f194c68bea6c8dd86d4",
+    "eval/blind_project_context/step15-answer-conditions/terra-small/AMENDMENT_RU.md": "abd39513b1f8f88809ec7aa01a1605582d21e445cb7beb9a991c67feca33720b",
+    "eval/blind_project_context/step15-answer-conditions/terra-small/cases.json": "ea0817420624a729d24057869bf6ceba1fea9eb9dcdf3c81d57635ee371a9f4c",
+    "eval/blind_project_context/step15-answer-conditions/terra-small/gold.json": "8ddd452522ea3a37247b575c93a6eb34e89846d070eef42d7bdbc3fe9132e82a",
+    "eval/blind_project_context/step15-answer-conditions/terra-small/inputs.json": "4ead071c6ac6bff79725bcedf93b1109b52c5a81e8c8a0f20a109ee5ece1bff4"
+  },
+  "provider_usage": null,
+  "production_acceptance": false
+}
