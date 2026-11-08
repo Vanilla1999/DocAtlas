@@ -1,0 +1,170 @@
+[
+  {
+    "id": "trial-001",
+    "agent": "/root/step15_trial001",
+    "prompt_sha256": "0baacaae348e1771ac6842c824d5d1d4ffe5e1bb030d3e002f8a2455172f59c4",
+    "provider_usage": null,
+    "answer": "При активной блокировке обслуживания **передачу нужно оставить в ожидании**, даже если принимающий наблюдатель уже согласился и дежурный оператор одобрил её. Сначала блокировку должна снять команда, обслуживающая инструмент. [`ev-8c0b8ec623baa336612c0ae6` — `reservations.md`, строки 11–14]\n\nПорядок действий для подтверждённого ночного бронирования:\n\n1. **Получите принятие бронирования новым наблюдателем и одобрение передачи дежурным оператором.** Сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита. Эти согласования необходимы, но сами по себе не позволяют завершить передачу при активной блокировке. [`ev-c921e34c76fdfa492bebb68b` — `reservations.md`, строки 7–10; `ev-8c0b8ec623baa336612c0ae6` — `reservations.md`, строки 11–14]\n\n2. **Дождитесь снятия блокировки командой инструмента.** До этого передача остаётся в ожидании; после снятия блокировки её можно завершить при выполненных условиях принятия и одобрения. [`ev-8c0b8ec623baa336612c0ae6` — `reservations.md`, строки 11–14; `ev-c921e34c76fdfa492bebb68b` — `reservations.md`, строки 7–10]\n\n3. **Погодную приостановку сохраняйте независимо от передачи.** Погодные решения регулируют выполнение наблюдения, а не принадлежность бронирования; передача погодную приостановку не изменяет. При размыкании ветровой блокировки наружные наблюдения должны быть приостановлены, а идентификаторы бронирований — сохранены. Возобновление допускается только после замыкания ветровой блокировки **и регистрации дежурным оператором разрешения на повторный запуск**. Одобрение передачи не заменяет это разрешение. [`ev-56d4c522edb788db6d1f445e` — `weather.md`, строки 1–4; `ev-159aa46f19575f991571621c` — `weather.md`, строки 5–8; `ev-c921e34c76fdfa492bebb68b` — `reservations.md`, строки 7–10]\n\nУпрощённое переназначение инструктором предусмотрено только для дневных учебных слотов и к подтверждённым наблюдениям не применяется. Календарь также не является способом снять ограничения: он лишь отображает состояние, смена темы не меняет выполнение наблюдения, а визуальное обновление не снимает блокировку обслуживания. [`ev-db6c99cd7162ee2e647282c4` — `reservations.md`, строки 15–17; `ev-525706a82d989ad63f985d9b` — `calendar.md`, строки 1–4; `ev-af3fb3da8c27448bc32cb3fd` — `calendar.md`, строки 5–8]\n\nКонкретные кнопки или команды для оформления передачи в предоставленных фрагментах не описаны."
+  },
+  {
+    "id": "trial-002",
+    "agent": "/root/step15_trial002",
+    "prompt_sha256": "34d6f6cb909ad1965cd09de031384b7c7a86f451a1e76861a187bc86c99897df",
+    "provider_usage": null,
+    "answer": "При активной блокировке обслуживания передачу нужно оставить в ожидании — даже если принимающий наблюдатель уже согласился, а дежурный оператор её одобрил. Завершать передачу можно только после того, как команда инструмента снимет блокировку. (`reservations.md`, строки 11–14; источник `ev-8c0b8ec623baa336612c0ae6`.)\n\nДля подтверждённых ночных бронирований на общих инструментах обязательны **оба условия**: согласие принимающего наблюдателя и одобрение передачи дежурным оператором. При передаче сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита. (`reservations.md`, строки 1–6 и 7–10; источники `ev-f0eb1e549fed1aca3d464c2e`, `ev-c921e34c76fdfa492bebb68b`.)\n\nПогодная приостановка регулирует выполнение наблюдения, а не принадлежность бронирования; передача другому наблюдателю её не изменяет. Поэтому после снятия блокировки обслуживания и выполнения условий передачи можно сменить наблюдателя, но это само по себе не разрешает начать наблюдение. (`weather.md`, строки 1–4; источник `ev-56d4c522edb788db6d1f445e`; `reservations.md`, строки 7–10; источник `ev-c921e34c76fdfa492bebb68b`.)\n\nНаружные наблюдения приостанавливаются при размыкании ветровой блокировки; идентификаторы бронирований при этом сохраняются. Возобновление допускается только после **замыкания ветровой блокировки и регистрации дежурным оператором разрешения на возобновление**. Одобрение передачи не заменяет эти условия. (`weather.md`, строки 5–8; источник `ev-159aa46f19575f991571621c`; `reservations.md`, строки 7–10; источник `ev-c921e34c76fdfa492bebb68b`.)\n\nУпрощённое переназначение инструктором предусмотрено только для дневных учебных слотов и к подтверждённому наблюдению не применяется. (`reservations.md`, строки 15–17; источник `ev-db6c99cd7162ee2e647282c4`.)"
+  },
+  {
+    "id": "trial-003",
+    "agent": "/root/step15_trial003",
+    "prompt_sha256": "d1fe2fb09f4cd6ccdeb268314568267fc0eea28570fc9299929f1c72b64d74ed",
+    "provider_usage": null,
+    "answer": "При активной блокировке обслуживания **передачу нужно оставить в ожидании**, даже если принимающий наблюдатель уже согласился, а дежурный оператор одобрил передачу. Сначала блокировку должна снять команда, отвечающая за инструмент. (`reservations.md:11–14`, источник `ev-8c0b8ec623baa336612c0ae6`.)\n\nДля подтверждённого ночного бронирования общего инструмента порядок такой:\n\n1. **Получите оба согласования:** принимающий наблюдатель должен принять бронирование, а дежурный оператор — одобрить передачу. Сохраните исходный идентификатор бронирования и укажите обоих наблюдателей в журнале аудита. (`reservations.md:7–10`, источник `ev-c921e34c76fdfa492bebb68b`.)\n\n2. **Не завершайте передачу до снятия блокировки обслуживания командой инструмента.** Согласие наблюдателя и одобрение оператора сами по себе эту блокировку не обходят. (`reservations.md:11–14`, источник `ev-8c0b8ec623baa336612c0ae6`.)\n\n3. **Сохраняйте погодную приостановку независимо от передачи.** Погодные решения регулируют выполнение наблюдений, а не принадлежность бронирования; передача другому наблюдателю не изменяет приостановку. Поэтому завершение передачи после снятия блокировки обслуживания не означает разрешения возобновить наблюдение. (`weather.md:1–4`, источник `ev-56d4c522edb788db6d1f445e`; `reservations.md:7–10`, источник `ev-c921e34c76fdfa492bebb68b`.)\n\n4. **Возобновляйте наружное наблюдение только после выполнения обоих погодных условий:** ветровая блокировочная цепь (*wind interlock*) должна замкнуться, а дежурный оператор — зарегистрировать разрешение на возобновление. При разомкнутой цепи наружные наблюдения приостанавливаются; идентификаторы бронирований сохраняются и во время приостановки. Одобрение передачи не заменяет разрешение на возобновление. (`weather.md:5–8`, источник `ev-159aa46f19575f991571621c`.)\n\nУпрощённое переназначение инструктором предусмотрено только для дневных учебных слотов и **не применяется к подтверждённым наблюдениям**. (`reservations.md:15–17`, источник `ev-db6c99cd7162ee2e647282c4`.)\n\nВ предоставленных фрагментах описаны эти условия и ответственные роли, но не конкретные кнопки или команды для оформления передачи и снятия блокировки."
+  },
+  {
+    "id": "trial-004",
+    "agent": "/root/step15_trial004",
+    "prompt_sha256": "1f7090473956cc8219df46cce34d216431d9b76cbac455f96fc3cf075a579485",
+    "provider_usage": null,
+    "answer": "Stop outdoor observations when the wind interlock opens, and preserve reservation identifiers throughout the suspension. Weather decisions affect execution, not ownership of reservations. (`weather.md:5–8`, source `ev-159aa46f19575f991571621c`; `weather.md:1–4`, source `ev-56d4c522edb788db6d1f445e`)\n\nRestart only after **both** the interlock has closed **and** the duty operator has recorded a restart approval. A favourable forecast cannot authorize a restart: the forecast panel is for planning, not an interlock signal. (`weather.md:5–8`, source `ev-159aa46f19575f991571621c`; `weather.md:13–15`, source `ev-d7ad6e3c0ae0215b63ed8bb6`)\n\nAn indoor instrument **may continue** during a wind suspension only if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish indoor classification. (`weather.md:9–12`, source `ev-0999a181d992f67ebae5ac73`)"
+  },
+  {
+    "id": "trial-005",
+    "agent": "/root/step15_trial005",
+    "prompt_sha256": "bc879db499060ee2a1f4c3729326affab01f18bc96e4a8ac7bd198abadda9c7b",
+    "provider_usage": null,
+    "answer": "- **Stop outdoor observations when the wind interlock opens.** The supplied documentation gives no numerical wind-speed threshold; the stated trigger is the interlock opening. (`weather.md:5–8`; ref `ev-159aa46f19575f991571621c`)\n\n- **Restart requires both conditions:** the wind interlock must close, and the duty operator must record a restart approval. A favourable forecast cannot authorize a restart—the forecast panel is for planning, not an interlock signal. (`weather.md:5–8`; ref `ev-159aa46f19575f991571621c`; `weather.md:13–15`; ref `ev-d7ad6e3c0ae0215b63ed8bb6`)\n\n- **An indoor instrument may continue during a wind suspension**, but only if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does **not** establish indoor classification. (`weather.md:9–12`; ref `ev-0999a181d992f67ebae5ac73`)\n\nPreserve reservation identifiers during suspension. These weather decisions govern execution, not ownership of reservations. (`weather.md:1–4`; ref `ev-56d4c522edb788db6d1f445e`; `weather.md:5–8`; ref `ev-159aa46f19575f991571621c`)"
+  },
+  {
+    "id": "trial-006",
+    "agent": "/root/step15_trial006",
+    "prompt_sha256": "57964d9ac2a31328a6fda5c0bc7ed6c8d895b0ff08ab4962bb5cb917e8c63312",
+    "provider_usage": null,
+    "answer": "- **Stop outdoor observations when the wind interlock opens.** Preserve reservation identifiers during the suspension. Weather decisions govern whether observations execute, not who owns the reservations. (`weather.md:5–8`, source `ev-159aa46f19575f991571621c`; `weather.md:1–4`, source `ev-56d4c522edb788db6d1f445e`)\n\n- **Restart only after both conditions are met:** the wind interlock has closed, and the duty operator has recorded a restart approval. A favourable forecast cannot authorize a restart—the forecast panel is for planning, not an interlock signal. (`weather.md:5–8`, source `ev-159aa46f19575f991571621c`; `weather.md:13–15`, source `ev-d7ad6e3c0ae0215b63ed8bb6`)\n\n- **An indoor instrument may continue during a wind suspension**, but only if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does **not** establish indoor classification. (`weather.md:9–12`, source `ev-0999a181d992f67ebae5ac73`)"
+  },
+  {
+    "id": "trial-007",
+    "agent": "/root/step15_trial007",
+    "prompt_sha256": "38e3fc8dfc8d3b55810ccb46d6e6d64ff237ad676f35e995d8f01840d1263729",
+    "provider_usage": null,
+    "answer": "If the absolute clock offset exceeds two seconds, the gateway must:\n\n- Pause schedule execution.\n- Notify the duty operator.\n- Keep queued reservations unchanged.\n- Resume only after **two consecutive reference checks** report an offset within two seconds.\n\nThese are the current gateway’s drift and recovery requirements. [ev-7ff924db065d30bda70fa508 — `clock.md`, lines 5–8]\n\nIf the reference clock is unavailable, execution must remain paused. A local clock reading alone cannot satisfy **either** recovery check—even if it appears acceptable. Recovery therefore still requires the two consecutive qualifying reference checks; reference unavailability does not relax that condition. [ev-7431ef82d2347181ffe5f433 — `clock.md`, lines 9–12; ev-7ff924db065d30bda70fa508 — `clock.md`, lines 5–8]\n\nDo not use the retired prototype’s behavior: clearing pending reservations or restarting on the first local clock sample is explicitly prohibited for recovery of the current gateway. [ev-74eb9cba956360994f654dbe — `architecture.md`, lines 9–11]"
+  },
+  {
+    "id": "trial-008",
+    "agent": "/root/step15_trial008",
+    "prompt_sha256": "8e119c8bff8b5171bc88ea96bfd732f249b64f5b81c392fb57cfa5c437eb6250",
+    "provider_usage": null,
+    "answer": "The gateway compares instrument time with the observatory reference before executing a schedule. When the **absolute clock offset exceeds two seconds**, it must:\n\n- **Pause schedule execution** and **notify the duty operator**.\n- **Keep queued reservations unchanged**.\n- Resume execution **only after two consecutive reference checks** report an offset within two seconds.\n\nSources: `ev-b6b5595954763d0a93f9d70e`, *clock.md*, lines 1–4; `ev-7ff924db065d30bda70fa508`, *clock.md*, lines 5–8.\n\nIf the reference clock is unavailable, **execution must remain paused**. A local clock reading alone cannot satisfy either of the required recovery checks, so it cannot authorize a restart. Source: `ev-7431ef82d2347181ffe5f433`, *clock.md*, lines 9–12.\n\nTwo behaviors must not be confused with current gateway recovery:\n\n- The **retired prototype** cleared pending reservations and restarted on its first local clock sample; the documentation explicitly prohibits using those behaviors for the current gateway. Source: `ev-74eb9cba956360994f654dbe`, *architecture.md*, lines 9–11.\n- The **simulator** advances time manually and never waits for reference checks, but its accelerated clock is isolated from the real instrument gateway. This is not a gateway recovery exception. Source: `ev-d0ae269afd83183145b789a0`, *clock.md*, lines 13–15."
+  },
+  {
+    "id": "trial-009",
+    "agent": "/root/step15_trial009",
+    "prompt_sha256": "b66741d72f605b6df95c7b25374e4cb901bd7e0ca806bfc3d07cf3a053856713",
+    "provider_usage": null,
+    "answer": "When the **absolute clock offset exceeds two seconds**, the gateway must pause schedule execution, notify the duty operator, and keep queued reservations unchanged. It may resume only after **two consecutive reference checks** both report an offset within two seconds. (`clock.md`, lines 5–8; source `ev-7ff924db065d30bda70fa508`.)\n\nIf the reference clock is unavailable, execution must remain paused. A local clock reading alone cannot satisfy either recovery check; recovery therefore requires the reference clock to become available and the two consecutive qualifying reference checks to succeed. (`clock.md`, lines 9–12; source `ev-7431ef82d2347181ffe5f433`; recovery requirement: `clock.md`, lines 5–8.)\n\nDo not use the retired prototype’s recovery behavior: clearing pending reservations or restarting on the first local clock sample is explicitly prohibited for the current gateway. (`architecture.md`, lines 9–11; source `ev-74eb9cba956360994f654dbe`.)"
+  },
+  {
+    "id": "trial-010",
+    "agent": "/root/step15_trial010",
+    "prompt_sha256": "061587a94782be11ce8d2aed4601042a3d3ad4a32bfe8c3c3824a44a59687d99",
+    "provider_usage": null,
+    "answer": "По предоставленным материалам нельзя определить, какая температура охлаждения обязательна для всех общих приборов обсерватории: источники не приложены.\n\nЭто не означает, что такого требования нет. Для точного ответа нужен соответствующий раздел документации обсерватории, устанавливающий температуру и область применения требования."
+  },
+  {
+    "id": "trial-011",
+    "agent": "/root/step15_trial011",
+    "prompt_sha256": "398fea0a237d7cf7ff0bcc4754f23820bc5e6cb66b60928fbe7c89d0f5c12f9e",
+    "provider_usage": null,
+    "answer": "По предоставленному контексту нельзя определить обязательную температуру охлаждения для всех общих приборов обсерватории: документационные источники не предоставлены.\n\nНельзя назвать конкретное значение или подтвердить, что единая температура обязательна для всех приборов. Это не означает, что такого требования нет — для ответа нужна соответствующая документация выбранного проекта и версии."
+  },
+  {
+    "id": "trial-012",
+    "agent": "/root/step15_trial012",
+    "prompt_sha256": "898a49246d8f0ecfbe35ba170fa1c9ccc0b51d44282e132797744224d98b09bc",
+    "provider_usage": null,
+    "answer": "По предоставленному контексту нельзя определить, какая температура охлаждения обязательна для всех общих приборов обсерватории: выдержки из документации не предоставлены. Нельзя также подтвердить, что для всех этих приборов установлена единая температура. Это не означает, что такого требования нет — для точного ответа нужен соответствующий раздел документации проекта."
+  },
+  {
+    "id": "trial-013",
+    "agent": "/root/step15_trial013",
+    "prompt_sha256": "91b7faa7adf26fde0491272fe933e57f6505c72e1eb59715673eb8792e4a7c2e",
+    "provider_usage": null,
+    "answer": "The documented procedure applies **only to RillPrint 4 queues already in maintenance mode**. If any job is marked `held`, stop recovery and leave the queue paused—**do not purge or resume it**. (`docs/rillprint/recover-stalled-queue.md`, lines 3–6.)\n\nOtherwise, follow this sequence:\n\n1. **Export the job manifest before any purge.** Purge only when **both** the upstream feeder is stopped **and** the device buffer is empty. (`docs/rillprint/recover-stalled-queue.md`, lines 4–5.)\n2. After the purge, run `spool-verify`. The queue may be resumed **only after that run succeeds**. (`docs/rillprint/recover-stalled-queue.md`, line 7.)\n\nUploading a diagnostic bundle is optional. Archived job receipts must remain unchanged throughout recovery. (`docs/rillprint/recover-stalled-queue.md`, lines 8–9.)"
+  },
+  {
+    "id": "trial-014",
+    "agent": "/root/step15_trial014",
+    "prompt_sha256": "4270b7cdc9bf324b04a06d782389eb8589e709fe68e9d4bca452ca22ea4a6402",
+    "provider_usage": null,
+    "answer": "The documented recovery procedure applies only to **RillPrint 4 queues already in maintenance mode**. (`docs/rillprint/recover-stalled-queue.md`, line 3.)\n\nBefore proceeding, observe the stop condition: **if any job is marked `held`, stop recovery and leave the queue paused—do not purge or resume it.** (`docs/rillprint/recover-stalled-queue.md`, line 6.)\n\nProvided that stop condition does not apply:\n\n1. **Export the job manifest before any purge.** (`docs/rillprint/recover-stalled-queue.md`, line 4.)\n2. **Purge only when both conditions are met:** the upstream feeder is stopped **and** the device buffer is empty. Meeting just one condition does not permit a purge. (`docs/rillprint/recover-stalled-queue.md`, line 5.)\n3. **After the purge, run `spool-verify`.** It must succeed before the queue may be resumed; the `held`-job prohibition still applies. (`docs/rillprint/recover-stalled-queue.md`, lines 6–7.)\n\nThroughout recovery, archived job receipts must remain unchanged. Uploading a diagnostic bundle is optional. (`docs/rillprint/recover-stalled-queue.md`, lines 8–9.)\n\nThe supplied documentation does not give the purge command syntax or explain how to enter maintenance mode, so those operational details cannot be established from this evidence."
+  },
+  {
+    "id": "trial-015",
+    "agent": "/root/step15_trial015",
+    "prompt_sha256": "b63e4bc8db9f0acbfee4e32fcbe4930838d65b7803b4f4efa89f403b75353b25",
+    "provider_usage": null,
+    "answer": "For RillPrint 4, the documented recovery procedure applies only to a queue that is already in maintenance mode. (`docs/rillprint/recover-stalled-queue.md`, line 3)\n\n1. Check for jobs marked `held`. If any exist, stop recovery and leave the queue paused. Do not purge or resume it. (`docs/rillprint/recover-stalled-queue.md`, line 6)\n2. Export the job manifest before any purge. (`docs/rillprint/recover-stalled-queue.md`, line 4)\n3. Purge only when both conditions are satisfied: the upstream feeder is stopped **and** the device buffer is empty. (`docs/rillprint/recover-stalled-queue.md`, line 5)\n4. After the purge, run `spool-verify`. It must succeed before the queue may be resumed; without a successful verification, do not resume. (`docs/rillprint/recover-stalled-queue.md`, line 7)\n\nArchived job receipts must remain unchanged throughout recovery. Uploading a diagnostic bundle is optional. (`docs/rillprint/recover-stalled-queue.md`, lines 8–9)\n\nThe supplied page does not provide the exact commands for entering maintenance mode, exporting the manifest, purging, or resuming the queue."
+  },
+  {
+    "id": "trial-016",
+    "agent": "/root/step15_trial016",
+    "prompt_sha256": "b91c0dd52d4dc4c264cd10d32d5bc774d05bc4c16e91d1ed3111f98bc338bd16",
+    "provider_usage": null,
+    "answer": "По документации пакет аудиогида «Тропа» можно публиковать только в статусе «черновик». Порядок и условия такие:\n\n1. **Сначала проверьте ссылки, затем получите подтверждение редактора.** Оба действия обязательны именно в этой последовательности; для публикации проверка ссылок должна быть успешной. (`docs/tropa/publish-guide-package.md`, строки 3–5.)\n2. **Убедитесь, что есть хотя бы одна аудиозапись либо включён текстовый режим.** Достаточно любого из этих двух условий, но оно не заменяет успешную проверку ссылок и подтверждение редактора. (`docs/tropa/publish-guide-package.md`, строки 4–5.)\n3. **Проверьте, нет ли редакционной блокировки.** При ней публикация запрещена, даже если остальные условия выполнены. Стендовый предпросмотр при этом не является обязательным этапом. (`docs/tropa/publish-guide-package.md`, строки 6–7.)\n4. **Сохраняйте текущую версию доступной посетителям до успешной синхронизации новой версии.** (`docs/tropa/publish-guide-package.md`, строка 8.)\n\nКонкретная команда или кнопка для запуска публикации в предоставленном фрагменте не описана: он определяет условия допуска, обязательную последовательность проверок и требование к доступности текущей версии."
+  },
+  {
+    "id": "trial-017",
+    "agent": "/root/step15_trial017",
+    "prompt_sha256": "3af8700118adde8e7d1ac893d8c76079dff574d0986db377a6fcb2e1638ef54d",
+    "provider_usage": null,
+    "answer": "По документации, для публикации нового пакета аудиогида «Тропа» нужно:\n\n1. **Убедиться, что пакет имеет статус «черновик».** Описанный порядок применяется только к таким пакетам. (`docs/tropa/publish-guide-package.md:3`)\n2. **Сначала проверить ссылки, затем получить подтверждение редактора.** Эта последовательность обязательна; проверка ссылок должна быть успешной. (`docs/tropa/publish-guide-package.md:4–5`)\n3. **Обеспечить хотя бы один вариант содержимого:** в пакете есть хотя бы одна аудиозапись **или** включён текстовый режим. Успешная проверка ссылок обязательна в обоих случаях — условие сформулировано как «ссылки проверены успешно И (есть аудио ИЛИ включён текстовый режим)». (`docs/tropa/publish-guide-package.md:5`)\n4. **Убедиться, что нет редакционной блокировки.** При её наличии публикация запрещена, даже если все остальные условия выполнены. (`docs/tropa/publish-guide-package.md:7`)\n\nСтендовый предпросмотр можно выполнить, но он **необязателен**. (`docs/tropa/publish-guide-package.md:6`)\n\nПри выпуске новой версии текущая версия должна оставаться доступна посетителям **до успешной синхронизации новой**. (`docs/tropa/publish-guide-package.md:8`)\n\nКонкретная кнопка, команда или технический способ запуска публикации в предоставленном фрагменте не указан."
+  },
+  {
+    "id": "trial-018",
+    "agent": "/root/step15_trial018",
+    "prompt_sha256": "a32683f9c4e47ba6bb54b7ea16bae68bb98c4a7e8aab88161c5a417da53dd3b8",
+    "provider_usage": null,
+    "answer": "Порядок публикации «Тропы» применяется только к пакету со статусом **«черновик»**. Перед публикацией обязательно **сначала проверьте ссылки, затем получите подтверждение редактора** — именно в таком порядке. Источник: `docs/tropa/publish-guide-package.md`, строки 3–4.\n\nПубликация разрешена только при успешной проверке ссылок **и** выполнении хотя бы одного из двух условий: в пакете есть минимум одна аудиозапись **или** включён текстовый режим. Стендовый предпросмотр необязателен. При редакционной блокировке публиковать нельзя, даже если все остальные условия выполнены. Источник: `docs/tropa/publish-guide-package.md`, строки 5–7.\n\nДо успешной синхронизации новой версии текущая версия должна оставаться доступной посетителям. Источник: `docs/tropa/publish-guide-package.md`, строка 8.\n\nКонкретная кнопка или команда запуска публикации в предоставленном фрагменте не указана."
+  },
+  {
+    "id": "trial-019",
+    "agent": "/root/step15_trial019",
+    "prompt_sha256": "5b036aba2d2a72a6b9438c5e01d373cb905b2c7d645e7c15ab0071542861a3d3",
+    "provider_usage": null,
+    "answer": "In a standard RelayPost mailbox, a single attachment can be at most **18 MiB**. (Source: `docs/relaypost/attachments.md`, line 3.)"
+  },
+  {
+    "id": "trial-020",
+    "agent": "/root/step15_trial020",
+    "prompt_sha256": "50ed114c0ba516bb46f180f7ccac93492ef5e49dd41da2a703bf67db8368989d",
+    "provider_usage": null,
+    "answer": "In a standard RelayPost mailbox, the maximum size of one attachment is **18 MiB**. (Source: `docs/relaypost/attachments.md`, line 3.)"
+  },
+  {
+    "id": "trial-021",
+    "agent": "/root/step15_trial021",
+    "prompt_sha256": "ff9a1af7266a835a5be3dccd2c42157461d1c3e8b8880156662f4e748b1421c8",
+    "provider_usage": null,
+    "answer": "A single attachment in a standard RelayPost mailbox can be at most **18 MiB**. (Source: `docs/relaypost/attachments.md`, line 3.)"
+  },
+  {
+    "id": "trial-022",
+    "agent": "/root/step15_trial022",
+    "prompt_sha256": "6ab2b3d29f54362e5f323b59858c83ba1b4f460d0b12169016a3a4958afd10e5",
+    "provider_usage": null,
+    "answer": "В предоставленном фрагменте документации срок автоматического удаления записей не указан, поэтому назвать число дней нельзя. Упомянутые 24 часа — это интервал сверки устройств, а не срок хранения журнала (`docs/mostik/access-journal.md`, строки 1–6)."
+  },
+  {
+    "id": "trial-023",
+    "agent": "/root/step15_trial023",
+    "prompt_sha256": "94bf931c1e56d71de7556fc4f4766b7ac3f8ca097970b3407efabbdf58f9399c",
+    "provider_usage": null,
+    "answer": "В предоставленном фрагменте документации срок автоматического удаления записей журнала не указан, поэтому определить количество дней по нему нельзя. Упомянутые «каждые 24 часа» относятся к сверке устройств, а не к удалению записей (`docs/mostik/access-journal.md`, строки 1–6)."
+  },
+  {
+    "id": "trial-024",
+    "agent": "/root/step15_trial024",
+    "prompt_sha256": "4720d65bf1ccc49e2b518a1c3ec1a56f88e3882c64682707ea72bf6e8e9cabe0",
+    "provider_usage": null,
+    "answer": "В предоставленном фрагменте документации срок автоматического удаления записей журнала «Мостика» не указан, поэтому назвать число дней нельзя. Упомянутые **24 часа** — это период сверки устройств, а не срок хранения записей.\n\nИсточник: `docs/mostik/access-journal.md`, строки 1–6."
+  }
+]
