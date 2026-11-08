@@ -1,0 +1,134 @@
+[
+  {
+    "id": "trial-001",
+    "prompt_sha256": "0baacaae348e1771ac6842c824d5d1d4ffe5e1bb030d3e002f8a2455172f59c4",
+    "answer": "Для подтверждённого ночного наблюдения на общем инструменте порядок такой:\n\n1. Получите согласие принимающего наблюдателя и одобрение передачи дежурным оператором. Сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита. [ev-c921e34c76fdfa492bebb68b, `reservations.md`, строки 7–10]\n2. **Не завершайте передачу, пока действует блокировка обслуживания:** даже после согласия и одобрения она должна оставаться в ожидании. Сначала команда инструмента должна снять блокировку. [ev-8c0b8ec623baa336612c0ae6, `reservations.md`, строки 11–14]\n3. Передача **не отменяет и не изменяет погодную приостановку**. Погодные решения регулируют выполнение наблюдения, а не владение бронированием. Если наружные наблюдения приостановлены из-за разомкнутой ветровой блокировки, возобновлять их можно только после её замыкания и записи дежурным оператором разрешения на возобновление. [ev-c921e34c76fdfa492bebb68b, `reservations.md`, строки 7–10; ev-56d4c522edb788db6d1f445e, `weather.md`, строки 1–4; ev-159aa46f19575f991571621c, `weather.md`, строки 5–8]\n\nКалендарь доступен только для просмотра; его обновление не снимает блокировку обслуживания. Упрощённое переназначение инструктором для дневных учебных слотов к подтверждённым наблюдениям не применяется. [ev-525706a82d989ad63f985d9b, `calendar.md`, строки 1–4; ev-af3fb3da8c27448bc32cb3fd, `calendar.md`, строки 5–8; ev-db6c99cd7162ee2e647282c4, `reservations.md`, строки 15–17]\n\nПредоставленные выдержки не описывают конкретные действия в интерфейсе для оформления или завершения передачи.",
+    "session_id": "ses_e452b8498ffe4mJtNX3qUxCEYY",
+    "requested_model": "openai/gpt-6.1-terra",
+    "effort_override": null,
+    "provider_usage": null,
+    "status": "completed",
+    "attempt": 1
+  },
+  {
+    "id": "trial-002",
+    "prompt_sha256": "34d6f6cb909ad1965cd09de031384b7c7a86f451a1e76861a187bc86c99897df",
+    "answer": "Для подтверждённого ночного бронирования **общего инструмента**:\n\n1. Получите согласие принимающего наблюдателя и одобрение передачи от дежурного оператора. Сохраните исходный идентификатор бронирования и укажите обоих наблюдателей в журнале аудита. [reservations.md, строки 1–10; ev-f0eb1e549fed1aca3d464c2e, ev-c921e34c76fdfa492bebb68b]\n2. Пока активна блокировка обслуживания, **оставьте передачу в ожидании**, даже если согласие и одобрение уже получены. Сначала блокировку должна снять команда инструмента. [reservations.md, строки 11–14; ev-8c0b8ec623baa336612c0ae6]\n\nПередача не меняет погодную приостановку: погодные решения регулируют выполнение наблюдения, а не владение бронированием. Если наружные наблюдения приостановлены из-за размыкания ветровой блокировки, их можно возобновить только после её замыкания и записи дежурным оператором разрешения на возобновление; идентификатор бронирования при приостановке сохраняется. [reservations.md, строки 7–10; ev-c921e34c76fdfa492bebb68b; weather.md, строки 1–8; ev-56d4c522edb788db6d1f445e, ev-159aa46f19575f991571621c]",
+    "session_id": "ses_e452b8490ffelGRqZ6jjLOg0Ou",
+    "requested_model": "openai/gpt-6.1-terra",
+    "effort_override": null,
+    "provider_usage": null,
+    "status": "completed",
+    "attempt": 1
+  },
+  {
+    "id": "trial-003",
+    "prompt_sha256": "d1fe2fb09f4cd6ccdeb268314568267fc0eea28570fc9299929f1c72b64d74ed",
+    "answer": "Для подтверждённого ночного бронирования общего инструмента порядок такой:\n\n1. Получите согласие принимающего наблюдателя и одобрение дежурного оператора. Сохраните исходный идентификатор бронирования и укажите обоих наблюдателей в журнале аудита. [reservations.md, строки 1–4, 7–10; ev-f0eb1e549fed1aca3d464c2e, ev-c921e34c76fdfa492bebb68b]\n2. **Пока активна блокировка обслуживания, оставьте передачу в ожидании**, даже если согласие и одобрение уже получены. Сначала команда инструмента должна снять блокировку. [reservations.md, строки 11–14; ev-8c0b8ec623baa336612c0ae6]\n3. Передача не отменяет погодную приостановку: погодные решения регулируют выполнение наблюдений, а не владение бронированием. Если наружные наблюдения приостановлены из-за размыкания ветровой блокировки, возобновить их можно только после её замыкания и записи дежурным оператором одобрения на возобновление. Идентификатор бронирования при приостановке сохраняется. [reservations.md, строки 7–10; weather.md, строки 1–8; ev-c921e34c76fdfa492bebb68b, ev-56d4c522edb788db6d1f445e, ev-159aa46f19575f991571621c]\n\nКалендарь доступен только для просмотра; его визуальное обновление не снимает блокировку обслуживания. Упрощённое переназначение инструктором для дневных учебных слотов к подтверждённому наблюдению не применяется. [calendar.md, строки 1–8; reservations.md, строки 15–17; ev-525706a82d989ad63f985d9b, ev-af3fb3da8c27448bc32cb3fd, ev-db6c99cd7162ee2e647282c4]\n\nВ предоставленных выдержках не указан конкретный способ выполнения передачи в интерфейсе или подачи запроса на снятие блокировки.",
+    "session_id": "ses_e452b8489ffeo7Jtkb0wpsZjNM",
+    "requested_model": "openai/gpt-6.1-terra",
+    "effort_override": null,
+    "provider_usage": null,
+    "status": "completed",
+    "attempt": 1
+  },
+  {
+    "id": "trial-013",
+    "prompt_sha256": "91b7faa7adf26fde0491272fe933e57f6505c72e1eb59715673eb8792e4a7c2e",
+    "answer": "For a stalled **RillPrint 4 queue already in maintenance mode**:\n\n1. If any job is marked `held`, stop recovery and leave the queue paused. Do not purge or resume it.\n2. Otherwise, export the job manifest before purging. Purge only when **both** the upstream feeder is stopped and the device buffer is empty.\n3. After the purge, run `spool-verify` successfully before resuming the queue.\n\nUploading a diagnostic bundle is optional. Archived job receipts must remain unchanged throughout recovery. [Source: `docs/rillprint/recover-stalled-queue.md`, lines 1–9]\n\nThe supplied documentation does not specify how to recover a queue that is not already in maintenance mode.",
+    "session_id": "ses_e452b2685ffeX6SEb2dA9Z3oCO",
+    "requested_model": "openai/gpt-6.1-terra",
+    "effort_override": null,
+    "provider_usage": null,
+    "status": "completed",
+    "attempt": 1
+  },
+  {
+    "id": "trial-014",
+    "prompt_sha256": "4270b7cdc9bf324b04a06d782389eb8589e709fe68e9d4bca452ca22ea4a6402",
+    "answer": "For a **RillPrint 4 queue already in maintenance mode**, the documented recovery procedure is:\n\n1. If any job is marked `held`, stop recovery and leave the queue paused. **Do not purge or resume it.**\n2. Before purging, export the job manifest. Purge only when the upstream feeder is stopped **and** the device buffer is empty.\n3. After purging, run `spool-verify` successfully before resuming the queue.\n\nArchived job receipts must remain unchanged throughout recovery. Uploading a diagnostic bundle is optional. The supplied procedure does not explain how to enter maintenance mode or provide purge commands. [Source: `docs/rillprint/recover-stalled-queue.md`, lines 1–9]",
+    "session_id": "ses_e452b267effeqhorHRMN2MD56K",
+    "requested_model": "openai/gpt-6.1-terra",
+    "effort_override": null,
+    "provider_usage": null,
+    "status": "completed",
+    "attempt": 1
+  },
+  {
+    "id": "trial-015",
+    "prompt_sha256": "b63e4bc8db9f0acbfee4e32fcbe4930838d65b7803b4f4efa89f403b75353b25",
+    "answer": "For a **RillPrint 4 queue already in maintenance mode**, the documented recovery procedure is:\n\n1. If any job is marked `held`, **stop recovery and leave the queue paused**. Do not purge or resume it.\n2. Before purging, export the job manifest.\n3. Purge only when the upstream feeder is stopped **and** the device buffer is empty.\n4. After the purge, run `spool-verify` successfully before resuming the queue.\n\nKeep archived job receipts unchanged throughout recovery. Uploading a diagnostic bundle is optional. The supplied documentation does not specify purge commands or how to recover a queue that is not already in maintenance mode.\n\nSource: `docs/rillprint/recover-stalled-queue.md`, lines 1–9.",
+    "session_id": "ses_e452b267affeJlX7obZTujYAxe",
+    "requested_model": "openai/gpt-6.1-terra",
+    "effort_override": null,
+    "provider_usage": null,
+    "status": "completed",
+    "attempt": 1
+  },
+  {
+    "id": "trial-019",
+    "prompt_sha256": "5b036aba2d2a72a6b9438c5e01d373cb905b2c7d645e7c15ab0071542861a3d3",
+    "answer": "In a standard RelayPost mailbox, one attachment can be at most **18 MiB**. ([Source: `docs/relaypost/attachments.md`, lines 1–3](docs/relaypost/attachments.md#L1-L3))",
+    "session_id": "ses_e452ad16effe1VOLq8EqJXssnQ",
+    "requested_model": "openai/gpt-6.1-terra",
+    "effort_override": null,
+    "provider_usage": null,
+    "status": "completed",
+    "attempt": 1
+  },
+  {
+    "id": "trial-020",
+    "prompt_sha256": "50ed114c0ba516bb46f180f7ccac93492ef5e49dd41da2a703bf67db8368989d",
+    "answer": "In a standard RelayPost mailbox, one attachment can be at most **18 MiB**. (`docs/relaypost/attachments.md`, lines 1–3)",
+    "session_id": "ses_e452ad16cffeWPsf1iJJjjEP3z",
+    "requested_model": "openai/gpt-6.1-terra",
+    "effort_override": null,
+    "provider_usage": null,
+    "status": "completed",
+    "attempt": 1
+  },
+  {
+    "id": "trial-021",
+    "prompt_sha256": "ff9a1af7266a835a5be3dccd2c42157461d1c3e8b8880156662f4e748b1421c8",
+    "answer": "In a standard RelayPost mailbox, one attachment may be at most **18 MiB**. (`docs/relaypost/attachments.md`, lines 1–3)",
+    "session_id": "ses_e452ad149ffe2e7iaGIrAeeo6c",
+    "requested_model": "openai/gpt-6.1-terra",
+    "effort_override": null,
+    "provider_usage": null,
+    "status": "completed",
+    "attempt": 1
+  },
+  {
+    "id": "trial-022",
+    "prompt_sha256": "6ab2b3d29f54362e5f323b59858c83ba1b4f460d0b12169016a3a4958afd10e5",
+    "answer": "В предоставленной документации срок автоматического удаления записей журнала проходов не указан. Упомянутые 24 часа относятся к периодичности сверки устройств, а не к хранению записей. Отсутствие срока в этом фрагменте не означает, что он не указан в другой документации. Источник: `docs/mostik/access-journal.md`, строки 1–6.",
+    "session_id": "ses_e452ad140ffeQBKAZCSeg8fG3N",
+    "requested_model": "openai/gpt-6.1-terra",
+    "effort_override": null,
+    "provider_usage": null,
+    "status": "completed",
+    "attempt": 1
+  },
+  {
+    "id": "trial-023",
+    "prompt_sha256": "94bf931c1e56d71de7556fc4f4766b7ac3f8ca097970b3407efabbdf58f9399c",
+    "answer": "В предоставленной документации срок автоматического удаления записей журнала проходов сервиса «Мостик» не указан. Упомянутые 24 часа относятся к сверке устройств, а не к сроку хранения журнала. Это не исключает, что срок указан в других материалах. Источник: `docs/mostik/access-journal.md`, строки 1–6.",
+    "session_id": "ses_e452ad134ffeBub4yxIm6cCxBT",
+    "requested_model": "openai/gpt-6.1-terra",
+    "effort_override": null,
+    "provider_usage": null,
+    "status": "completed",
+    "attempt": 1
+  },
+  {
+    "id": "trial-024",
+    "prompt_sha256": "4720d65bf1ccc49e2b518a1c3ec1a56f88e3882c64682707ea72bf6e8e9cabe0",
+    "answer": "В предоставленной документации срок автоматического удаления записей журнала проходов не указан. Указанные 24 часа — это периодичность сверки устройств, а не срок хранения журнала ([docs/mostik/access-journal.md, строки 1–6](docs/mostik/access-journal.md)).\n\nПо этому источнику нельзя установить, указан ли срок в другой документации.",
+    "session_id": "ses_e452ad123ffe5EzjSUnYbMhvHe",
+    "requested_model": "openai/gpt-6.1-terra",
+    "effort_override": null,
+    "provider_usage": null,
+    "status": "completed",
+    "attempt": 1
+  }
+]
