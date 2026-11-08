@@ -1,0 +1,247 @@
+[
+  {
+    "id": "V-M1",
+    "cohort": "seen-meridian",
+    "question": "Как передать подтверждённое ночное наблюдение другому наблюдателю при активной блокировке обслуживания и погодной приостановке?",
+    "sources": [
+      {
+        "ref": "ev-525706a82d989ad63f985d9b",
+        "path": "calendar.md",
+        "section": "Calendar display",
+        "line_start": 1,
+        "line_end": 4,
+        "text": "# Calendar display\n\nThe calendar is a read-only projection of reservation and instrument state.\n\n",
+        "source_sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad"
+      },
+      {
+        "ref": "ev-af3fb3da8c27448bc32cb3fd",
+        "path": "calendar.md",
+        "section": "Calendar display > Colours",
+        "line_start": 5,
+        "line_end": 8,
+        "text": "## Colours\n\nAmber indicates a pending assignment, blue a confirmed slot, and grey a suspended interval. Changing a browser theme changes colours locally without changing instrument execution. A visual refresh cannot clear a maintenance lock.\n\n",
+        "source_sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad"
+      },
+      {
+        "ref": "ev-f0eb1e549fed1aca3d464c2e",
+        "path": "reservations.md",
+        "section": "Confirmed reservations",
+        "line_start": 1,
+        "line_end": 6,
+        "text": "# Confirmed reservations\n\nThese rules apply to confirmed night-time reservations on shared instruments.\n\nFor orientation, the reservation console links to the calendar's [colour legend](calendar.md#colours).\n\n",
+        "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080"
+      },
+      {
+        "ref": "ev-c921e34c76fdfa492bebb68b",
+        "path": "reservations.md",
+        "section": "Confirmed reservations > Transfer",
+        "line_start": 7,
+        "line_end": 10,
+        "text": "## Transfer\n\nTransfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).\n\n",
+        "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080"
+      },
+      {
+        "ref": "ev-8c0b8ec623baa336612c0ae6",
+        "path": "reservations.md",
+        "section": "Confirmed reservations > Locked instrument",
+        "line_start": 11,
+        "line_end": 14,
+        "text": "## Locked instrument\n\nIf the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.\n\n",
+        "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080"
+      },
+      {
+        "ref": "ev-db6c99cd7162ee2e647282c4",
+        "path": "reservations.md",
+        "section": "Confirmed reservations > Training slots",
+        "line_start": 15,
+        "line_end": 17,
+        "text": "## Training slots\n\nDaytime training slots can be reassigned by an instructor without the night-time approval workflow. This shortcut does not apply to confirmed observations.\n",
+        "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080"
+      },
+      {
+        "ref": "ev-56d4c522edb788db6d1f445e",
+        "path": "weather.md",
+        "section": "Weather decisions",
+        "line_start": 1,
+        "line_end": 4,
+        "text": "# Weather decisions\n\nWeather decisions govern execution, not ownership of reservations.\n\n",
+        "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+      },
+      {
+        "ref": "ev-159aa46f19575f991571621c",
+        "path": "weather.md",
+        "section": "Weather decisions > Suspension",
+        "line_start": 5,
+        "line_end": 8,
+        "text": "## Suspension\n\nSuspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n\n",
+        "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+      }
+    ]
+  },
+  {
+    "id": "V-M2",
+    "cohort": "seen-meridian",
+    "question": "When should wind stop observations, what is required to restart, and may an indoor instrument continue?",
+    "sources": [
+      {
+        "ref": "ev-56d4c522edb788db6d1f445e",
+        "path": "weather.md",
+        "section": "Weather decisions",
+        "line_start": 1,
+        "line_end": 4,
+        "text": "# Weather decisions\n\nWeather decisions govern execution, not ownership of reservations.\n\n",
+        "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+      },
+      {
+        "ref": "ev-159aa46f19575f991571621c",
+        "path": "weather.md",
+        "section": "Weather decisions > Suspension",
+        "line_start": 5,
+        "line_end": 8,
+        "text": "## Suspension\n\nSuspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n\n",
+        "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+      },
+      {
+        "ref": "ev-0999a181d992f67ebae5ac73",
+        "path": "weather.md",
+        "section": "Weather decisions > Indoor instrument",
+        "line_start": 9,
+        "line_end": 12,
+        "text": "## Indoor instrument\n\nAn instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.\n\n",
+        "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+      },
+      {
+        "ref": "ev-d7ad6e3c0ae0215b63ed8bb6",
+        "path": "weather.md",
+        "section": "Weather decisions > Forecast display",
+        "line_start": 13,
+        "line_end": 15,
+        "text": "## Forecast display\n\nThe forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.\n",
+        "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+      }
+    ]
+  },
+  {
+    "id": "V-M3",
+    "cohort": "seen-meridian",
+    "question": "What must the gateway do after excessive clock drift, including recovery when the reference clock is unavailable?",
+    "sources": [
+      {
+        "ref": "ev-9d09cae8e21c7ef232baca1b",
+        "path": "architecture.md",
+        "section": "Scheduler architecture",
+        "line_start": 1,
+        "line_end": 4,
+        "text": "# Scheduler architecture\n\nMeridian separates ownership, planning, execution and display to permit independent restarts.\n\n",
+        "source_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b"
+      },
+      {
+        "ref": "ev-74eb9cba956360994f654dbe",
+        "path": "architecture.md",
+        "section": "Scheduler architecture > Prototype recovery",
+        "line_start": 9,
+        "line_end": 11,
+        "text": "## Prototype recovery\n\nThe retired prototype cleared pending reservations when time drifted and restarted on its first local clock sample. These behaviours must not be used to recover the current gateway.\n",
+        "source_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b"
+      },
+      {
+        "ref": "ev-b6b5595954763d0a93f9d70e",
+        "path": "clock.md",
+        "section": "Time coordination",
+        "line_start": 1,
+        "line_end": 4,
+        "text": "# Time coordination\n\nThe gateway compares instrument time with the observatory reference before executing a schedule.\n\n",
+        "source_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10"
+      },
+      {
+        "ref": "ev-7ff924db065d30bda70fa508",
+        "path": "clock.md",
+        "section": "Time coordination > Clock offset",
+        "line_start": 5,
+        "line_end": 8,
+        "text": "## Clock offset\n\nIf the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator. Keep queued reservations unchanged. Resume only after two consecutive reference checks report an offset within two seconds.\n\n",
+        "source_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10"
+      },
+      {
+        "ref": "ev-7431ef82d2347181ffe5f433",
+        "path": "clock.md",
+        "section": "Time coordination > Missing reference",
+        "line_start": 9,
+        "line_end": 12,
+        "text": "## Missing reference\n\nIf the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.\n\n",
+        "source_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10"
+      },
+      {
+        "ref": "ev-d0ae269afd83183145b789a0",
+        "path": "clock.md",
+        "section": "Time coordination > Simulation clock",
+        "line_start": 13,
+        "line_end": 15,
+        "text": "## Simulation clock\n\nThe simulator advances time manually and never waits for reference checks. Its accelerated clock is isolated from the real instrument gateway.\n",
+        "source_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10"
+      }
+    ]
+  },
+  {
+    "id": "V-M4",
+    "cohort": "seen-meridian",
+    "question": "Какая температура охлаждения обязательна для всех общих приборов обсерватории?",
+    "sources": []
+  },
+  {
+    "id": "fresh-en-print-queue-recovery",
+    "cohort": "fresh-synthetic",
+    "question": "What is the documented way to recover a stalled RillPrint 4 queue?",
+    "sources": [
+      {
+        "path": "docs/rillprint/recover-stalled-queue.md",
+        "text": "# Recovering a stalled queue\n\n- This procedure applies only to RillPrint 4 queues that are already in maintenance mode.\n- Before any purge, export the job manifest.\n- A purge is permitted only when the upstream feeder is stopped AND the device buffer is empty.\n- If any job is marked `held`, stop recovery and leave the queue paused; do not purge or resume it.\n- After the purge, a successful `spool-verify` run is required before the queue may be resumed.\n- Uploading a diagnostic bundle is optional.\n- Archived job receipts must remain unchanged throughout recovery.\n",
+        "line_start": 1,
+        "line_end": 9,
+        "source_sha256": "2900f440d32a642c6bba9f25708841ecae8763588f62d0e07e650d4ba5759e41"
+      }
+    ]
+  },
+  {
+    "id": "fresh-ru-guide-package-publication",
+    "cohort": "fresh-synthetic",
+    "question": "Как по документации опубликовать новый пакет аудиогида «Тропа»?",
+    "sources": [
+      {
+        "path": "docs/tropa/publish-guide-package.md",
+        "text": "# Публикация пакета аудиогида «Тропа»\n\n- Этот порядок применяется только к пакетам со статусом «черновик».\n- Перед публикацией обязательно сначала проверить ссылки, затем получить подтверждение редактора.\n- Публикация разрешена только при успешной проверке ссылок И (есть хотя бы одна аудиозапись ИЛИ включён текстовый режим).\n- Стендовый предпросмотр необязателен.\n- При редакционной блокировке публикация запрещена, даже если остальные условия выполнены.\n- До успешной синхронизации новой версии посетителям должна оставаться доступна текущая версия.\n",
+        "line_start": 1,
+        "line_end": 8,
+        "source_sha256": "0e49ad9e5abc341e1f1cd541bcc416312bb07aa947c02b5e933405b8a311a9e8"
+      }
+    ]
+  },
+  {
+    "id": "fresh-en-single-attachment-limit",
+    "cohort": "fresh-synthetic",
+    "question": "In a standard RelayPost mailbox, what is the maximum size of one attachment?",
+    "sources": [
+      {
+        "path": "docs/relaypost/attachments.md",
+        "text": "# Attachments in RelayPost\n\nIn a standard mailbox, a single attachment may be at most 18 MiB.\n\n## Adding an attachment\n1. Open a draft message.\n2. Choose **Attach file** and select a local file.\n3. Wait for the upload indicator to finish before sending.\n",
+        "line_start": 1,
+        "line_end": 8,
+        "source_sha256": "589d22511ad336930a167d227dc5e76a29cadc6989fbc35ccbf7c1f471a96ee5"
+      }
+    ]
+  },
+  {
+    "id": "fresh-ru-undocumented-journal-retention",
+    "cohort": "fresh-synthetic",
+    "question": "Через сколько дней сервис «Мостик» автоматически удаляет записи журнала проходов?",
+    "sources": [
+      {
+        "path": "docs/mostik/access-journal.md",
+        "text": "# Журнал проходов сервиса «Мостик»\n\nЖурнал содержит время прохода, идентификатор пропуска и название входа.\nВремя записывается в UTC.\nСверка устройств выполняется каждые 24 часа.\nАдминистратор может вручную выгрузить журнал в CSV.\n",
+        "line_start": 1,
+        "line_end": 6,
+        "source_sha256": "588c07a1fb468190831956a37836a49a04ca247637e3fd809b3459f793cad639"
+      }
+    ]
+  }
+]

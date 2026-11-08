@@ -1,0 +1,168 @@
+{
+  "status": "FROZEN_BEFORE_GENERATION",
+  "base_commit": "e62fa9e357bd22731cddabe930532a4a2faecc18",
+  "one_pass_trials": 24,
+  "revision_roster": [
+    {
+      "id": "trial-025",
+      "case_id": "V-M1",
+      "policy": "source-revision-v1",
+      "baseline_id": "trial-001"
+    },
+    {
+      "id": "trial-026",
+      "case_id": "V-M2",
+      "policy": "source-revision-v1",
+      "baseline_id": "trial-006"
+    },
+    {
+      "id": "trial-027",
+      "case_id": "V-M3",
+      "policy": "source-revision-v1",
+      "baseline_id": "trial-008"
+    },
+    {
+      "id": "trial-028",
+      "case_id": "V-M4",
+      "policy": "source-revision-v1",
+      "baseline_id": "trial-010"
+    },
+    {
+      "id": "trial-029",
+      "case_id": "fresh-en-print-queue-recovery",
+      "policy": "source-revision-v1",
+      "baseline_id": "trial-015"
+    },
+    {
+      "id": "trial-030",
+      "case_id": "fresh-ru-guide-package-publication",
+      "policy": "source-revision-v1",
+      "baseline_id": "trial-017"
+    },
+    {
+      "id": "trial-031",
+      "case_id": "fresh-en-single-attachment-limit",
+      "policy": "source-revision-v1",
+      "baseline_id": "trial-019"
+    },
+    {
+      "id": "trial-032",
+      "case_id": "fresh-ru-undocumented-journal-retention",
+      "policy": "source-revision-v1",
+      "baseline_id": "trial-024"
+    }
+  ],
+  "facts_by_cohort": {
+    "seen-meridian": 19,
+    "fresh-synthetic": 14
+  },
+  "source_provenance": {
+    "V-M1": {
+      "stdio_sha256": "caa6083aafada40b60234920c4cd6988906d5698d7691ef48440ae3afc66a334",
+      "receipts": [
+        {
+          "request_id": 3,
+          "source_context": {
+            "authority": "source_of_truth",
+            "project_identity": "local:c5969289883c68fd089528a8f5015c377d73028660f327d1fe3599210ca4545e",
+            "scope": "project",
+            "version_binding": "unversioned"
+          },
+          "context_quality": {
+            "reasons": [
+              "coverage_unverified"
+            ],
+            "status": "unverified"
+          },
+          "rows": 8
+        }
+      ]
+    },
+    "V-M2": {
+      "stdio_sha256": "b5443287597d900704ee2e3889119353619aac63667bbf30a73c392a29003f64",
+      "receipts": [
+        {
+          "request_id": 3,
+          "source_context": {
+            "authority": "source_of_truth",
+            "project_identity": "local:c5969289883c68fd089528a8f5015c377d73028660f327d1fe3599210ca4545e",
+            "scope": "project",
+            "version_binding": "unversioned"
+          },
+          "context_quality": {
+            "reasons": [
+              "coverage_unverified"
+            ],
+            "status": "unverified"
+          },
+          "rows": 4
+        }
+      ]
+    },
+    "V-M3": {
+      "stdio_sha256": "f2b1a9372e8f3ea06d909b81e96023216792c956d7ca16026d93c5afe8510a13",
+      "receipts": [
+        {
+          "request_id": 3,
+          "source_context": {
+            "authority": "source_of_truth",
+            "project_identity": "local:c5969289883c68fd089528a8f5015c377d73028660f327d1fe3599210ca4545e",
+            "scope": "project",
+            "version_binding": "unversioned"
+          },
+          "context_quality": {
+            "reasons": [
+              "coverage_unverified"
+            ],
+            "status": "unverified"
+          },
+          "rows": 6
+        }
+      ]
+    },
+    "V-M4": {
+      "stdio_sha256": "a62af8a32b13b693bd2f1bc888e3fdea36ac0c28effaa1a1b943374d5bc6869b",
+      "receipts": [
+        {
+          "request_id": 3,
+          "source_context": null,
+          "context_quality": {
+            "reasons": [
+              "coverage_unverified"
+            ],
+            "status": "unavailable"
+          },
+          "rows": 0
+        },
+        {
+          "request_id": 4,
+          "source_context": null,
+          "context_quality": {
+            "reasons": [
+              "coverage_unverified"
+            ],
+            "status": "unavailable"
+          },
+          "rows": 0
+        }
+      ]
+    }
+  },
+  "files": {
+    "eval/blind_project_context/step15-answer-conditions/PLAN_RU.md": "9eab6018debb5d0bde82d98d7c9549576d02fe361bc4a1d14aef49e0a57c6e3f",
+    "eval/blind_project_context/step15-answer-conditions/fresh-cases.json": "59699f349805603f119d0d2b5d85ce206c8bdb59934cbd18837b80e25a18a83c",
+    "eval/blind_project_context/step15-answer-conditions/source-revision.txt": "a8f71c3513578ad5ac172efcb75c54aa00471e59ede1158d93ab42c657130f13",
+    "eval/blind_project_context/step15-answer-conditions/cases.json": "a709d7c2252c0c07b5651eec1f9bd93b28018d2efc49053b1f0978c64e68c9fc",
+    "eval/blind_project_context/step15-answer-conditions/gold.json": "fdce71ddcd9b0b95861fdc8c476e0b9cc6944b959a48529d48a627f735e904e6",
+    "eval/blind_project_context/step15-answer-conditions/inputs.json": "70c90074182b4b6c98252ceabab12cd5de1c7c13d26c3f3fd80ff45cf2b24464",
+    "eval/blind_project_context/step15-answer-conditions/study.py": "2aa6857dc0718ec66e0ceba098c7562b439d9f9f7a65b5ebc74074e3f0f3240c",
+    "eval/blind_project_context/step14-host-language-live/tasks.json": "d091e3e94bb56a9d67a1514d23fc9417bb0dc8ee1718b69c4dad63ab8f0505eb",
+    "integrations/opencode-v2-compact/answer_policy.py": "2101ad889aa9a5c7ad9322b394fc863c72b23ae86fd204095e28468047c0a0fb",
+    "integrations/opencode-v2-compact/profile/common.txt": "3dca2da563a7f156c7bc94594dc7c486834b95982278e3d707c931e1571ee5e1",
+    "integrations/opencode-v2-compact/profile/answer-rule-contract.txt": "e93d15b635fcd25fddbf596b1c5ca9d1fae7ac8218d160b52bec9f8533655d78",
+    "integrations/opencode-v2-compact/profile/answer-evidence-led.txt": "7c6bbfe85770d9b8050a30a283d667c4597a4e2950be30b5f48e52b8a79737d3"
+  },
+  "generation": "Fresh isolated available-agent sessions, no model/effort override, no parent history. One exact input load then no tools. Not Terra Low.",
+  "provider_usage": null,
+  "production_acceptance": false
+}

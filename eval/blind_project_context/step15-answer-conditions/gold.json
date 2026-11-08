@@ -1,0 +1,307 @@
+[
+  {
+    "id": "V-M1",
+    "facts": [
+      {
+        "id": "V-M1-fact-1",
+        "source": "reservations.md",
+        "quote": "These rules apply to confirmed night-time reservations on shared instruments.",
+        "requirement": "These rules apply to confirmed night-time reservations on shared instruments.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M1-fact-2",
+        "source": "reservations.md",
+        "quote": "Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer.",
+        "requirement": "Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M1-fact-3",
+        "source": "reservations.md",
+        "quote": "Retain the original reservation identifier and record both observers in the audit trail.",
+        "requirement": "Retain the original reservation identifier and record both observers in the audit trail.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M1-fact-4",
+        "source": "reservations.md",
+        "quote": "leave the transfer pending even after observer acceptance and operator approval",
+        "requirement": "leave the transfer pending even after observer acceptance and operator approval",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M1-fact-5",
+        "source": "reservations.md",
+        "quote": "The lock must be cleared by the instrument team first.",
+        "requirement": "The lock must be cleared by the instrument team first.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M1-fact-6",
+        "source": "weather.md",
+        "quote": "Suspend outdoor observations when the wind interlock opens.",
+        "requirement": "Suspend outdoor observations when the wind interlock opens.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M1-fact-7",
+        "source": "weather.md",
+        "quote": "Preserve reservation identifiers during suspension.",
+        "requirement": "Preserve reservation identifiers during suspension.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M1-fact-8",
+        "source": "weather.md",
+        "quote": "Resume only after the interlock closes and the duty operator records a restart approval.",
+        "requirement": "Resume only after the interlock closes and the duty operator records a restart approval.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      }
+    ],
+    "no_answer": false,
+    "unsupported_claims": [
+      "No new requirements or unsupported global-absence claims."
+    ]
+  },
+  {
+    "id": "V-M2",
+    "facts": [
+      {
+        "id": "V-M2-fact-1",
+        "source": "weather.md",
+        "quote": "Weather decisions govern execution, not ownership of reservations.",
+        "requirement": "Weather decisions govern execution, not ownership of reservations.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M2-fact-2",
+        "source": "weather.md",
+        "quote": "Suspend outdoor observations when the wind interlock opens.",
+        "requirement": "Suspend outdoor observations when the wind interlock opens.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M2-fact-3",
+        "source": "weather.md",
+        "quote": "Preserve reservation identifiers during suspension.",
+        "requirement": "Preserve reservation identifiers during suspension.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M2-fact-4",
+        "source": "weather.md",
+        "quote": "Resume only after the interlock closes and the duty operator records a restart approval.",
+        "requirement": "Resume only after the interlock closes and the duty operator records a restart approval.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M2-fact-5",
+        "source": "weather.md",
+        "quote": "An instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed.",
+        "requirement": "An instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M2-fact-6",
+        "source": "weather.md",
+        "quote": "A roof visible as closed on the calendar does not establish indoor classification.",
+        "requirement": "A roof visible as closed on the calendar does not establish indoor classification.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      }
+    ],
+    "no_answer": false,
+    "unsupported_claims": [
+      "No new requirements or unsupported global-absence claims."
+    ]
+  },
+  {
+    "id": "V-M3",
+    "facts": [
+      {
+        "id": "V-M3-fact-1",
+        "source": "clock.md",
+        "quote": "The gateway compares instrument time with the observatory reference before executing a schedule.",
+        "requirement": "The gateway compares instrument time with the observatory reference before executing a schedule.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M3-fact-2",
+        "source": "clock.md",
+        "quote": "If the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator.",
+        "requirement": "If the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M3-fact-3",
+        "source": "clock.md",
+        "quote": "Keep queued reservations unchanged.",
+        "requirement": "Keep queued reservations unchanged.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M3-fact-4",
+        "source": "clock.md",
+        "quote": "Resume only after two consecutive reference checks report an offset within two seconds.",
+        "requirement": "Resume only after two consecutive reference checks report an offset within two seconds.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      },
+      {
+        "id": "V-M3-fact-5",
+        "source": "clock.md",
+        "quote": "If the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.",
+        "requirement": "If the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.",
+        "materiality": "Historical rubric unchanged; relevance assessed separately."
+      }
+    ],
+    "no_answer": false,
+    "unsupported_claims": [
+      "No new requirements or unsupported global-absence claims."
+    ]
+  },
+  {
+    "id": "V-M4",
+    "facts": [],
+    "no_answer": true,
+    "unsupported_claims": [
+      "No new requirements or unsupported global-absence claims."
+    ]
+  },
+  {
+    "id": "fresh-en-print-queue-recovery",
+    "facts": [
+      {
+        "id": "print-applicability",
+        "source": "docs/rillprint/recover-stalled-queue.md",
+        "quote": "This procedure applies only to RillPrint 4 queues that are already in maintenance mode.",
+        "requirement": "Restrict the procedure to RillPrint 4 queues already in maintenance mode; do not present it as an unconditional recovery procedure for any stalled queue.",
+        "materiality": "critical: changes when the procedure is applicable"
+      },
+      {
+        "id": "print-manifest-before-purge",
+        "source": "docs/rillprint/recover-stalled-queue.md",
+        "quote": "Before any purge, export the job manifest.",
+        "requirement": "Treat the manifest export as mandatory and place it before any purge.",
+        "materiality": "critical: loses a mandatory pre-purge action if omitted or reordered"
+      },
+      {
+        "id": "print-purge-conjunction",
+        "source": "docs/rillprint/recover-stalled-queue.md",
+        "quote": "A purge is permitted only when the upstream feeder is stopped AND the device buffer is empty.",
+        "requirement": "Preserve the conjunction: a stopped upstream feeder and an empty device buffer are both necessary for a purge; either one alone is insufficient.",
+        "materiality": "critical: changes the permission condition if AND is weakened to OR"
+      },
+      {
+        "id": "print-held-job-exception",
+        "source": "docs/rillprint/recover-stalled-queue.md",
+        "quote": "If any job is marked `held`, stop recovery and leave the queue paused; do not purge or resume it.",
+        "requirement": "Make any held job a blocking exception: stop recovery, keep the queue paused, and perform neither purge nor resume.",
+        "materiality": "critical: otherwise authorizes an explicitly prohibited recovery branch"
+      },
+      {
+        "id": "print-verification-gate",
+        "source": "docs/rillprint/recover-stalled-queue.md",
+        "quote": "After the purge, a successful `spool-verify` run is required before the queue may be resumed.",
+        "requirement": "Place verification after the purge and make its success a prerequisite to resuming; merely attempting verification is not enough.",
+        "materiality": "critical: changes both ordering and the success gate for resume"
+      },
+      {
+        "id": "print-optional-diagnostics",
+        "source": "docs/rillprint/recover-stalled-queue.md",
+        "quote": "Uploading a diagnostic bundle is optional.",
+        "requirement": "Keep the diagnostic upload explicitly optional, rather than converting it into a required recovery step.",
+        "materiality": "material: introduces a nonexistent obligation if made mandatory"
+      },
+      {
+        "id": "print-receipt-invariant",
+        "source": "docs/rillprint/recover-stalled-queue.md",
+        "quote": "Archived job receipts must remain unchanged throughout recovery.",
+        "requirement": "Preserve the invariant that archived job receipts remain unchanged for the entire recovery.",
+        "materiality": "critical: loses an explicit preservation constraint"
+      }
+    ],
+    "no_answer": false,
+    "unsupported_claims": [
+      "The source does not provide commands for entering maintenance mode, exporting the manifest, or purging; do not invent command syntax.",
+      "The source does not authorize deleting held jobs, clearing their held status, modifying archived receipts, or resuming after failed verification."
+    ]
+  },
+  {
+    "id": "fresh-ru-guide-package-publication",
+    "facts": [
+      {
+        "id": "guide-draft-applicability",
+        "source": "docs/tropa/publish-guide-package.md",
+        "quote": "Этот порядок применяется только к пакетам со статусом «черновик».",
+        "requirement": "Ограничить применимость порядка пакетами в статусе «черновик».",
+        "materiality": "critical: без ограничения порядок распространяется на неподтверждённые состояния пакета"
+      },
+      {
+        "id": "guide-mandatory-order",
+        "source": "docs/tropa/publish-guide-package.md",
+        "quote": "Перед публикацией обязательно сначала проверить ссылки, затем получить подтверждение редактора.",
+        "requirement": "Сохранить обязательность и порядок: проверка ссылок, затем подтверждение редактора; оба действия предшествуют публикации.",
+        "materiality": "critical: пропуск обязательного действия или перестановка меняют процедуру"
+      },
+      {
+        "id": "guide-nested-eligibility",
+        "source": "docs/tropa/publish-guide-package.md",
+        "quote": "Публикация разрешена только при успешной проверке ссылок И (есть хотя бы одна аудиозапись ИЛИ включён текстовый режим).",
+        "requirement": "Сохранить условие: успешная проверка ссылок обязательна и дополнительно достаточно хотя бы одного из двух вариантов — аудиозаписи или включённого текстового режима. Не требовать одновременно оба варианта и не делать их заменой проверке ссылок.",
+        "materiality": "critical: неверные скобки, И или ИЛИ меняют разрешение на публикацию"
+      },
+      {
+        "id": "guide-optional-preview",
+        "source": "docs/tropa/publish-guide-package.md",
+        "quote": "Стендовый предпросмотр необязателен.",
+        "requirement": "Явно оставить стендовый предпросмотр необязательным.",
+        "materiality": "material: превращение предпросмотра в требование создаёт лишнюю обязанность"
+      },
+      {
+        "id": "guide-editorial-block-exception",
+        "source": "docs/tropa/publish-guide-package.md",
+        "quote": "При редакционной блокировке публикация запрещена, даже если остальные условия выполнены.",
+        "requirement": "Сохранить приоритет блокирующего исключения: редакционная блокировка запрещает публикацию независимо от выполнения остальных условий.",
+        "materiality": "critical: иначе ответ разрешает явно запрещённую публикацию"
+      },
+      {
+        "id": "guide-current-version-invariant",
+        "source": "docs/tropa/publish-guide-package.md",
+        "quote": "До успешной синхронизации новой версии посетителям должна оставаться доступна текущая версия.",
+        "requirement": "Сохранить доступ посетителей к текущей версии до успешной синхронизации новой; начала публикации или начала синхронизации недостаточно.",
+        "materiality": "critical: потеря условия окончания снимает гарантию доступности слишком рано"
+      }
+    ],
+    "no_answer": false,
+    "unsupported_claims": [
+      "Документ не описывает снятие редакционной блокировки, переход из других статусов в черновик или автоматическое подтверждение редактора.",
+      "Документ не требует одновременно аудиозапись и текстовый режим и не разрешает отключить текущую версию до успешной синхронизации новой."
+    ]
+  },
+  {
+    "id": "fresh-en-single-attachment-limit",
+    "facts": [
+      {
+        "id": "attachment-size-limit",
+        "source": "docs/relaypost/attachments.md",
+        "quote": "In a standard mailbox, a single attachment may be at most 18 MiB.",
+        "requirement": "Give the direct factual answer: at most 18 MiB per attachment in a standard mailbox. Preserve the unit and per-attachment scope, and omit the unasked upload procedure.",
+        "materiality": "critical: a different unit or scope changes the limit; a procedure dump fails the narrow question"
+      }
+    ],
+    "no_answer": false,
+    "unsupported_claims": [
+      "The source does not state a total-message size limit or a limit for any other mailbox class.",
+      "18 MiB must not silently become 18 decimal MB. The separate upload procedure is not requested by this question."
+    ]
+  },
+  {
+    "id": "fresh-ru-undocumented-journal-retention",
+    "facts": [],
+    "no_answer": true,
+    "unsupported_claims": [
+      "В приведённом источнике не указаны ни срок хранения журнала, ни правило автоматического удаления. Ответ должен обозначить отсутствие этих сведений, а не придумывать срок.",
+      "Период сверки устройств в 24 часа не является сроком хранения. Возможность ручной выгрузки не доказывает удаление после выгрузки или бессрочное хранение."
+    ]
+  }
+]

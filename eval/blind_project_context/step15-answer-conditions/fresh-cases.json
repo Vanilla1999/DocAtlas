@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "diagnostic": "step15-answer-conditions-fresh",
+  "scope": "Compact synthetic diagnostic of condition preservation in final answers. All evidence is supplied directly; retrieval is outside the boundary of this diagnostic.",
+  "provenance": "Questions and expected facts were authored independently before answer generation, without inspecting existing task corpora or current product prompts. This set is held out from prompt writing; it is not statistical or real-world validation.",
+  "grading_note": "Assess semantic preservation of the quoted source facts and the requested answer scope. These are human-readable expectations, not keyword rules or question-to-answer mappings for production code.",
+  "cases": [
+    {
+      "id": "fresh-en-print-queue-recovery",
+      "question": "What is the documented way to recover a stalled RillPrint 4 queue?",
+      "sources": [
+        {
+          "path": "docs/rillprint/recover-stalled-queue.md",
+          "text": "# Recovering a stalled queue\n\n- This procedure applies only to RillPrint 4 queues that are already in maintenance mode.\n- Before any purge, export the job manifest.\n- A purge is permitted only when the upstream feeder is stopped AND the device buffer is empty.\n- If any job is marked `held`, stop recovery and leave the queue paused; do not purge or resume it.\n- After the purge, a successful `spool-verify` run is required before the queue may be resumed.\n- Uploading a diagnostic bundle is optional.\n- Archived job receipts must remain unchanged throughout recovery.\n"
+        }
+      ],
+      "facts": [
+        {
+          "id": "print-applicability",
+          "source": "docs/rillprint/recover-stalled-queue.md",
+          "quote": "This procedure applies only to RillPrint 4 queues that are already in maintenance mode.",
+          "requirement": "Restrict the procedure to RillPrint 4 queues already in maintenance mode; do not present it as an unconditional recovery procedure for any stalled queue.",
+          "materiality": "critical: changes when the procedure is applicable"
+        },
+        {
+          "id": "print-manifest-before-purge",
+          "source": "docs/rillprint/recover-stalled-queue.md",
+          "quote": "Before any purge, export the job manifest.",
+          "requirement": "Treat the manifest export as mandatory and place it before any purge.",
+          "materiality": "critical: loses a mandatory pre-purge action if omitted or reordered"
+        },
+        {
+          "id": "print-purge-conjunction",
+          "source": "docs/rillprint/recover-stalled-queue.md",
+          "quote": "A purge is permitted only when the upstream feeder is stopped AND the device buffer is empty.",
+          "requirement": "Preserve the conjunction: a stopped upstream feeder and an empty device buffer are both necessary for a purge; either one alone is insufficient.",
+          "materiality": "critical: changes the permission condition if AND is weakened to OR"
+        },
+        {
+          "id": "print-held-job-exception",
+          "source": "docs/rillprint/recover-stalled-queue.md",
+          "quote": "If any job is marked `held`, stop recovery and leave the queue paused; do not purge or resume it.",
+          "requirement": "Make any held job a blocking exception: stop recovery, keep the queue paused, and perform neither purge nor resume.",
+          "materiality": "critical: otherwise authorizes an explicitly prohibited recovery branch"
+        },
+        {
+          "id": "print-verification-gate",
+          "source": "docs/rillprint/recover-stalled-queue.md",
+          "quote": "After the purge, a successful `spool-verify` run is required before the queue may be resumed.",
+          "requirement": "Place verification after the purge and make its success a prerequisite to resuming; merely attempting verification is not enough.",
+          "materiality": "critical: changes both ordering and the success gate for resume"
+        },
+        {
+          "id": "print-optional-diagnostics",
+          "source": "docs/rillprint/recover-stalled-queue.md",
+          "quote": "Uploading a diagnostic bundle is optional.",
+          "requirement": "Keep the diagnostic upload explicitly optional, rather than converting it into a required recovery step.",
+          "materiality": "material: introduces a nonexistent obligation if made mandatory"
+        },
+        {
+          "id": "print-receipt-invariant",
+          "source": "docs/rillprint/recover-stalled-queue.md",
+          "quote": "Archived job receipts must remain unchanged throughout recovery.",
+          "requirement": "Preserve the invariant that archived job receipts remain unchanged for the entire recovery.",
+          "materiality": "critical: loses an explicit preservation constraint"
+        }
+      ],
+      "no_answer": false,
+      "unsupported_claims": [
+        "The source does not provide commands for entering maintenance mode, exporting the manifest, or purging; do not invent command syntax.",
+        "The source does not authorize deleting held jobs, clearing their held status, modifying archived receipts, or resuming after failed verification."
+      ]
+    },
+    {
+      "id": "fresh-ru-guide-package-publication",
+      "question": "Как по документации опубликовать новый пакет аудиогида «Тропа»?",
+      "sources": [
+        {
+          "path": "docs/tropa/publish-guide-package.md",
+          "text": "# Публикация пакета аудиогида «Тропа»\n\n- Этот порядок применяется только к пакетам со статусом «черновик».\n- Перед публикацией обязательно сначала проверить ссылки, затем получить подтверждение редактора.\n- Публикация разрешена только при успешной проверке ссылок И (есть хотя бы одна аудиозапись ИЛИ включён текстовый режим).\n- Стендовый предпросмотр необязателен.\n- При редакционной блокировке публикация запрещена, даже если остальные условия выполнены.\n- До успешной синхронизации новой версии посетителям должна оставаться доступна текущая версия.\n"
+        }
+      ],
+      "facts": [
+        {
+          "id": "guide-draft-applicability",
+          "source": "docs/tropa/publish-guide-package.md",
+          "quote": "Этот порядок применяется только к пакетам со статусом «черновик».",
+          "requirement": "Ограничить применимость порядка пакетами в статусе «черновик».",
+          "materiality": "critical: без ограничения порядок распространяется на неподтверждённые состояния пакета"
+        },
+        {
+          "id": "guide-mandatory-order",
+          "source": "docs/tropa/publish-guide-package.md",
+          "quote": "Перед публикацией обязательно сначала проверить ссылки, затем получить подтверждение редактора.",
+          "requirement": "Сохранить обязательность и порядок: проверка ссылок, затем подтверждение редактора; оба действия предшествуют публикации.",
+          "materiality": "critical: пропуск обязательного действия или перестановка меняют процедуру"
+        },
+        {
+          "id": "guide-nested-eligibility",
+          "source": "docs/tropa/publish-guide-package.md",
+          "quote": "Публикация разрешена только при успешной проверке ссылок И (есть хотя бы одна аудиозапись ИЛИ включён текстовый режим).",
+          "requirement": "Сохранить условие: успешная проверка ссылок обязательна и дополнительно достаточно хотя бы одного из двух вариантов — аудиозаписи или включённого текстового режима. Не требовать одновременно оба варианта и не делать их заменой проверке ссылок.",
+          "materiality": "critical: неверные скобки, И или ИЛИ меняют разрешение на публикацию"
+        },
+        {
+          "id": "guide-optional-preview",
+          "source": "docs/tropa/publish-guide-package.md",
+          "quote": "Стендовый предпросмотр необязателен.",
+          "requirement": "Явно оставить стендовый предпросмотр необязательным.",
+          "materiality": "material: превращение предпросмотра в требование создаёт лишнюю обязанность"
+        },
+        {
+          "id": "guide-editorial-block-exception",
+          "source": "docs/tropa/publish-guide-package.md",
+          "quote": "При редакционной блокировке публикация запрещена, даже если остальные условия выполнены.",
+          "requirement": "Сохранить приоритет блокирующего исключения: редакционная блокировка запрещает публикацию независимо от выполнения остальных условий.",
+          "materiality": "critical: иначе ответ разрешает явно запрещённую публикацию"
+        },
+        {
+          "id": "guide-current-version-invariant",
+          "source": "docs/tropa/publish-guide-package.md",
+          "quote": "До успешной синхронизации новой версии посетителям должна оставаться доступна текущая версия.",
+          "requirement": "Сохранить доступ посетителей к текущей версии до успешной синхронизации новой; начала публикации или начала синхронизации недостаточно.",
+          "materiality": "critical: потеря условия окончания снимает гарантию доступности слишком рано"
+        }
+      ],
+      "no_answer": false,
+      "unsupported_claims": [
+        "Документ не описывает снятие редакционной блокировки, переход из других статусов в черновик или автоматическое подтверждение редактора.",
+        "Документ не требует одновременно аудиозапись и текстовый режим и не разрешает отключить текущую версию до успешной синхронизации новой."
+      ]
+    },
+    {
+      "id": "fresh-en-single-attachment-limit",
+      "question": "In a standard RelayPost mailbox, what is the maximum size of one attachment?",
+      "sources": [
+        {
+          "path": "docs/relaypost/attachments.md",
+          "text": "# Attachments in RelayPost\n\nIn a standard mailbox, a single attachment may be at most 18 MiB.\n\n## Adding an attachment\n1. Open a draft message.\n2. Choose **Attach file** and select a local file.\n3. Wait for the upload indicator to finish before sending.\n"
+        }
+      ],
+      "facts": [
+        {
+          "id": "attachment-size-limit",
+          "source": "docs/relaypost/attachments.md",
+          "quote": "In a standard mailbox, a single attachment may be at most 18 MiB.",
+          "requirement": "Give the direct factual answer: at most 18 MiB per attachment in a standard mailbox. Preserve the unit and per-attachment scope, and omit the unasked upload procedure.",
+          "materiality": "critical: a different unit or scope changes the limit; a procedure dump fails the narrow question"
+        }
+      ],
+      "no_answer": false,
+      "unsupported_claims": [
+        "The source does not state a total-message size limit or a limit for any other mailbox class.",
+        "18 MiB must not silently become 18 decimal MB. The separate upload procedure is not requested by this question."
+      ]
+    },
+    {
+      "id": "fresh-ru-undocumented-journal-retention",
+      "question": "Через сколько дней сервис «Мостик» автоматически удаляет записи журнала проходов?",
+      "sources": [
+        {
+          "path": "docs/mostik/access-journal.md",
+          "text": "# Журнал проходов сервиса «Мостик»\n\nЖурнал содержит время прохода, идентификатор пропуска и название входа.\nВремя записывается в UTC.\nСверка устройств выполняется каждые 24 часа.\nАдминистратор может вручную выгрузить журнал в CSV.\n"
+        }
+      ],
+      "facts": [],
+      "no_answer": true,
+      "unsupported_claims": [
+        "В приведённом источнике не указаны ни срок хранения журнала, ни правило автоматического удаления. Ответ должен обозначить отсутствие этих сведений, а не придумывать срок.",
+        "Период сверки устройств в 24 часа не является сроком хранения. Возможность ручной выгрузки не доказывает удаление после выгрузки или бессрочное хранение."
+      ]
+    }
+  ]
+}

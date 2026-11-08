@@ -351,3 +351,53 @@ ordinary profile. Client catalog size, tool-result size, repeated history,
 provider rounds and final-answer quality are separate measurements. A smaller
 first request does not establish that DocAtlas beats file search on total cost
 or answer completeness.
+
+## Opt-in answer-writing hypotheses
+
+The default remains `--answer-policy current`: the existing common prompt and
+generated client configuration remain unchanged. New receipt fields record the
+selection and its provenance. Two **experimental**, non-default alternatives
+are available for a newly generated documentation location:
+
+```text
+--answer-policy rule-contract-v1
+```
+
+or:
+
+```text
+--answer-policy evidence-led-v1
+```
+
+`rule-contract-v1` asks for claims whose applicability, required conditions,
+ordering, exceptions and invariants remain explicit where relevant. Simple
+factual questions should still receive direct answers, not a forced procedure.
+`evidence-led-v1` instead emphasizes composing from the supplied source
+statements and their dependencies, rather than using a first draft as the
+inventory of what must be checked. Neither policy adds topic-specific examples,
+synonym dictionaries, question-to-document mappings or an expected fact count.
+Both return an ordinary final answer, not a reasoning trace.
+
+`answer_policy.py` is the common loader for the profile and answer-only studies.
+Each alternative replaces only the exact existing source-to-draft paragraph in
+`profile/common.txt`. The file itself is not edited. A changed or duplicated
+paragraph boundary rejects the alternative instead of silently replacing other
+instructions. Shared scope, trust, uncertainty, citation, tool and stopping
+rules remain in place. The default policy returns the original common text.
+
+This option applies equally to MCP and the isolated files comparison control;
+keep the selected policy equal when comparing those backends. It is independent
+of `--instruction-variant` and, for MCP, `--language-preflight`. It neither selects
+Qwen/MiniLM, changes retrieval or one-hop expansion, nor schedules an additional
+provider call. Prompt changes can still affect a model's choices and token use;
+unchanged invocation code is not a guarantee of unchanged session cost.
+
+Receipts record `answer_policy`, the base common-prompt hash, the candidate
+paragraph hash (`null` for `current`), and hashes of the actual selected input
+files. `common_prompt_sha256` and `system_sha256` describe the resulting injected
+text. A previously generated location does not acquire a policy automatically.
+
+These candidates are hypotheses, not a completeness guarantee. An answer-only
+comparison can isolate use of already supplied evidence, but does not establish
+native OpenCode/MCP acceptance, Terra Low quality, or provider-billing savings.
+No default should be promoted solely because an instruction is more explicit.

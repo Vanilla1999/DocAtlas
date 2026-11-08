@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 from copy import deepcopy
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -19,6 +20,16 @@ PROFILE = "documentation-light-v1"
 INSTRUCTION_VARIANTS = ("standard", "concise-v1")
 LANGUAGE_PREFLIGHTS = ("model", "host-v1")
 HERE = Path(__file__).resolve().parent
+
+# The builder is used both as a CLI and through spec_from_file_location by
+# study runners. Resolve this fixed sibling without changing sys.path or
+# accidentally importing an unrelated module with the same short name.
+_answer_spec = importlib.util.spec_from_file_location("docatlas_documentation_answer_policy", HERE / "answer_policy.py")
+if _answer_spec is None or _answer_spec.loader is None:
+    raise ImportError("Cannot load the documentation answer-policy module")
+_answer_module = importlib.util.module_from_spec(_answer_spec)
+_answer_spec.loader.exec_module(_answer_module)
+ANSWER_POLICIES = _answer_module.ANSWER_POLICIES
 
 
 def _digest(value: bytes) -> str:
@@ -61,7 +72,8 @@ def build_profile(*, project_root: Path, workspace: Path, backend: str,
                   model: str | None = None, frozen: bool = False,
                   max_steps: int | None = None,
                   instruction_variant: str = "standard",
-                  language_preflight: str = "model") -> tuple[dict, dict]:
+                  language_preflight: str = "model",
+                  answer_policy: str = "current") -> tuple[dict, dict]:
     """Build a new configuration, without changing the selected retrieval policy.
 
     This first profile binds project scope. Module/library/all-scope workflows use
@@ -76,6 +88,8 @@ def build_profile(*, project_root: Path, workspace: Path, backend: str,
         raise ValueError("instruction_variant must be standard or concise-v1")
     if language_preflight not in LANGUAGE_PREFLIGHTS:
         raise ValueError("language_preflight must be model or host-v1")
+    if answer_policy not in ANSWER_POLICIES:
+        raise ValueError("answer_policy must be current, rule-contract-v1 or evidence-led-v1")
     if backend != "mcp" and language_preflight != "model":
         raise ValueError("host-v1 language preflight requires the MCP backend")
     if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", server_name):
@@ -107,7 +121,7 @@ def build_profile(*, project_root: Path, workspace: Path, backend: str,
                DOCATLAS_CONTEXT_PRESENTATION="literal-v2",
                DOCATLAS_MCP_ADMIN_TOOLS="0", DOCATLAS_MCP_ADVANCED_TOOLS="0",
                DOCATLAS_OFFLINE="1", DOCATLAS_AUTO_VECTORS="0")
-    common = (HERE / "profile/common.txt").read_text(encoding="utf-8").strip()
+    common, answer_provenance = _answer_module.load_common_prompt(answer_policy)
     specific_path = HERE / "profile" / (
         "mcp-concise.txt" if backend == "mcp" and instruction_variant == "concise-v1" else f"{backend}.txt")
     specific = specific_path.read_text(encoding="utf-8").strip()
@@ -171,6 +185,9 @@ def build_profile(*, project_root: Path, workspace: Path, backend: str,
         config["instructions"] = [str(instructions)]
     receipt = {"profile": PROFILE, "backend": backend, "project_path": str(root),
                "instruction_variant": instruction_variant,
+               "answer_policy": answer_policy,
+               "answer_policy_prompt_sha256": answer_provenance["answer_policy_prompt_sha256"],
+               "answer_policy_base_prompt_sha256": answer_provenance["answer_policy_base_prompt_sha256"],
                "tool_description_policy": "concise-v1 model-facing annotations only"
                    if backend == "mcp" and instruction_variant == "concise-v1" else "original catalog",
                "workspace_path": str(location), "scope": "project", "agent": agent_name,
@@ -188,11 +205,12 @@ def build_profile(*, project_root: Path, workspace: Path, backend: str,
                "file_control_snapshot": file_snapshot,
                "mcp_active_snapshot_verified_by_builder": False,
                "model_calls": 0, "preparation_calls": 0,
-               "inputs": {str(path.relative_to(HERE)): _digest(path.read_bytes()) for path in
+               "inputs": {**{str(path.relative_to(HERE)): _digest(path.read_bytes()) for path in
                           [HERE / "documentation_profile.py", HERE / "profile/common.txt",
                            specific_path, HERE / "profile/index.js", HERE / "index.js",
                            HERE / "count_tokens.py", HERE / "profile/language-preflight.js"] +
                           ([host_language_path] if language_preflight == "host-v1" else [])},
+                          **answer_provenance["inputs"]},
                "boundary": "Configuration only; actual client/runtime acceptance is recorded separately."}
     return deepcopy(config), receipt
 
@@ -206,6 +224,8 @@ def main() -> None:
                         help="Opt-in concise-v1 MCP instructions/descriptions; files and runtime guards stay unchanged")
     parser.add_argument("--language-preflight", choices=LANGUAGE_PREFLIGHTS, default="model",
                         help="Opt-in host-v1: real bound MCP language metadata before the first model request of each user prompt")
+    parser.add_argument("--answer-policy", choices=ANSWER_POLICIES, default="current",
+                        help="Opt-in answer-writing experiment shared by MCP and files; current preserves the existing prompt")
     parser.add_argument("--executable", type=Path, required=True, help="Absolute installed doc-atlas executable")
     parser.add_argument("--python", type=Path, required=True, help="Absolute interpreter from the same installed environment")
     parser.add_argument("--server-env-json", type=Path, help="Explicit existing server environment map; no policy is selected automatically")
@@ -225,7 +245,7 @@ def main() -> None:
             backend=args.backend, executable=args.executable, python=args.python,
             server_environment=environment, server_name=args.server_name, agent_name=args.agent_name, model=args.model,
             max_steps=args.max_steps, instruction_variant=args.instruction_variant,
-            language_preflight=args.language_preflight)
+            language_preflight=args.language_preflight, answer_policy=args.answer_policy)
     except (ValueError, OSError, TypeError) as exc:
         parser.error(str(exc))
     for name, value in (("opencode.json", config), ("profile-receipt.json", receipt)):
@@ -235,6 +255,7 @@ def main() -> None:
     print(json.dumps({"profile": PROFILE, "location": str(args.output), "agent": args.agent_name,
                       "instruction_variant": args.instruction_variant,
                       "language_preflight": args.language_preflight,
+                      "answer_policy": args.answer_policy,
                       "next": "Run OpenCode here with this agent; pass the unchanged question through stdin."}))
 
 
