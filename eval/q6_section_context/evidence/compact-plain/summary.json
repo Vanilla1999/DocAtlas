@@ -1,0 +1,542 @@
+{
+  "answer_quality": "NOT_TESTED",
+  "boundary": "installed_public_stdio_mcp",
+  "budget": {
+    "max_tokens_or_bytes_over_four": 10072,
+    "o200k_tokens": 9939,
+    "utf8_bytes": 40285
+  },
+  "calls": {
+    "answer_model_calls": 0,
+    "get_docs_context": 1,
+    "initializations": 1,
+    "list_tools": 1,
+    "prepare_docs": 0,
+    "read_docs_source": 0,
+    "server_processes": 1
+  },
+  "case": "Q6",
+  "catalog_sha256": "8fd86610d8a1fcd6ce67cb4cab4978d2f9ac2a0f0ed9862dd0e4592779c7951c",
+  "delivered_facts": 4,
+  "delivered_rows_sha256": "f63914b294f79e523fbb5c1ee18cb0ab9e39cd1f81d00c862f2b8a115f658ce1",
+  "documents": 19,
+  "evaluator_sha256": "22789e3bbdab825268eafbd8f17bcfd9937d377e11185d4b343aa24cfc27d97b",
+  "exact_wire_parity": true,
+  "facts": [
+    {
+      "delivered": true,
+      "id": "budget_formula"
+    },
+    {
+      "delivered": true,
+      "id": "compact_and_canonical"
+    },
+    {
+      "delivered": true,
+      "id": "delivery_error_contract"
+    },
+    {
+      "delivered": true,
+      "id": "delivery_failure_recovery"
+    }
+  ],
+  "mode": "lexical",
+  "observation": {
+    "acquisitions": [],
+    "all_delivered_bindings_checked": null,
+    "selections": []
+  },
+  "observed": false,
+  "oracle_sha256": "aba6d104eb2ddcff8f171084ea5f20f8e85fda839e8246d69e1a04b143b1d0da",
+  "profile": "compact",
+  "provider_usage": null,
+  "question": "How does OpenCode compact delivery work, what size limits apply, and how is a delivery failure diagnosed?",
+  "raw_wire_sha256": "233175257199f8a2c3128d4f68605b514ad8898f0784dbf595b7d147a6816c50",
+  "reason_code": null,
+  "recorded_configuration": {
+    "case": "Q6",
+    "contextual_relevance_sha256": "71b5c88ddf5f22ad18a7c51d96cc0c672e04a7650ef5dd450f7ad67fc9f270c7",
+    "harness_sha256": "22789e3bbdab825268eafbd8f17bcfd9937d377e11185d4b343aa24cfc27d97b",
+    "mode": "lexical",
+    "observe": false,
+    "oracle_sha256": "aba6d104eb2ddcff8f171084ea5f20f8e85fda839e8246d69e1a04b143b1d0da",
+    "profile": "compact",
+    "question": "How does OpenCode compact delivery work, what size limits apply, and how is a delivery failure diagnosed?"
+  },
+  "recorded_harness_sha256": "22789e3bbdab825268eafbd8f17bcfd9937d377e11185d4b343aa24cfc27d97b",
+  "run_status": "COMPLETE",
+  "scope": "unchanged default request; original catalog",
+  "seconds": 10.575674239000364,
+  "source_and_index_unchanged": true,
+  "source_fidelity": [
+    {
+      "content_sha256": null,
+      "line_end": 173,
+      "line_start": 166,
+      "path": "README.md",
+      "snippet_sha256": "be49f808dfc5fcc2149a73fb44fa404e524c338c9b4def66d2d182527b69f28f"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 175,
+      "line_start": 174,
+      "path": "README.md",
+      "snippet_sha256": "1fde160df261870310c94c149b68b49769a267eab2b86ecff9cd7b8a3afa2c92"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 73,
+      "line_start": 72,
+      "path": "docs/opencode-compact-text.md",
+      "snippet_sha256": "1508dfdb3039ba6dd67e602a3c080e6b846742de3291b680a6f2582c984a1caf"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 81,
+      "line_start": 74,
+      "path": "docs/opencode-compact-text.md",
+      "snippet_sha256": "744f22fc61b6b415f9c22a63b248124fea5da82fb32ace45f4a8892b58486ec3"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 89,
+      "line_start": 82,
+      "path": "docs/opencode-compact-text.md",
+      "snippet_sha256": "328eafdf8cd19be1314b1471d19836028f33fc57fb1352121016b09dda3a463b"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 94,
+      "line_start": 90,
+      "path": "docs/opencode-compact-text.md",
+      "snippet_sha256": "98ce8c05f1950cbe490070d15c6603a47978affe08a06f9aae1e5958889dbd8a"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 67,
+      "line_start": 59,
+      "path": "wiki/Architecture.md",
+      "snippet_sha256": "a94070a082ecc65c7dafa8ecf70f79aafcba15b6bff57f2c231187db7cc63495"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 184,
+      "line_start": 182,
+      "path": "docs/mcp-docs-server.md",
+      "snippet_sha256": "4009a329df4b80d2bb10192e53f2adeb9407985c0a153d10e2e1c99223eb9566"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 16,
+      "line_start": 13,
+      "path": "README.md",
+      "snippet_sha256": "bc80da418d0a6b6965a76059068e75e4bff43cd1c5befb035c8807694983f296"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 28,
+      "line_start": 17,
+      "path": "README.md",
+      "snippet_sha256": "e47e587d08f670651cedf80f2cde93aaf3fba3dfd1f06f8349c0f77043c3fb0c"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 35,
+      "line_start": 29,
+      "path": "README.md",
+      "snippet_sha256": "a559a15911a68b45f95d6ede9781d998b65559ea87cbb13a3544a81ba693bfd8"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 122,
+      "line_start": 121,
+      "path": "docs/mcp-docs-server.md",
+      "snippet_sha256": "04cb55f098652eb94a06b5fa29a7b8bde699631ac9784d432fa235b50f52bed9"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 134,
+      "line_start": 123,
+      "path": "docs/mcp-docs-server.md",
+      "snippet_sha256": "07591c1236f581326c8ddb703673a8bb5b88d0c9edffbdb453f0ffc4d563f06f"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 142,
+      "line_start": 135,
+      "path": "docs/mcp-docs-server.md",
+      "snippet_sha256": "cbb37c2ddae3ceec185a2506f4e6d705d92b600b87b45d20110d3336dea6c2cb"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 148,
+      "line_start": 143,
+      "path": "docs/mcp-docs-server.md",
+      "snippet_sha256": "7b4f46a1cca05c0f4a5fac2afc437afad0a40095ef5eecb952220edbdc11137e"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 75,
+      "line_start": 67,
+      "path": "wiki/Configuration.md",
+      "snippet_sha256": "acdccc42b04f6807bc04115ee66b036672a366d6d9d1e555f9bd5ea32403d5a9"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 36,
+      "line_start": 24,
+      "path": "docs/adr/0003-context-first-project-reads.md",
+      "snippet_sha256": "9a1f1bcc350774bc19a2c64effbaf71a324ac8fe424be23c7b991602c3eead91"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 100,
+      "line_start": 95,
+      "path": "docs/opencode-compact-text.md",
+      "snippet_sha256": "a7b030bb084716a734fd5a4836eaed63160f240786ff93c27e2b2bfdeffd6717"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 109,
+      "line_start": 101,
+      "path": "docs/opencode-compact-text.md",
+      "snippet_sha256": "f65cfcf6160f442b2d78888dd58d5d7619c3005aa0535de3e64aa96823b8d6e0"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 114,
+      "line_start": 110,
+      "path": "docs/opencode-compact-text.md",
+      "snippet_sha256": "e6ffe11652346918221a745f58efd34b9b76881f7138630deffc61c54c719220"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 122,
+      "line_start": 115,
+      "path": "docs/opencode-compact-text.md",
+      "snippet_sha256": "5750bdf051f3edcd26b12294106219112aecd44dcb57215c855f5d2ccff41f24"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 127,
+      "line_start": 123,
+      "path": "docs/opencode-compact-text.md",
+      "snippet_sha256": "8668a861831623e0e1c582b0677ff5b973fd1de4fca531c72e0d2683e09b0012"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 101,
+      "line_start": 89,
+      "path": "docs/index-cleanup.md",
+      "snippet_sha256": "da14b9a5c448669c69c6b335033f1cb8e4ec3f4e8ff713a1d40b38d44bcc9926"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 90,
+      "line_start": 80,
+      "path": "docs/modules/project-context-retrieval.md",
+      "snippet_sha256": "22e81a10d8ab55d7f22835155916c943c6bad1d78db0e36f625cd88dd67a14c9"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 95,
+      "line_start": 91,
+      "path": "docs/modules/project-context-retrieval.md",
+      "snippet_sha256": "1c3cc7b6a87a36f00963b78196eca07e5bb00e59e966882feec4cb688d86080a"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 52,
+      "line_start": 48,
+      "path": "docs/modules/evidence-selection.md",
+      "snippet_sha256": "a5f8fd1e2a3a5f8accb8313e5f29dd3787b30f77f1162da145e9cd62bb8e1919"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 58,
+      "line_start": 53,
+      "path": "docs/modules/evidence-selection.md",
+      "snippet_sha256": "1b7919729b6d3521319712ae17eeed70e119c77ce163ee4770bb8acc84dc2903"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 63,
+      "line_start": 59,
+      "path": "docs/modules/evidence-selection.md",
+      "snippet_sha256": "0ae6484dd126a2659d9299d8c3df195da7f9958747b49fb27b4218b7d3422040"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 69,
+      "line_start": 64,
+      "path": "docs/modules/evidence-selection.md",
+      "snippet_sha256": "c77845df87dcb956bab9eadcf62b7cae47b86fb1a839a1087c1f556403f10997"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 75,
+      "line_start": 70,
+      "path": "docs/modules/evidence-selection.md",
+      "snippet_sha256": "36cd9ea16b5e5f9ed60e842f7d8e2604e867c6ddacaade647c9fb5ddce78566f"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 80,
+      "line_start": 76,
+      "path": "docs/modules/evidence-selection.md",
+      "snippet_sha256": "cf1e822f0d5bb66137ef63bc3bf3ea3d7c3a778a7ef42422a928b6b0d767580d"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 66,
+      "line_start": 60,
+      "path": "docs/PROJECT_BINDING.md",
+      "snippet_sha256": "de54db2dd4627c3852ae75caf5d9f5a6e0dcb85b05ae84300ed633226e052b45"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 71,
+      "line_start": 67,
+      "path": "docs/PROJECT_BINDING.md",
+      "snippet_sha256": "0ebf0954c5934703be1572712010d77f298b03b3a5746053a73b63c21757f64a"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 151,
+      "line_start": 150,
+      "path": "README.md",
+      "snippet_sha256": "232813feba7cdfd759b96c1d06bc69676c3cd6d5d8934ab8ca83ed6d59cdc75b"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 153,
+      "line_start": 152,
+      "path": "README.md",
+      "snippet_sha256": "5952d011a6b3876947f7bff1730a2847786a70127ca496dab5b604fb64fa300b"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 155,
+      "line_start": 154,
+      "path": "README.md",
+      "snippet_sha256": "6c048fd68b772fe12feba2a06234813007646647b80e4cc766ebdaf4788b8d28"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 157,
+      "line_start": 156,
+      "path": "README.md",
+      "snippet_sha256": "9adcd6e58b81b532c41187345abb693e2a69e186a595b5ffc680f0f98e665747"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 159,
+      "line_start": 158,
+      "path": "README.md",
+      "snippet_sha256": "7b17b633ab616219202189c6a1ae732b76c89400059bd00de3e2431b94b86d75"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 111,
+      "line_start": 110,
+      "path": "wiki/Architecture.md",
+      "snippet_sha256": "c4a1a5df1b4c4a256c087897ccd6cbe47e8488bccbfca8f8186a1f7c125a0c6c"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 114,
+      "line_start": 112,
+      "path": "wiki/Architecture.md",
+      "snippet_sha256": "41381d9b8bbf2a5044ba68c2b93e0c1ef6916b311f49aed16b8636f6004ed5dd"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 119,
+      "line_start": 115,
+      "path": "wiki/Architecture.md",
+      "snippet_sha256": "344993b010117550002c80ab5705c19752093236c252ef1eb307c8cb8ad99d80"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 120,
+      "line_start": 120,
+      "path": "wiki/Architecture.md",
+      "snippet_sha256": "27bf73b55c209fba50276279e963d7ef3fdbfd7486edab8362d6331659a42f15"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 15,
+      "line_start": 1,
+      "path": "docs/PROJECT_BINDING.md",
+      "snippet_sha256": "08c5b535910a8adccc4cc81405137865832048835fa71741fe6adfb9872f6faa"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 24,
+      "line_start": 16,
+      "path": "docs/PROJECT_BINDING.md",
+      "snippet_sha256": "e015d7087de2fcf2f1a41b3c06b78e8e8565e35069d042b6926a642f6153e951"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 32,
+      "line_start": 25,
+      "path": "docs/PROJECT_BINDING.md",
+      "snippet_sha256": "ac52fe593f7d2a9ab743b8eec4593454d05b031cb5fff2206fc49c8a75caf01c"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 41,
+      "line_start": 33,
+      "path": "docs/PROJECT_BINDING.md",
+      "snippet_sha256": "ee7d06ab6655affad03128c251b6e7a2dab1cd67a0199637cddaaf78fcddb631"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 50,
+      "line_start": 42,
+      "path": "docs/PROJECT_BINDING.md",
+      "snippet_sha256": "cc815f5467a9c78397b040a2f8db4f2ef91cb33eb112a2a0a0e2df896d108f23"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 128,
+      "line_start": 121,
+      "path": "docs/modules/evidence-selection.md",
+      "snippet_sha256": "106cdd9bfc509d0c250c354b4f96099804a437ad48d317bc449f2bd8347022eb"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 208,
+      "line_start": 200,
+      "path": "README.md",
+      "snippet_sha256": "539f673ec94ec54d570c38614ae94769ea0342a09ef7684c86cbf0a7ed7504ac"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 210,
+      "line_start": 209,
+      "path": "README.md",
+      "snippet_sha256": "326b703977268395f2f9d43756b1a7b70c56592eefa7bd594dd0fba818518cb7"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 137,
+      "line_start": 136,
+      "path": "README.md",
+      "snippet_sha256": "242d00e3aed2ee8ead8e8bed8cb59c4bafa5326847cae85c9e555008cba91c48"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 139,
+      "line_start": 138,
+      "path": "README.md",
+      "snippet_sha256": "4e96ecfb24a5385b876a4bbfb0cf8f111a7eb01a5d249e38cb7eedc015bc5db4"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 141,
+      "line_start": 140,
+      "path": "README.md",
+      "snippet_sha256": "ea34df309638a4df54f752386d7150606021a283bf56939824eee201ce4f4a73"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 143,
+      "line_start": 142,
+      "path": "README.md",
+      "snippet_sha256": "daea62eca7a693904628b5b7b423316da7f081f86f5efe23c13d756aac269ced"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 145,
+      "line_start": 144,
+      "path": "README.md",
+      "snippet_sha256": "29452da03bf3224bba0000749a2b1c40828f07d3c8a7c287747c9d1c114c71f7"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 147,
+      "line_start": 146,
+      "path": "README.md",
+      "snippet_sha256": "107ae4944c6a2517d6fc193f38cdd66d0a3fa8729b1e51a53e0b81a6ad272c97"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 111,
+      "line_start": 105,
+      "path": "docs/project-docs-mcp-workflow.md",
+      "snippet_sha256": "96009137b3807d1d2d43fbe1e206685234753749e9df35e752a230037b2e8f71"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 123,
+      "line_start": 112,
+      "path": "docs/project-docs-mcp-workflow.md",
+      "snippet_sha256": "e49187d47c06e6ff7d878e1b4564cc17e8528109ac02cfd5d54e821345f9acd0"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 100,
+      "line_start": 79,
+      "path": "docs/adr/0003-context-first-project-reads.md",
+      "snippet_sha256": "ed941efa2f1d47e7c82d072b93aab2b0cdfb44c0c98553af46fa1dfd4c1f629f"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 46,
+      "line_start": 38,
+      "path": "docs/opencode-compact-text.md",
+      "snippet_sha256": "9f09a1561bcd70d308bcb9470f66e4e3a5cfbb56ee091184da887d7188d10d4d"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 59,
+      "line_start": 47,
+      "path": "docs/opencode-compact-text.md",
+      "snippet_sha256": "c8ac2da11e69e357ce0f6df3e87f5658c0f2795f498ccd1e91cc0620cf811fd0"
+    },
+    {
+      "content_sha256": null,
+      "line_end": 71,
+      "line_start": 60,
+      "path": "docs/opencode-compact-text.md",
+      "snippet_sha256": "74b5e93972e06e63d48a6f9d2658f87b2aceb82a1c9b73be4af3f9f00cff213e"
+    }
+  ],
+  "source_rows": 62,
+  "state_proof": {
+    "after_sha256": "6a1918587e1f34ceaa5a1517f8631bbd1bea587172f2863a5c9cdba24e80a36d",
+    "before_sha256": "6a1918587e1f34ceaa5a1517f8631bbd1bea587172f2863a5c9cdba24e80a36d",
+    "logical_equal": true,
+    "status": "recorded",
+    "tables": {
+      "generation_sources": {
+        "after_rows": 19,
+        "before_rows": 19
+      },
+      "index_generations": {
+        "after_rows": 1,
+        "before_rows": 1
+      },
+      "retrieval_children": {
+        "after_rows": 429,
+        "before_rows": 429
+      },
+      "retrieval_parents": {
+        "after_rows": 163,
+        "before_rows": 163
+      },
+      "sections": {
+        "after_rows": 167,
+        "before_rows": 167
+      },
+      "sources": {
+        "after_rows": 19,
+        "before_rows": 19
+      }
+    }
+  },
+  "status": "truncated",
+  "wire_sha256": "233175257199f8a2c3128d4f68605b514ad8898f0784dbf595b7d147a6816c50"
+}
