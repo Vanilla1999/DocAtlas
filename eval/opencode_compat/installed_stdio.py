@@ -685,19 +685,27 @@ async def run(out: Path, *, large_packet: bool = False):
 
         # Exercise an existing registration as well as a new one: installer
         # upgrades the owned environment without overwriting unrelated config.
+        # An empty local model directory deliberately cannot run MiniLM. Its
+        # presence must not opt the registered OpenCode profile into inference.
+        model_directory = root / "unused-model-assets"
+        model_directory.mkdir()
         cfg = root / "opencode.json"
         cfg.write_text(json.dumps({"mcp": {"docatlas": {"type": "local",
             "command": ["doc-atlas", "mcp", "docs-serve"],
-            "environment": {"DOCATLAS_MCP_TEXT_FALLBACK": "1", "USER_SETTING": "retain"},
+            "environment": {"DOCATLAS_MCP_TEXT_FALLBACK": "1", "USER_SETTING": "retain",
+                            "DOCATLAS_MINILM_MODEL_DIR": str(model_directory)},
             "disabled": True}}}), encoding="utf-8")
         target = AgentTarget("opencode", cfg, "json_opencode_mcp")
-        assert register_server(target)[0]
-        assert not register_server(target)[0], "registration must be idempotent"
+        with patch.dict(os.environ, {**env, "DOCATLAS_MINILM_MODEL_DIR": str(model_directory)}, clear=True):
+            assert register_server(target)[0]
+            assert not register_server(target)[0], "registration must be idempotent"
         config = json.loads(cfg.read_text(encoding="utf-8"))
         entry = config["mcp"]["servers"]["docatlas"]
         assert entry["disabled"] is True
         assert entry["environment"]["USER_SETTING"] == "retain"
         assert entry["environment"]["DOCATLAS_MCP_COMPACT_TEXT"] == "1"
+        assert entry["environment"]["DOCATLAS_CONTEXT_COMPRESSION"] == "off"
+        assert entry["environment"]["DOCATLAS_MINILM_MODEL_DIR"] == str(model_directory)
         # An old custom private-ledger entry is incompatible with stock
         # OpenCode. Installation must refuse migration without changing it.
         unsafe_path = root / "opencode-unsafe.json"
@@ -713,7 +721,8 @@ async def run(out: Path, *, large_packet: bool = False):
             raise AssertionError("unsafe private-ledger mode was silently migrated")
         assert unsafe_path.read_bytes() == unsafe_bytes
 
-        baseline_env = {**env, "DOCATLAS_MCP_COMPACT_TEXT": "off"}
+        baseline_env = {**env, "DOCATLAS_MCP_COMPACT_TEXT": "off",
+                        "DOCATLAS_CONTEXT_COMPRESSION": "off"}
         original, original_text, original_error = await call(baseline_env, root, prepare=mutation)
         baseline_rows = expand_sections(original)["sources"]
         assert baseline_rows and original["kind"] == "docs_context"
@@ -776,6 +785,7 @@ async def run(out: Path, *, large_packet: bool = False):
             assert visible["text"] in (root / "project" / visible["path"]).read_text(encoding="utf-8")
         assert state(database) == before
         assert all((root / "project" / name).read_bytes() == content for name, content in original_bytes.items())
+        assert not list(model_directory.iterdir()), "registration/read must not download model assets"
         out.mkdir(parents=True, exist_ok=True)
         result = {"pass": True, "installed_stdio": True,
                   "sources": len(view["sources"]), "untampered": True, "denial_equal": True,
@@ -787,6 +797,10 @@ async def run(out: Path, *, large_packet: bool = False):
                   "explicit_adaptive_layout": explicit_raw["context_format"],
                   "literal_rollback_layout": rolled_back["context_format"],
                   "default_registry_compact": True, "default_adaptive_enabled": True,
+                  "default_registry_compression": "off", "model_path_does_not_enable_selection": True,
+                  "base_scenario_calls": {"prepare_docs": 1, "get_docs_context": 9,
+                                          "docs_status": 1, "source_resource_reads": 0,
+                                          "initialize": 4, "tools_list": 4},
                   "note": "real installed stdio, not a paid OpenCode conversation"}
         if large_packet:
             result["large_packet"] = await large_packet_check(out / "large-packet")

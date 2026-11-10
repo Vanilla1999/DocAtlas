@@ -25,6 +25,12 @@ model API. With the compressor enabled, the default selection is facet-guarded-l
 using markdown-owner-v1 units; use DOCATLAS_SECTION_SELECTION=fixed and
 DOCATLAS_SECTION_UNITS=legacy for the previous fixed-5 behavior.
 
+OpenCode registration is a host-specific exception: `doc-atlas install opencode`
+and the one-line installer now default `DOCATLAS_CONTEXT_COMPRESSION` to `off`
+without overwriting an explicit registered choice. A model path alone therefore
+does not activate MiniLM in that profile. Set `minilm-sections-v1` explicitly in
+the registered MCP environment to opt in; see [OpenCode defaults](opencode-compact-text.md).
+
 Model: cross-encoder/ms-marco-MiniLM-L6-v2, revision
 233902d25c440f23af6f7d6e94d2946bac0bee0a, Apache-2.0. Runtime verifies SHA-256 and
 size of tokenizer and ONNX bytes. Weights are not shipped in the repository,

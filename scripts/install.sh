@@ -334,6 +334,9 @@ if environment.get("DOCATLAS_MCP_MODEL_VIEW") == "1":
           "disable DOCATLAS_MCP_MODEL_VIEW before compact-text registration", file=sys.stderr)
     sys.exit(2)
 merged = {**(existing or {}), **desired, "environment": {**environment, **desired["environment"]}}
+# A provisioned model path alone must not change OpenCode's ordinary selector.
+# An explicit policy belongs to the host and survives registration unchanged.
+merged["environment"].setdefault("DOCATLAS_CONTEXT_COMPRESSION", "off")
 if "enabled" in merged:
     enabled = merged.pop("enabled")
     if not isinstance(enabled, bool) or ("disabled" in merged and merged["disabled"] != (not enabled)):
@@ -363,7 +366,8 @@ PY
     ok "opencode: '$SERVER_NAME' configured in $cfg"
   else
     warn "opencode: could not update $cfg automatically."
-    step "Add manually under mcp.servers, preserving any existing server name and disabled state: {\"$SERVER_NAME\": {\"type\":\"local\",\"command\":[\"doc-atlas\",\"mcp\",\"docs-serve\"],\"environment\":{\"DOCATLAS_MCP_TEXT_FALLBACK\":\"1\",\"DOCATLAS_MCP_COMPACT_TEXT\":\"1\"}}}"
+    step "New registration example under mcp.servers: {\"$SERVER_NAME\": {\"type\":\"local\",\"command\":[\"doc-atlas\",\"mcp\",\"docs-serve\"],\"environment\":{\"DOCATLAS_MCP_TEXT_FALLBACK\":\"1\",\"DOCATLAS_MCP_COMPACT_TEXT\":\"1\",\"DOCATLAS_CONTEXT_COMPRESSION\":\"off\"}}}"
+    step "For an existing entry, preserve its name, disabled state, other options, and explicit DOCATLAS_CONTEXT_COMPRESSION or DOCATLAS_CONTEXT_ASSEMBLY choice; use compression=off only when unset."
   fi
 }
 

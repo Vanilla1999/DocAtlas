@@ -287,6 +287,7 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
             "Run opencode mcp list to check the connection, then ask your documentation question. OpenCode reloads configuration automatically; use /reload if needed.",
             extra_lines=[
                 "Self-contained compact MCP text is enabled; ordinary reads use the advertised tools directly.",
+                "Ordinary context selection is the default; explicit registered selection settings are preserved.",
                 "After a package upgrade, rerun this install command to refresh the registration and guidance.",
                 "Registration does not index documents. On first use, approve the preparation proposed by DocAtlas, then retry your original question.",
             ],
