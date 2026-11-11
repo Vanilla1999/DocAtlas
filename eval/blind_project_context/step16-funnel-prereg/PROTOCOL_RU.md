@@ -20,8 +20,10 @@
    source URI, evidence IDs, line spans, доступ, retrieval matches,
    authoritative query plan, конфигурация и бюджет. У ранжирования
    кандидатов без source verification ещё нет права быть выбранным.
-4. Сводные JSON, опубликованные сейчас в репозитории, не содержат этих
-   построчных данных. **При отсутствии исходных ranking/pool не создавать
+4. `baseline/score.json` хранит исторические 24 `not_acquired` fact-case
+   ID: их можно проверить и посчитать **без показа holdout**. Но
+   опубликованные E5 JSON не содержат новых построчных ranking и pool.
+   **При отсутствии исходных ranking/pool не создавать
    фиктивные features, evidence IDs или «похожие» запросы; состояние
    `BLOCKED: frozen candidate-level artifacts unavailable`.** Запрашивать
    только доступ к исходным сохранённым артефактам, не к секретам.

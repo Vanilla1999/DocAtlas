@@ -7,6 +7,7 @@ replay and not an integration test. In particular, it cannot label any of the
 
 from __future__ import annotations
 
+from collections import Counter
 import hashlib
 import json
 import math
@@ -40,10 +41,12 @@ def main() -> None:
     union_file = STUDY / "step8-evidence/models/minilm-union-with-baseline.json"
     mini_file = STUDY / "step8-evidence/models/minilm-summary.json"
     e5_file = STUDY / "step8-evidence/models/e5-summary.json"
-    inputs = (study4, study7, union_file, mini_file, e5_file)
+    baseline_file = STUDY / "baseline/score.json"
+    inputs = (study4, study7, union_file, mini_file, e5_file, baseline_file)
 
     step4, step7 = study4.read_text(encoding="utf-8"), study7.read_text(encoding="utf-8")
     union, mini, e5 = (read_json(path) for path in (union_file, mini_file, e5_file))
+    baseline = read_json(baseline_file)
 
     after_pruning, before_pruning = checked_pair(
         step4, r"после отсева остаётся\s+(\d+)\s+из\s+(\d+)\s+фактов", "post-pruning counts"
@@ -56,6 +59,7 @@ def main() -> None:
     )
 
     totals = union["totals"]
+    cases = totals["cases"]
     lexical, dense, combined = (
         e5["totals"]["256"][key]
         for key in ("lexical_candidate_facts", "semantic_candidate_facts", "union_candidate_facts")
@@ -69,7 +73,24 @@ def main() -> None:
     assert (total - lexical, lexical - after_pruning, after_pruning - default) == (24, 31, 29)
     assert (dev_gains, dev_losses, holdout_gains, holdout_losses) == (13, 6, 9, 7)
 
-    cases = totals["cases"]
+    # The old published baseline still preserves the 24 missed fact-case IDs.
+    # Do not emit these IDs or the private question/quote text. The actual
+    # E5 candidate row ranking, however, was not published with the summaries.
+    missing = [(case["split"], case["corpus"], case["lang"], case["case_id"], fact_id)
+               for case in baseline["cases"] for fact_id in case["lost"]["not_acquired"]]
+    assert len(baseline["cases"]) == cases == 96
+    assert len(missing) == len(set(missing)) == total - lexical == 24
+    per_slice = Counter("/".join(item[:3]) for item in missing)
+    slices = sorted(key.removesuffix("/k=256") for key in e5["slices"] if key.endswith("/k=256"))
+    assert len(slices) == 8
+    assert set(per_slice) == {
+        key.removesuffix("/k=256") for key, data in e5["slices"].items()
+        if key.endswith("/k=256") and data["lexical_missing"] > 0
+    }
+    for key, data in e5["slices"].items():
+        if key.endswith("/k=256"):
+            assert per_slice[key.removesuffix("/k=256")] == data["lexical_missing"]
+
     assert cases == mini["tokens_o200k"]["all"]["calls"] == 96
     default_tokens = round(union["default_mean_tokens"] * cases)
     mini_tokens = mini["tokens_o200k"]["all"]["total"]
@@ -89,6 +110,7 @@ def main() -> None:
                   "not_acquired": total - lexical,
                   "lost_in_pool_pruning": lexical - after_pruning,
                   "lost_after_pool_pruning": after_pruning - default},
+        "historical_acquisition_misses_by_slice": {key: per_slice[key] for key in slices},
         "e5_acquisition": {"lexical": lexical, "dense": dense, "union": combined},
         "dense_rerank": {"delivered": default + gained - lost, "gains": gained, "losses": lost,
                          "mcnemar_exact_unclustered_p": round(exact_mcnemar(gained, lost), 9)},
