@@ -2,13 +2,22 @@
 
 ## Installation and normal use
 
-The default `doc-atlas install opencode` registration now sets both
-`DOCATLAS_MCP_TEXT_FALLBACK=1` and `DOCATLAS_MCP_COMPACT_TEXT=1`. An existing
-registration is upgraded idempotently by running `doc-atlas install opencode`
-again (add `--project` for a project-owned config). Updating the package alone
+The default `doc-atlas install opencode` registration sets
+`DOCATLAS_MCP_TEXT_FALLBACK=1`, `DOCATLAS_MCP_COMPACT_TEXT=1`, and, unless a
+selection setting is already registered, `DOCATLAS_CONTEXT_COMPRESSION=off`.
+The one-line shell installer uses the same defaults. This keeps ordinary lexical
+selection (`body` pruning when needed) even if a MiniLM model directory is
+configured. It does not change the selector, its budget, or source checks.
+
+An existing registration is upgraded idempotently by running
+`doc-atlas install opencode` again (add `--project` for a project-owned config).
+Existing explicit selection settings, including `minilm-sections-v1`, and
+`DOCATLAS_CONTEXT_ASSEMBLY=literal` are preserved. A model path alone is no longer
+an opt-in after this registration update. To opt in, set
+`DOCATLAS_CONTEXT_COMPRESSION=minilm-sections-v1` in the registered DocAtlas MCP
+environment alongside the provisioned model path. Updating the package alone
 **does not edit existing OpenCode configuration**; restart OpenCode after
-registration. This changes only OpenCode's registered DocAtlas MCP environment,
-not other MCP consumers or selection policies.
+registration. Other MCP consumers retain their existing selection behavior.
 
 When the compact-text flag is active, **Context Assembly defaults to
 `adaptive`** after upgrading to a package containing this change and
@@ -104,13 +113,21 @@ settings. A checkout SHA alone does not identify a running installed server.
 | `DOCATLAS_MCP_COMPACT_TEXT=1` | Enable the self-contained compact route. |
 | `DOCATLAS_MCP_MODEL_VIEW` absent or `off` | Avoid the private-ledger route that stock OpenCode cannot preserve. |
 | `DOCATLAS_CONTEXT_ASSEMBLY` absent or `adaptive` | Choose a reversible layout; `literal` is an explicit rollback. |
-| `DOCATLAS_CONTEXT_COMPRESSION` | Separate section-selection setting; `off` disables it. |
-| `DOCATLAS_MINILM_MODEL_DIR` | Explicitly provisioned MiniLM assets; when compression is unset, a nonempty path enables section selection. |
+| `DOCATLAS_CONTEXT_COMPRESSION=off` | Default registered OpenCode selection profile; use the ordinary lexical selector. Existing explicit overrides are preserved. |
+| `DOCATLAS_EXPERIMENT_POOL_PRUNE` absent | Ordinary joint selection uses `body`; a checked pool that fits in full is not pruned. |
+| `DOCATLAS_MINILM_MODEL_DIR` | Provisioned MiniLM assets; the registered `off` setting prevents the path alone from enabling section selection. |
 
-No model directory is a supported configuration. Installation neither downloads
-MiniLM nor silently enables a new selection policy. When comparing with an
-installed acceptance run, compare these settings too; equal questions and package
-versions alone do not establish equal selection or delivery routes.
+No model directory is a supported configuration. Installation does not download
+MiniLM. For manually configured servers outside this registered profile, omitting
+the compression setting still enables MiniLM when a nonempty model path is set;
+see [MiniLM sections](minilm-sections.md). When comparing with an installed
+acceptance run, compare these settings too; equal questions and package versions
+alone do not establish equal selection or delivery routes.
+
+This is the retained working default, not a claim of universally best answer
+quality. Heading-based pruning, semantic ranking and minimal-context recipes
+remain explicit experiments. Compact/adaptive controls presentation, not proof
+of completeness; the host must still preserve conditions in its final answer.
 
 Use the saved full MCP response to inspect the first rejected transformation and
 the sizes of its intermediate views. There are two size checks before Context

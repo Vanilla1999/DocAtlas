@@ -15,6 +15,13 @@ Other fixed-k values remain restricted by the existing contract. None of these
 settings is an LLM-supplied tool argument. Model-view transport still requires a
 compatible host; raw v1 remains the wire default.
 
+The registered [OpenCode profile](opencode-compact-text.md) supplies
+`DOCATLAS_CONTEXT_COMPRESSION=off` by default, even when model assets are present.
+Re-registration preserves an explicit compression choice; enabling the optional
+compressor in OpenCode requires that choice in its MCP environment. The automatic
+model-path behavior above still applies to manually configured servers where
+the compression setting is absent.
+
 The prior 53/53 development evidence result is NOT independent answer acceptance.
 These defaults are changing in main through the integration PR. The original
 regression suites are development tests, not independent production acceptance.

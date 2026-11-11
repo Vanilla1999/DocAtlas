@@ -169,6 +169,8 @@ def unregister_server(target: AgentTarget) -> bool:
                 key: environment[key] for key in (BINDING_ENV, "DOCATLAS_MINILM_MODEL_DIR")
                 if key in environment
             }}}
+            if environment.get("DOCATLAS_CONTEXT_COMPRESSION") == "off":
+                expected["environment"]["DOCATLAS_CONTEXT_COMPRESSION"] = "off"
             if entry == expected:
                 owned.append((name, entry))
         if len(owned) == 1:
@@ -261,6 +263,9 @@ def _update_opencode_config(config: dict[str, Any], *, environment: dict[str, st
             "before registering the self-contained compact text mode."
         )
     merged = {**existing, **desired, "environment": {**environment, **requested_environment}}
+    # Model assets alone must not change OpenCode's ordinary selection profile.
+    # Preserve an explicit registered opt-in or rollback instead of overwriting it.
+    merged["environment"].setdefault("DOCATLAS_CONTEXT_COMPRESSION", "off")
     if "enabled" in merged:
         enabled = merged.pop("enabled")
         if not isinstance(enabled, bool):
