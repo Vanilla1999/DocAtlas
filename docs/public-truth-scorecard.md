@@ -1,6 +1,6 @@
 # P0 public-truth closure scorecard
 
-Status: **INCOMPLETE** — `1.3.2` is the next reviewed source candidate, but no immutable `v1.3.2` tag or exact public PyPI artifact exists yet. The external PyPI Trusted Publisher mismatch proven by the two historical `1.3.1` attempts must be corrected before publication.
+Status: **INCOMPLETE** — `2.0.0` is the owner-selected proposed candidate, not an approved release. No immutable `v2.0.0` tag or exact public PyPI artifact exists. The earlier `1.3.2` candidate was not published. The PyPI Trusted Publisher identity rejected in the two historical `1.3.1` attempts must be reverified and corrected if still mismatched before publication.
 
 This document distinguishes proven public truth, pending public evidence, and explicitly accepted operational risk. `accepted_risk` never means that the missing control exists.
 
@@ -26,15 +26,15 @@ environment: release-current
 
 | Public-truth row | State | Evidence / closure requirement |
 |---|---|---|
-| Release source identity | `pending` | Source version, changelog, README ownership marker, and `server.json` agree on `1.3.2`. A reviewed release request must create immutable `v1.3.2` from the exact merged tree. |
+| Release source identity | `pending` | Source version, changelog, README ownership marker, and `server.json` agree on `2.0.0`. A reviewed release request must create immutable `v2.0.0` from the exact merged tree. |
 | Branch protection | `accepted_risk` | Maintainer decision remains unchanged: release flow compensates by requiring the tag commit to be reachable from exact remote `main`. |
 | Namespace / state isolation | `green` | Fresh release smoke uses `DOCATLAS_HOME`, `~/.docatlas`, and the `docatlas` MCP registration identity. |
 | Installed agent contract | `green` | The public Docs MCP inventory remains exactly `get_docs_context`, `prepare_docs`, `docs_status`. |
-| Trusted Publisher identity | `pending` | Historical `1.3.1` attempts proved GitHub claims `Vanilla1999 / DocAtlas / publish.yml / release-current`; PyPI still needs that exact publisher under the existing `doc-atlas` project. |
-| Exact public artifact identity | `pending` | Publish exactly `doc-atlas==1.3.2` and prove gated SHA-256 = PyPI metadata SHA-256 = independently downloaded bytes for one wheel and one sdist. |
-| Exact public MCP behavior | `pending` | No-cache install of `doc-atlas==1.3.2` must pass the exact three-tool Docs MCP stdio smoke. |
+| Trusted Publisher identity | `pending` | Historical `1.3.1` attempts proved GitHub claims `Vanilla1999 / DocAtlas / publish.yml / release-current`; The existing `doc-atlas` project's current publisher settings must be verified against that tuple; prior attempts did not match. |
+| Exact public artifact identity | `pending` | Publish exactly `doc-atlas==2.0.0` and prove gated SHA-256 = PyPI metadata SHA-256 = independently downloaded bytes for one wheel and one sdist. |
+| Exact public MCP behavior | `pending` | No-cache install of `doc-atlas==2.0.0` must pass the exact three-tool Docs MCP stdio smoke. |
 | Cross-platform public install | `pending` | The exact public package must pass Linux, macOS, and Windows smoke. |
-| Official MCP Registry | `pending` | After all public-package smokes pass, GitHub OIDC publishes `io.github.Vanilla1999/docatlas` version `1.3.2` and the Registry API must return that exact name/version. |
+| Official MCP Registry | `pending` | After all public-package smokes pass, GitHub OIDC publishes `io.github.Vanilla1999/docatlas` version `2.0.0` and the Registry API must return that exact name/version. |
 | Product claim boundary | `green` | Public maturity remains **Beta**; no Context7 parity or unmeasured product-value claim is introduced. |
 
 ## Closure rule

@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [2.0.0] - Release candidate (not published)
+
+### Added
+
+- Added the opt-in `reranker prepare` and `reranker check` onboarding path for the pinned experimental Qwen model, with local asset provenance and explicit runtime preflight. It is not part of the default lexical installation.
+- Added a source-hash-checked historical comparison of DocAtlas/Qwen, direct file tools, and Grounded lexical, plus release-readiness documentation. These results do not establish a general quality or cost winner.
+
 ### Changed
 
 - Optional `docs_status(include_language=true)` now returns compact bound identifiers and complete language metadata by default for projects and libraries; use `details=true` to include ordinary status diagnostics. Ordinary status is unchanged, and language preflight is not required before `get_docs_context`.
@@ -15,6 +22,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Experimental Qwen preparation now verifies downloads in private staging and never recursively cleans the user's destination on failure or cancellation. Symlink and concurrently changed destinations are rejected.
 - Reranker preflight and doctor validate the effective selector configuration, distinguish preflight from inference, and explain incompatible paired/minimal or paired/MiniLM profiles. MCP reports those conflicts explicitly instead of silently routing paired Qwen through MiniLM. Model/runtime pins and no-fallback behavior remain unchanged.
 - Corrected the optional GPU dependency recipe to preserve PyPI and clarified hardware scope, explicit profile disablement and the measured Qwen cost baseline.
+
+### Release qualification
+
+- The owner selected `2.0.0` as the next proposed release version on 2026-11-14. This candidate is **not published** and does not imply Stable maturity or a verified GPU inference path.
+- The ordinary default remains lexical and usable without Qwen/CUDA. Optional Qwen retains exact model/runtime pins, local assets, and no silent lexical fallback.
+- Installed-MCP and required-CI failures, clean `uv` first-install coverage, supported-GPU inference, and PyPI Trusted Publisher identity remain release gates. See `docs/RELEASE_2_0_0_CANDIDATE.md`.
 
 ## [1.3.2] - 2026-09-08
 

@@ -8,13 +8,13 @@
     "url": "https://github.com/Vanilla1999/DocAtlas",
     "source": "github"
   },
-  "version": "1.3.2",
+  "version": "2.0.0",
   "packages": [
     {
       "registryType": "pypi",
       "registryBaseUrl": "https://pypi.org",
       "identifier": "doc-atlas",
-      "version": "1.3.2",
+      "version": "2.0.0",
       "runtimeHint": "uvx",
       "transport": {
         "type": "stdio"

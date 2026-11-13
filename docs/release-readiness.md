@@ -1,5 +1,7 @@
 # Release readiness: dated checkpoint
 
+> **2026-11-14 update:** [PR #256](https://github.com/Vanilla1999/DocAtlas/pull/256) was merged into `main` at `d7db88319e3267a62fd31bf0e316cfd19f1bc202`. The owner chose `2.0.0` for a separate, **unpublished** preparation PR. The 2026-11-13 CI evidence below remains a dated pre-merge observation, not a 2.0.0 sign-off. See the [2.0.0 candidate plan](RELEASE_2_0_0_CANDIDATE.md).
+
 **As of 2026-11-13: not approved for publication.** This snapshot describes
 existing CI evidence for onboarding PR [#256](https://github.com/Vanilla1999/DocAtlas/pull/256),
 code head `1a52300c53f114b9889b049dd8c09cd2e2791b48`, compared with main
@@ -93,10 +95,11 @@ provenance, selection, or delivery failures.
    experimental/unqualified boundary; do not advertise supported Qwen inference.
    Any exception to planned pre-release qualification needs explicit release-owner
    approval; documentation alone does not waive it.
-4. **Choose the actual version and release tag.** The package version at this
-   snapshot is **1.3.2**. A “1.0 readiness” milestone is not permission to publish
-   a lower or different version. Reconcile the version, changelog, package and
-   registry metadata, and artifact contents before a publish run.
+4. **Verify the owner-selected 2.0.0 release identity.** At the 2026-11-13
+   snapshot, the source was still **1.3.2**. On 2026-11-14 the owner selected
+   **2.0.0**; it is prepared separately, not yet approved for publication.
+   Reconcile version, changelog, package and registry metadata, and exact
+   artifact contents before an immutable tag or publish run.
 5. **Re-run required gates on the exact release candidate, then publish only
    with approval.** Merge, tag/publish, registry publication, and verification
    of the publicly installed artifact are separate boundaries. This checkpoint
