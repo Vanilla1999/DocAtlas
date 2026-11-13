@@ -10,6 +10,7 @@ import hashlib
 import json
 import math
 import os
+import uuid
 from contextlib import contextmanager
 from contextvars import ContextVar
 from pathlib import Path
@@ -211,12 +212,18 @@ def _scored_units_with_cache(original, structure, model_path, diagnostics):
             identity = row["identity"]
             score = row["score"]
             receipt_sha = hashlib.sha256(evidence_scoring.canonical(fresh_receipt).encode()).hexdigest()
-            tmp = cache_root / f"{keys[identity]}.tmp"
-            tmp.write_text(json.dumps({
-                "score_key": keys[identity], "score": score,
-                "receipt_sha256": receipt_sha, "source_receipt": fresh_receipt,
-            }, ensure_ascii=False), encoding="utf-8")
-            os.replace(tmp, cache_root / f"{keys[identity]}.json")
+            # Unique temp per writer: overlapping identical misses must never share
+            # one tmp path. os.replace is atomic, so a concurrent reader of the final
+            # entry sees either the old complete file or the new complete file.
+            tmp = cache_root / f"{keys[identity]}.{os.getpid()}.{uuid.uuid4().hex}.tmp"
+            try:
+                tmp.write_text(json.dumps({
+                    "score_key": keys[identity], "score": score,
+                    "receipt_sha256": receipt_sha, "source_receipt": fresh_receipt,
+                }, ensure_ascii=False), encoding="utf-8")
+                os.replace(tmp, cache_root / f"{keys[identity]}.json")
+            finally:
+                tmp.unlink(missing_ok=True)
             source_digests.add(receipt_sha)
     scores.extend(fresh_scores)
     scores.sort(key=lambda row: unit_ids.index(row["identity"]))

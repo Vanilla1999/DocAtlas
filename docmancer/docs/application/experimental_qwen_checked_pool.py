@@ -208,12 +208,18 @@ def score_rows(retrieval, rows, snapshot, trace):
                     entry = {"input_sha256": keys[identity], "score": values[identity],
                              "scorer_receipt": actual_receipt, "receipt_sha256": digest(actual_receipt)}
                     entry["entry_sha256"] = digest(entry)
-                    # Exclusive creation avoids replacing another process's completed entry.
+                    # Write a fully serialized unique temp first, then publish by
+                    # atomic link: a concurrent reader never sees a partial final
+                    # entry, and a completed peer entry is never replaced.
+                    tmp = cache / f"{keys[identity]}.{os.getpid()}.{uuid.uuid4().hex}.tmp"
                     try:
-                        with (cache / (keys[identity] + ".json")).open("x", encoding="utf-8") as stream:
-                            stream.write(canonical(entry))
-                    except FileExistsError:
-                        pass
+                        tmp.write_text(canonical(entry), encoding="utf-8")
+                        try:
+                            os.link(tmp, cache / (keys[identity] + ".json"))
+                        except FileExistsError:
+                            pass
+                    finally:
+                        tmp.unlink(missing_ok=True)
         ordered = [values[str(index)] for index in range(len(rows))]
         trace.emit("qwen_scoring", adapter_recipe=ADAPTER_RECIPE,
                    scoring_contract_sha256=digest(contract), assets_verified=True,

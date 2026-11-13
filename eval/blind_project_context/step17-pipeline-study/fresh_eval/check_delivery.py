@@ -73,6 +73,23 @@ def main():
     require(run['questions_sha256'] == m['questions_sha256'], 'run questions mismatch')
     require(run['split'] in ('dev', 'holdout'), 'unknown split')
     require(run.get('variant_freeze_sha256') == sha(a.variants_frozen), 'run/freeze receipt mismatch')
+    # Bind the run to one reviewed frozen environment variant and verify the same
+    # values reached the server process, so mode/budget cannot silently drift.
+    frozen_envs = {sha(p): json.loads(p.read_text()) for p in sorted((HERE / 'env').glob('*.json'))}
+    require(frozen_envs, 'no frozen environment variants')
+    require(run.get('environment_sha256') in frozen_envs, 'run environment is not a frozen reviewed variant')
+    env = frozen_envs[run['environment_sha256']]
+    require(all(run.get('environment', {}).get(key) == value for key, value in env.items()),
+            'run environment differs from the frozen variant file')
+    units_env = run.get('units') or []
+    require(units_env and isinstance(units_env[0].get('server_environment'), dict), 'missing server environment')
+    require(all(units_env[0]['server_environment'].get(key) == value for key, value in env.items()),
+            'effective server environment differs from the frozen variant file')
+    require(run.get('adapter_sha256') == sha(HERE / 'run_fresh.py'), 'run adapter is not the frozen one')
+    require(run.get('run_unit_sha256') == sha(HERE.parents[1] / 'run.py'), 'run unit harness is not the recorded one')
+    budget_raw = env.get('DOCATLAS_EXPERIMENT_DELIVERY_MAX_TOKENS')
+    require(budget_raw is not None and budget_raw.isdecimal(), 'frozen variant lacks a delivery budget')
+    budget = int(budget_raw)
     expected = {k for k, v in questions.items() if v['split'] == run['split']}
     require(set(run['expected_case_ids']) == expected and len(run['expected_case_ids']) == len(expected),
             'selected cases mismatch')
@@ -98,6 +115,7 @@ def main():
                 tokens = len(encoding.encode(text, disallowed_special=()))
                 metrics = {'utf8_bytes': len(raw), 'o200k_tokens': tokens,
                            'charged_tokens': max(tokens, (len(raw) + 3) // 4)}
+                require(metrics['charged_tokens'] <= budget, 'delivery budget exceeded')
                 require(record.get('utf8_bytes') == len(raw), 'payload byte count mismatch')
                 require(type(record.get('is_error')) is bool, 'missing error flag')
                 if record['is_error']:
@@ -144,8 +162,9 @@ def main():
     families = {}
     for result in results:
         families.setdefault(result['topic_id'], []).append(result['all_witnesses_delivered'])
-    print(json.dumps({'schema_version': 2, 'metric': 'literal_witness_delivery_only',
+    print(json.dumps({'schema_version': 3, 'metric': 'literal_witness_delivery_only',
                       'semantic_answer_correctness': 'NOT_MEASURED',
+                      'delivery_budget_tokens': budget,
                       'checker_sha256': sha(Path(__file__)), 'manifest_sha256': sha(HERE / 'manifest.json'),
                       'questions_sha256': m['questions_sha256'], 'oracle_sha256': m['oracle_sha256'],
                       'run_sha256': sha(a.run / 'run.json'), 'split': run['split'],

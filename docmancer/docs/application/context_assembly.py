@@ -25,7 +25,7 @@ _LEGENDS = {
     # Delivery-only layout: the internal storage handle source_uri is not part of
     # the documented citation contract (cite ref, path and lines), so compact
     # omits it. Decode restores every other field exactly.
-    "compact": " Each source array follows source_columns; group indexes source_groups (zero-based) for path/section. source_uri is omitted: cite ref, path and lines. Shared source_context applies to every source.",
+    "compact": " Each source array follows source_columns; group indexes source_groups (zero-based) for path/section. source_uri is omitted: cite ref, path and lines; refetch gaps with source_path. Shared source_context applies to every source.",
 }
 _RESERVED = {"source_groups", "source_columns"}
 
@@ -72,7 +72,10 @@ def _compact(view: dict) -> dict | None:
     """Delivery-only: grouped-table minus the per-row storage handle source_uri.
 
     Reversible for every field except source_uri, which is intentionally not
-    delivered (internal handle; citations use ref, path and lines).
+    delivered (internal handle; citations use ref, path and lines). Gap
+    follow-ups stay available without a per-row URI: the documented
+    source_path input and any envelope-issued bounded reads (read_next /
+    more_context) are preserved verbatim. Decode restores every other field.
     """
     rows = view["sources"]
     if not rows or any("source_uri" not in row for row in rows):
