@@ -25,8 +25,8 @@ Before the next public release candidate:
 - [ ] Fresh installs use `DOCATLAS_HOME`, `~/.docatlas`, `docatlas.yaml`, and the `docatlas` MCP registration identity.
 - [ ] Any explicit state/config migration shipped in this release is ownership-checked, preview-first, fail-closed on ambiguous/foreign state, and covered by installed tests.
 - [ ] Installed agent guidance and examples validate against the real three-tool public MCP schema.
-- [ ] The active release identity note and changelog agree on the intended public version. Repository `1.2.0` is an unpublished milestone; failed `1.3.0`/`1.3.1` tags remain audit history; the next intended public release is `1.3.2`.
-- [ ] The historical executable release decision `.github/release-requests/v1.3.1.json` remains immutable audit evidence. For the next candidate, a new `.github/release-requests/v1.3.2.json` must bind the exact merged launch base/delta, tag, publisher identity, and public tool inventory before any `v1.3.2` tag is created.
+- [ ] The active release identity note and changelog agree on the owner-selected proposed version `2.0.0`. Repository `1.2.0` and the previous `1.3.2` candidate remain unpublished milestones; failed `1.3.0`/`1.3.1` tags remain audit history. This does not grant Stable or publication status.
+- [ ] The historical executable release decision `.github/release-requests/v1.3.1.json` remains immutable audit evidence. **Only after required gates and owner approval**, a new `.github/release-requests/v2.0.0.json` must bind the exact merged launch base/delta, tag, publisher identity, and public tool inventory before any `v2.0.0` tag is created. No executable request is part of the preparation PR.
 
 ## Built artifact
 

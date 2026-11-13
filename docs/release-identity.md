@@ -1,25 +1,44 @@
 # Release identity
 
-## Current public candidate
+## Proposed 2.0.0 candidate (unpublished)
 
-The current source release candidate is **DocAtlas 1.3.2**. It supersedes the unpublished `1.3.1` candidate because the public-launch README and Official MCP Registry ownership metadata were added after the immutable `v1.3.1` tag.
+On 2026-11-14 the owner selected **DocAtlas 2.0.0** for the next release
+preparation. It replaces the earlier planned, unpublished `1.3.2` candidate;
+the historical `v1.3.0` and `v1.3.1` failed-publish records remain immutable.
+PR #256 was merged into `main` at
+`d7db88319e3267a62fd31bf0e316cfd19f1bc202`, but this version proposal
+does not yet qualify that source for publication.
 
-Canonical intended identity:
+Proposed identity after approval:
 
 ```text
 product: DocAtlas
 distribution: doc-atlas
-source version: 1.3.2
-planned immutable tag: v1.3.2
+source version: 2.0.0
+planned immutable tag: v2.0.0
 maturity: Beta
 MCP Registry name: io.github.Vanilla1999/docatlas
-MCP package: doc-atlas==1.3.2
-MCP command: uvx doc-atlas==1.3.2 mcp docs-serve
+MCP package: doc-atlas==2.0.0
+MCP command: uvx doc-atlas==2.0.0 mcp docs-serve
 ```
 
-No `v1.3.2` tag or public `doc-atlas==1.3.2` artifact is claimed by this preparation change. The tag must be created only by the reviewed release-request controller after this launch tree is merged and after the external PyPI Trusted Publisher is corrected. `server.json`, the source version, changelog, and hidden PyPI README ownership marker are kept version-aligned so the exact public package can be verified by the Official MCP Registry.
+There is no `v2.0.0` tag, approved executable release request, or public
+`doc-atlas==2.0.0` artifact. Version, changelog, and `server.json` are staged
+in a separate preparation PR; `main` retains its own source version until that
+proposal is reviewed and merged. The owner did not authorize publication by
+requesting preparation.
 
-The Registry publication path uses GitHub OIDC and runs only after the canonical PyPI publish job and exact Linux/macOS/Windows public-package smokes succeed.
+The default lexical MCP path stays independent of Qwen/CUDA. The optional Qwen
+profile remains an experimental pinned mode, and maturity remains **Beta** until
+separately qualified. See
+[the 2.0.0 candidate checklist](RELEASE_2_0_0_CANDIDATE.md) and
+[the dated release-readiness audit](release-readiness.md).
+
+The intended publication mechanism is the reviewed release-request controller,
+after required gates pass and the existing-project PyPI Trusted
+Publisher identity is verified and corrected if still mismatched. Only the canonical workflow may create the
+immutable tag and dispatch publication. The Registry publication path uses
+GitHub OIDC after the exact public PyPI package passes required platform smokes.
 
 ## Historical `v1.3.1` publication blocker
 
@@ -97,9 +116,9 @@ Environment is optional in PyPI generally, but this workflow deliberately uses `
 
 ### Superseded retry boundary
 
-The two `v1.3.1` failures remain immutable audit evidence. They are no longer the active publication path: the launch and Registry ownership metadata were added after that tag, so the next public candidate is `1.3.2`. `v1.3.1` must never be moved, replaced, or reused. Do not move or recreate `v1.3.1`, and do not present a newer tree as that tag.
+The two `v1.3.1` failures remain immutable audit evidence. They are no longer the active publication path: the launch and Registry ownership metadata were added after that tag. The later `1.3.2` candidate was planned but not published; on 2026-11-14 the owner selected `2.0.0` instead. `v1.3.1` must never be moved, replaced, or reused. Do not present a newer tree as that tag.
 
-After the existing-project PyPI publisher is visibly corrected, create and approve a reviewed `v1.3.2` release request from the exact merged launch tree. No long-lived token fallback is permitted.
+After the existing-project PyPI publisher is visibly verified or corrected **and** the 2.0.0 required gates pass, create and approve a separate reviewed `v2.0.0` release request bound to the exact merged launch tree. No long-lived token fallback is permitted.
 
 ## Historical repository milestone
 
@@ -128,4 +147,4 @@ sha256 e5bb4eb1f2b3221bcd3e8e9db719fe8f11596a88bd000e3d922bd6826c6683ab
 
 Until the exact public version is downloadable and passes the post-publish Linux/macOS/Windows MCP smoke, release truth remains incomplete and product maturity remains **Beta**.
 
-For clarity, the failed `1.3.1` attempts remain historical pre-public evidence; no public `doc-atlas==1.3.2` release is claimed until the new exact release is published and verified.
+For clarity, the failed `1.3.1` attempts remain historical pre-public evidence, the `1.3.2` candidate was not published, and no public `doc-atlas==2.0.0` release is claimed until the exact new release is published and verified.
