@@ -94,6 +94,8 @@ Accepted values: `claude-code`, `opencode`, `codex`, `all`, `none`. An unknown v
 
 For OpenCode, the installer honors `OPENCODE_CONFIG` (full path), falling back to `$XDG_CONFIG_HOME/opencode/opencode.json`. Existing JSONC configs (comments / trailing commas) are parsed; a `.bak` backup is kept on rewrite.
 
+The default installation needs no extra setup: lexical documentation retrieval works immediately after the MCP server is registered. The optional pinned Qwen evidence scorer is experimental, GPU-specific (Blackwell only) and configured separately — see [wiki/Reranker](https://github.com/Vanilla1999/DocAtlas/wiki/Reranker) or run `doc-atlas reranker check` for a readiness report.
+
 ## Python import namespace
 
 The product name is **DocAtlas**.

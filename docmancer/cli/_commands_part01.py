@@ -328,6 +328,22 @@ def _collect_doctor_report(config, config_path: str | None, *, profile: str = "c
     if profile == "agent" and not installed_agents:
         issues.append(_doctor_issue("AGENT_NOT_INSTALLED", "agent", "BLOCKER", "The selected agent path cannot see Docmancer instructions.", "doc-atlas install codex", "doctor shows at least one installed agent integration.", restart_required=True, auto_fix=True))
 
+    # Reranker readiness matters only when the opt-in paired Qwen scoring is on;
+    # the default lexical path never imports model dependencies.
+    if os.environ.get("DOCATLAS_EXPERIMENT_PAIRED_QWEN") == "1":
+        try:
+            from docmancer.docs.application import reranker_setup as _reranker
+
+            report = _reranker.check_ready()
+            if report["ready"]:
+                add_check("reranker", "ok", f"assets and pinned runtime ready ({report['model_id']})")
+            else:
+                add_check("reranker", "failed", report["assets"]["error"] or "pinned runtime mismatch")
+                issues.append(_doctor_issue("RERANKER_NOT_READY", "reranker", "BLOCKER", "Paired Qwen scoring is enabled but the pinned model contract is not satisfied.", "doc-atlas reranker check", "doc-atlas reranker check reports ready=true."))
+        except Exception as exc:  # noqa: BLE001
+            add_check("reranker", "failed", str(exc))
+            issues.append(_doctor_issue("RERANKER_CHECK_FAILED", "reranker", "BLOCKER", "Paired Qwen scoring readiness cannot be verified.", "doc-atlas reranker check", "doc-atlas reranker check runs without raising."))
+
     severity_rank = {name: i for i, name in enumerate(DOCTOR_SEVERITIES)}
     worst = min((severity_rank.get(issue["severity"], 99) for issue in issues), default=severity_rank["INFO"])
     return {

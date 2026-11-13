@@ -49,7 +49,7 @@ INSTALL_TARGETS = [
 SETUP_PROFILES = ["cli-docs", "agent", "mcp-docs", "api-packs"]
 RETRIEVAL_PROFILES = ["local-hybrid", "lexical-now", "cloud"]
 DOCTOR_SEVERITIES = ["BLOCKER", "DEGRADED", "WARN", "INFO"]
-DOCTOR_CHECK_GROUPS = ["config", "storage", "sqlite", "qdrant", "embeddings", "vectors", "sources", "extraction", "agent", "mcp-docs", "cloud"]
+DOCTOR_CHECK_GROUPS = ["config", "storage", "sqlite", "qdrant", "embeddings", "vectors", "sources", "extraction", "agent", "mcp-docs", "cloud", "reranker"]
 
 
 # ---------------------------------------------------------------------------

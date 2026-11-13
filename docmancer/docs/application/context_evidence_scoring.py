@@ -95,7 +95,11 @@ def _load(root, receipt):
         raise ValueError("evidence_model_requires_cuda")
     runtime.update(capability=list(torch.cuda.get_device_capability(0)), dtype="bfloat16", attention="sdpa", batch=1)
     if runtime != RUNTIME:
-        raise ValueError("evidence_model_runtime_mismatch:" + canonical(runtime))
+        mismatch = {key: {"expected": RUNTIME[key], "actual": runtime.get(key)}
+                    for key in sorted(set(RUNTIME) | set(runtime)) if RUNTIME.get(key) != runtime.get(key)}
+        raise ValueError("evidence_model_runtime_mismatch:" + canonical(mismatch)
+                         + "; pinned hardware: CUDA capability 12.0 (Blackwell, RTX 50xx). "
+                           "Run `doc-atlas reranker check` for the full comparison.")
     receipt["runtime"] = runtime
     if _RUNTIME is None or _RUNTIME[0] != str(root):
         tokenizer = AutoTokenizer.from_pretrained(root, local_files_only=True, trust_remote_code=False, padding_side="left")

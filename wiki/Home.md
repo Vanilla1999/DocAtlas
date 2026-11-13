@@ -13,6 +13,7 @@ This wiki is the deep-dive reference for DocAtlas's local, version-aware documen
 | **[Supported Sources](./Supported-Sources.md)** | File formats, URL providers, and the MCP pack source standards |
 | **[Install Targets](./Install-Targets.md)** | Where `doc-atlas install <agent>` drops skill files for each supported agent |
 | **[MCP Packs](./MCP-Packs.md)** | Advanced layer: installing version-pinned API action packs and how the dispatcher routes calls |
+| **[Reranker](./Reranker.md)** | Experimental pinned Qwen evidence scorer: prepare/check commands, pinned runtime contract, enabling env vars |
 | **[Troubleshooting](./Troubleshooting.md)** | Common errors and their fixes |
 
 ## What lives where

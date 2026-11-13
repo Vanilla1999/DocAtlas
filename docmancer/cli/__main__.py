@@ -30,6 +30,7 @@ from docmancer.cli.mcp_commands import (
     uninstall_pack_cmd,
 )
 from docmancer.cli.qdrant_commands import qdrant_group
+from docmancer.cli.reranker_commands import reranker_group
 from docmancer.support_policy import label_cli_commands
 from docmancer.docs.application.query_trace import query_trace
 
@@ -99,6 +100,7 @@ cli.add_command(mcp_group, "mcp")
 cli.add_command(install_pack_cmd, "install-pack")
 cli.add_command(uninstall_pack_cmd, "uninstall")
 cli.add_command(qdrant_group, "qdrant")
+cli.add_command(reranker_group, "reranker")
 label_cli_commands(cli)
 
 
