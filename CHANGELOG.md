@@ -10,6 +10,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Optional `docs_status(include_language=true)` now returns compact bound identifiers and complete language metadata by default for projects and libraries; use `details=true` to include ordinary status diagnostics. Ordinary status is unchanged, and language preflight is not required before `get_docs_context`.
 
+### Fixed
+
+- Experimental Qwen preparation now verifies downloads in private staging and never recursively cleans the user's destination on failure or cancellation. Symlink and concurrently changed destinations are rejected.
+- Reranker preflight and doctor validate the effective selector configuration, distinguish preflight from inference, and explain incompatible paired/minimal or paired/MiniLM profiles. MCP reports those conflicts explicitly instead of silently routing paired Qwen through MiniLM. Model/runtime pins and no-fallback behavior remain unchanged.
+- Corrected the optional GPU dependency recipe to preserve PyPI and clarified hardware scope, explicit profile disablement and the measured Qwen cost baseline.
+
 ## [1.3.2] - 2026-09-08
 
 ### Added

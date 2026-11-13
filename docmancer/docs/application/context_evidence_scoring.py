@@ -98,7 +98,7 @@ def _load(root, receipt):
         mismatch = {key: {"expected": RUNTIME[key], "actual": runtime.get(key)}
                     for key in sorted(set(RUNTIME) | set(runtime)) if RUNTIME.get(key) != runtime.get(key)}
         raise ValueError("evidence_model_runtime_mismatch:" + canonical(mismatch)
-                         + "; pinned hardware: CUDA capability 12.0 (Blackwell, RTX 50xx). "
+                         + "; experimental pinned GPU capability: CUDA 12.0 (for example RTX 50xx). "
                            "Run `doc-atlas reranker check` for the full comparison.")
     receipt["runtime"] = runtime
     if _RUNTIME is None or _RUNTIME[0] != str(root):

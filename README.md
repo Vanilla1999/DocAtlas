@@ -94,7 +94,7 @@ Accepted values: `claude-code`, `opencode`, `codex`, `all`, `none`. An unknown v
 
 For OpenCode, the installer honors `OPENCODE_CONFIG` (full path), falling back to `$XDG_CONFIG_HOME/opencode/opencode.json`. Existing JSONC configs (comments / trailing commas) are parsed; a `.bak` backup is kept on rewrite.
 
-The default installation needs no extra setup: lexical documentation retrieval works immediately after the MCP server is registered. The optional pinned Qwen evidence scorer is experimental, GPU-specific (Blackwell only) and configured separately — see [wiki/Reranker](https://github.com/Vanilla1999/DocAtlas/wiki/Reranker) or run `doc-atlas reranker check` for a readiness report.
+The default lexical documentation path does not require Qwen, CUDA, or model downloads. After MCP registration, follow any `prepare_docs` action returned for an unprepared source. The optional Qwen evidence scorer is a separately enabled **experimental pinned profile**, not a generally supported GPU mode: it requires CUDA capability **12.0** and the exact dependency versions in [Reranker](wiki/Reranker.md). CPU, macOS, and other CUDA capabilities are not supported by that profile. Scoring failures do not silently fall back to lexical selection. Run `doc-atlas reranker check` for an assets/runtime/configuration preflight; this does not run model inference.
 
 ## Python import namespace
 

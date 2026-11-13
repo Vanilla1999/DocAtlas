@@ -336,10 +336,15 @@ def _collect_doctor_report(config, config_path: str | None, *, profile: str = "c
 
             report = _reranker.check_ready()
             if report["ready"]:
-                add_check("reranker", "ok", f"assets and pinned runtime ready ({report['model_id']})")
+                add_check("reranker", "ok", f"preflight passed in this process ({report['model_id']}); model load/inference not checked")
             else:
-                add_check("reranker", "failed", report["assets"]["error"] or "pinned runtime mismatch")
-                issues.append(_doctor_issue("RERANKER_NOT_READY", "reranker", "BLOCKER", "Paired Qwen scoring is enabled but the pinned model contract is not satisfied.", "doc-atlas reranker check", "doc-atlas reranker check reports ready=true."))
+                reasons = "; ".join(item["message"] for item in report["issues"])
+                add_check("reranker", "failed", reasons or "reranker preflight failed")
+                issues.append(_doctor_issue("RERANKER_NOT_READY", "reranker", "BLOCKER",
+                    "Paired Qwen preflight failed in this process: " + (reasons or "readiness unavailable"),
+                    "doc-atlas reranker check --json",
+                    "The same MCP server environment passes assets/runtime/profile checks; model load/inference is still untested.",
+                    restart_required=True))
         except Exception as exc:  # noqa: BLE001
             add_check("reranker", "failed", str(exc))
             issues.append(_doctor_issue("RERANKER_CHECK_FAILED", "reranker", "BLOCKER", "Paired Qwen scoring readiness cannot be verified.", "doc-atlas reranker check", "doc-atlas reranker check runs without raising."))

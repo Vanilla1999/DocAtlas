@@ -157,11 +157,18 @@ jobs:
           doc-atlas --version
           python -m pytest -q tests/test_public_surface_integration.py tests/test_main_flow_logging_integration.py
 
-      - name: Verify installed Docs MCP over stdio
+      - name: Build and install platform smoke wheel
         shell: bash
         run: |
           python -m pip wheel --no-deps --wheel-dir "$RUNNER_TEMP/docs-mcp-wheel" .
           python -m pip install --force-reinstall --no-deps "$RUNNER_TEMP"/docs-mcp-wheel/*.whl
+
+      - name: Verify installed reranker onboarding and default MCP
+        run: python -m pytest -q tests/test_reranker_onboarding.py
+
+      - name: Verify installed Docs MCP over stdio
+        shell: bash
+        run: |
           cd "$RUNNER_TEMP"
           python "$GITHUB_WORKSPACE/scripts/docs_mcp_stdio_smoke.py"
 

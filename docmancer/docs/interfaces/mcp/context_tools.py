@@ -289,6 +289,8 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     if name != "get_docs_context":
         return None
     from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+    from docmancer.docs.application.experimental_qwen_profile import validate_paired_context_mode
+    validate_paired_context_mode()
     minimal = minimal_context_enabled()
     context_format = args.get("context_format")
     if context_format is not None and context_format != "patch_context":
@@ -572,7 +574,9 @@ def _handle_prepared_context_tool(
                 from docmancer.docs.application.section_compression import (
                     enabled as section_compression_enabled, select_sections, encode_sections,
                 )
+                from docmancer.docs.application.experimental_qwen_profile import validate_paired_compression
                 section_compression_active = section_compression_enabled()
+                validate_paired_compression(section_compression_active)
                 if section_compression_active:
                     projection, snapshot = select_sections(projection, snapshot, raw, search_question)
                     # Price the complete compact packet before issuing references.
