@@ -45,7 +45,7 @@ from .experimental_qwen_pool_units import (
 from .experimental_qwen_profile import (
     JOINT_POOL_PRUNE_DEFAULT, JOINT_EXPERIMENT_CHOICES as _EXPERIMENT_CHOICES,
     joint_experiment as _experiment,
-    study_options as _study_options, validate_paired_context_mode,
+    study_options as _study_options, validated_minimal_context_enabled,
     validate_paired_context_budget, validate_paired_native_settings,
 )
 from .model_visible_projection import _refresh_estimate
@@ -380,9 +380,7 @@ def select_joint_context(
     study, pool_study = _study_options()
     if type(portion) is not int or portion < 1:
         raise ValueError("invalid_context_portion")
-    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
-    validate_paired_context_mode()
-    minimal = minimal_context_enabled()
+    minimal = validated_minimal_context_enabled()
     if minimal:
         from .minimal_context_selection import select_minimal_context
         return select_minimal_context(

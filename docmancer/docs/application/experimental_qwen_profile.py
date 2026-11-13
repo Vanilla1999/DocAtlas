@@ -1,8 +1,8 @@
 """Shared, inference-free guards for paired-Qwen selection and its preflight.
 
-These are the existing selector checks, not a second readiness policy. Runtime
-callers keep the checks at their original boundaries; CLI preflight cannot
-establish whether a future request will own a native context-read scope.
+Existing selector checks are shared instead of duplicated. Conflicting opt-ins
+fail before routing to a different scorer; CLI preflight cannot establish
+whether a future request will own a native context-read scope.
 """
 from __future__ import annotations
 
@@ -69,6 +69,21 @@ def validate_paired_compression(active: bool) -> None:
         raise PairedQwenProfileError("paired_qwen_requires_compression_off")
 
 
+def validated_minimal_context_enabled() -> bool:
+    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+
+    validate_paired_context_mode()
+    return minimal_context_enabled()
+
+
+def validated_section_compression_enabled() -> bool:
+    from .section_compression import enabled
+
+    active = enabled()
+    validate_paired_compression(active)
+    return active
+
+
 def validate_paired_context_budget(cap: int | None) -> None:
     if paired_qwen_enabled() and cap is None:
         raise ValueError("paired_qwen_requires_native_context_token_budget")
@@ -85,15 +100,11 @@ def validate_paired_native_settings(settings: tuple[str, str, str, str]) -> None
 
 def configured_profile() -> dict:
     """Check the current process's configuration without opening a request scope."""
-    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
     from docmancer.docs.domain.original_body_discovery import configured_context_max_tokens
-    from .section_compression import enabled as section_compression_enabled
 
     selection, pool = study_options()
-    validate_paired_context_mode()
-    minimal_context_enabled()
-    compression_active = section_compression_enabled()
-    validate_paired_compression(compression_active)
+    validated_minimal_context_enabled()
+    compression_active = validated_section_compression_enabled()
     cap = configured_context_max_tokens()
     validate_paired_context_budget(cap)
     settings = tuple(joint_experiment(name) for name in JOINT_EXPERIMENT_CHOICES)
