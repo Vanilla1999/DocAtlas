@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "sha256": {
+    "manifest.json": "cff8cd8c83699066ff4f5edfa9fd7cb03859094162567f0c7627f6617e27dec3",
+    "questions.json": "5b05d6a4a6519eaf2b7904793f776acaa26283581002a33b65e1bda5b06083b9",
+    "oracle.json": "2ba568fbb608130fd71fdebcd8d603927d956e614df3b1fff2be8d28213298e4",
+    "overlap-audit.sealed.json": "81af3da830fa53a3eadcb5b1a45e9de3ff14d7a40eed1e212fe5cf78c46f7477",
+    "author.sealed.py": "c996d4cc8c8d72c5181f11b16a533b552eb3a91ae48497b93f753f13225e88aa",
+    "run_fresh.py": "aef73f3ba93532d5709bc520460a4213539c8c854244a8d3511c4b11d7cd4e71",
+    "check_delivery.py": "f0eb69609d2a38f86b82e9f6bbd9322a75ce9bf0fad4f49e77b06f556b4f6304",
+    "PROTOCOL.md": "edfc546361780e2cb179ad81e44e29bae0af63e19bbdeffc455507a5e2cff42c"
+  },
+  "note": "Hash inventory only; no runtime tests or inference performed."
+}

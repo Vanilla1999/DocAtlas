@@ -2,6 +2,7 @@
 import argparse
 from collections import defaultdict
 import hashlib
+import gzip
 import json
 from pathlib import Path
 
@@ -11,9 +12,17 @@ def digest(value):
                                     separators=(',', ':'), allow_nan=False).encode()).hexdigest()
 
 
+def trace_lines(path):
+    if not path.exists() and Path(str(path) + '.gz').is_file():
+        path = Path(str(path) + '.gz')
+    opener = gzip.open(path, 'rt', encoding='utf-8') if path.suffix == '.gz' else path.open(encoding='utf-8')
+    with opener as stream:
+        yield from stream
+
+
 def load(path):
     groups = defaultdict(list)
-    for line in path.open(encoding='utf-8'):
+    for line in trace_lines(path):
         event = json.loads(line)
         if event.get('event') != 'pool_manifest':
             continue

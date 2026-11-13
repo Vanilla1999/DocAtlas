@@ -48,7 +48,8 @@ from docmancer.docs.application.project_docs_member_transaction import catalog_e
 from docmancer.docs.project_docs_catalog import read_project_docs_catalog  # noqa: E402
 from docmancer.mcp.agent_config import OPENCODE_MCP_ENVIRONMENT  # noqa: E402
 
-CALL_TIMEOUT = timedelta(minutes=15)
+CALL_TIMEOUT = timedelta(
+    seconds=float(os.environ.get("DOCATLAS_BLIND_CALL_TIMEOUT_SECONDS", "900")))
 # Supported per-project setting (ProjectSourceBoundaryConfig.scan_deadline_seconds,
 # product default 5 s). It bounds wall-clock time of member preparation and of
 # catalog discovery only; preparing the 489 L2 members exceeds 5 s on a 2-CPU
@@ -134,8 +135,17 @@ def observer_facts(work: Path) -> Path:
 def git_state(tree: Path) -> dict:
     def git(*args: str) -> str:
         return subprocess.run(["git", *args], cwd=tree, capture_output=True, text=True).stdout
+    paths = git("ls-files", "--cached", "--others", "--exclude-standard", "-z").split("\0")
+    code_hashes = {}
+    for relative in sorted(set(paths)):
+        path = tree / relative
+        if relative.endswith(".py") and (relative.startswith("docmancer/") or
+                (relative.startswith("eval/blind_project_context/") and relative.count("/") == 2)) and path.is_file():
+            code_hashes[relative] = sha256(path.read_bytes())
     return {"commit": git("rev-parse", "HEAD").strip() or None,
-            "dirty_paths": [line[3:] for line in git("status", "--porcelain").splitlines() if line.strip()]}
+            "dirty_paths": [line[3:] for line in git("status", "--porcelain").splitlines() if line.strip()],
+            "code_sha256": code_hashes,
+            "code_manifest_sha256": sha256(json.dumps(code_hashes, sort_keys=True).encode("utf-8"))}
 
 
 def member_grant(project: Path, storage_path: str) -> dict:
@@ -223,6 +233,12 @@ async def run_unit(unit: dict, out: Path, work: Path, tree: Path, observe: bool,
                                     "payload_sha256": sha256(text.encode("utf-8")),
                                     "utf8_bytes": len(text.encode("utf-8")), "observer_events": events}
                     records.append(record)
+                    # Durable per-call evidence survives an interrupted campaign.
+                    # Separate files per worker avoid concurrent append races.
+                    with (out / "logs" / f"{unit['name']}.records.jsonl").open("a", encoding="utf-8") as journal:
+                        journal.write(json.dumps(record, ensure_ascii=False) + "\n")
+                        journal.flush()
+                        os.fsync(journal.fileno())
                     print(f"{unit['name']} {case['id']} {seconds:.1f}s", flush=True)
                     # Follow only server-issued continuation state. The first
                     # record remains the original single-call gate input.
@@ -343,6 +359,16 @@ def main() -> int:
     source_state, eval_state = git_state(tree), git_state(ROOT)
     started_at = datetime.now(timezone.utc)
     started = time.perf_counter()
+    # Persist launch provenance before any model work; interrupted runs retain it.
+    (out / "start.json").write_text(json.dumps({
+        "status": "started_not_completed", "started_at_utc": started_at.isoformat(timespec="seconds"),
+        "source_tree": source_state, "eval_tree": eval_state,
+        "questions_sha256": sha256((HERE / "questions.json").read_bytes()),
+        "corpus_lock_sha256": sha256((HERE / "corpus-lock.json").read_bytes()),
+        "selected_cases": [case["id"] for case in cases], "corpora": corpora,
+        "jobs": jobs, "observer": not args.no_observer, "extra_server_environment": extra,
+        "requested_portions": args.portions,
+    }, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     results = asyncio.run(run_all(units, jobs, out, work, tree, not args.no_observer, extra,
                                  args.reuse_work, args.portions))
     env_shown = results[0]["server_environment"] if results else {}

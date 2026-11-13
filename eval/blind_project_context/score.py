@@ -281,9 +281,12 @@ def score(out: Path) -> dict:
         raise RuntimeError("witness-audit.json is stale: run audit.py")
     records = {(record["corpus"], record["case_id"]): record for record in run["records"]}
     # Candidate ranks of gold quotes exist only when the observer had this gold.
-    ranked = bool(run["observer"]) and run.get("observer_oracle_sha256") == oracle_sha256 and all(
-        "fact_ranks" in event for record in run["records"] for event in record["observer_events"]
-        if event.get("event") == "acquisition")
+    acquisitions = [[event for event in record["observer_events"]
+                     if event.get("event") == "acquisition"] for record in run["records"]]
+    # Missing acquisition traces are unknown, not evidence of zero acquisition.
+    ranked = (bool(run["observer"]) and run.get("observer_oracle_sha256") == oracle_sha256
+              and bool(acquisitions) and all(acquisitions)
+              and all("fact_ranks" in event for events in acquisitions for event in events))
     selected = set(run["selected_cases"])
     with TemporaryDirectory() as tmp:
         corpora = {name: documents(project) for name, project in build(Path(tmp)).items()}

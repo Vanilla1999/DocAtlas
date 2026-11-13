@@ -1,0 +1,320 @@
+{
+  "schema_version": 2,
+  "state": "SEALED_DO_NOT_OPEN_UNTIL_VARIANTS_FROZEN",
+  "questions_sha256": "5b05d6a4a6519eaf2b7904793f776acaa26283581002a33b65e1bda5b06083b9",
+  "line_convention": "1-based inclusive; char offsets zero-based half-open Unicode; source SHA256 exact UTF-8 bytes",
+  "topics": [
+    {
+      "topic_id": "F01",
+      "split": "dev",
+      "answerable": true,
+      "negative_kind": null,
+      "path": "docs/development/python-module-size-policy.md",
+      "complete_answer_rule": "Every obligation and all qualifications required. Witness coverage certifies retrieval delivery, not answer correctness.",
+      "facts": [
+        {
+          "fact_id": "F01.F1",
+          "obligation": "Hard physical-line bound; hand-written production/evaluation/test scope; not a quality score.",
+          "quote": "DocAtlas treats **1,000 physical lines as a hard upper bound for hand-written Python modules**. The limit is a guardrail, not a quality score: a 300-line file can still mix responsibilities, and a generated table can legitimately be large. Hand-written production, evaluation, and test modules must nevertheless stay at or below the bound so growth cannot silently recreate monoliths.",
+          "path": "docs/development/python-module-size-policy.md",
+          "line_start": 5,
+          "line_end": 5,
+          "char_start": 235,
+          "char_end": 619,
+          "source_sha256": "efed3dd085cbd2b787a3800973f9ad5742ebda038f787bec45106ed338c754bd",
+          "required": true
+        },
+        {
+          "fact_id": "F01.F2",
+          "obligation": "Untracked files included; only environment/build/cache exclusions; pre-merge split; all temporary-waiver conditions and current absence.",
+          "quote": "The gate scans all repository `.py` files, including newly created/untracked files in the working tree. It ignores only environment/build/cache directories. There is no blanket exclusion for `docmancer/`, `eval/`, or `tests/`.\n\nA module crossing the limit must be split before merge. An exceptional temporary waiver should name the exact file, explain why splitting would be riskier, and include an expiry/removal task; there are no waivers in the current tree.",
+          "path": "docs/development/python-module-size-policy.md",
+          "line_start": 21,
+          "line_end": 23,
+          "char_start": 1447,
+          "char_end": 1908,
+          "source_sha256": "efed3dd085cbd2b787a3800973f9ad5742ebda038f787bec45106ed338c754bd",
+          "required": true
+        }
+      ]
+    },
+    {
+      "topic_id": "F02",
+      "split": "dev",
+      "answerable": true,
+      "negative_kind": null,
+      "path": "docs/development/python-module-size-policy.md",
+      "complete_answer_rule": "Every obligation and all qualifications required. Witness coverage certifies retrieval delivery, not answer correctness.",
+      "facts": [
+        {
+          "fact_id": "F02.F1",
+          "obligation": "Practical target; responsibility not arbitrary splitting; naming caveat; stable imports; facade re-export; focused new logic; preserve or explicitly replace documented seams.",
+          "quote": "Prefer modules in the **200–700 line** range when practical. Split on reasons to change, not on arbitrary line numbers. Good boundaries include domain models, parsing, persistence, transport, orchestration, formatting, and compatibility façades. Avoid `part1.py`, `misc.py`, and `utils2.py` as permanent architecture; implementation shards should have a named responsibility or remain private compatibility shards behind a stable façade.\n\nPublic import paths should remain stable when a module is split. A façade may re-export the old symbols, but new logic should live in focused internal modules. If tests or embedders monkeypatch a documented module-level seam, the façade must preserve that seam or provide an explicit replacement.",
+          "path": "docs/development/python-module-size-policy.md",
+          "line_start": 9,
+          "line_end": 11,
+          "char_start": 639,
+          "char_end": 1374,
+          "source_sha256": "efed3dd085cbd2b787a3800973f9ad5742ebda038f787bec45106ed338c754bd",
+          "required": true
+        }
+      ]
+    },
+    {
+      "topic_id": "F03",
+      "split": "dev",
+      "answerable": true,
+      "negative_kind": null,
+      "path": "docs/support-surface-policy.md",
+      "complete_answer_rule": "Every obligation and all qualifications required. Witness coverage certifies retrieval delivery, not answer correctness.",
+      "facts": [
+        {
+          "fact_id": "F03.F1",
+          "obligation": "Current release only; explicit future-policy exception; no retired migration claims; distribution/CLI versus current import namespace; service registration and explicit tier decision.",
+          "quote": "The inventory describes the current release only. Removed commands, tools, arguments, configuration shapes, aliases, and behaviors receive no compatibility window unless a future policy explicitly adopts one. Documentation and tests must not advertise retired surfaces as supported migration paths.\n\nThe distribution and CLI are named `doc-atlas`. The Python import namespace remains `docmancer`; this is the current namespace, not a deprecated alias.\n\nPublic service surfaces must also be registered in `SHIPPED_SERVICE_SURFACE_IDS` in `docmancer/support_policy.py`. CI compares that registration boundary with the machine inventory, so a service cannot become supported without an explicit tier decision.",
+          "path": "docs/support-surface-policy.md",
+          "line_start": 18,
+          "line_end": 22,
+          "char_start": 1382,
+          "char_end": 2088,
+          "source_sha256": "8103ff0c0d7a92db1b62b1cfc76365748c75de0973ce866f609b0c628441b9f5",
+          "required": true
+        }
+      ]
+    },
+    {
+      "topic_id": "F04",
+      "split": "dev",
+      "answerable": true,
+      "negative_kind": null,
+      "path": "docs/support-surface-policy.md",
+      "complete_answer_rule": "Every obligation and all qualifications required. Witness coverage certifies retrieval delivery, not answer correctness.",
+      "facts": [
+        {
+          "fact_id": "F04.F1",
+          "obligation": "Every failure-budget bullet: core blockers, scoped advanced degradation/local availability, maintenance availability exclusions, current default-store exception, cross-tier security/storage blocks, advisory live versus required offline.",
+          "quote": "- A core retrieval, local SQLite storage, trust-boundary, or shared security regression blocks release.\n- An Advanced network outage must not make the local Docs MCP unhealthy. The affected advanced action reports a scoped degraded/error state while `get_docs_context` remains available for local evidence.\n- Maintenance-only Qdrant administration/download, USPTO, hosted embedding, crawler, or Packs-provider availability is outside the core health budget. The currently default Qdrant store remains core until Task 24 changes the default backend and install profile.\n- Across every tier, shared security and storage regressions block release.\n- Live-provider suites are scheduled or manually triggered and advisory; offline contract tests remain required.",
+          "path": "docs/support-surface-policy.md",
+          "line_start": 26,
+          "line_end": 30,
+          "char_start": 2110,
+          "char_end": 2867,
+          "source_sha256": "8103ff0c0d7a92db1b62b1cfc76365748c75de0973ce866f609b0c628441b9f5",
+          "required": true
+        }
+      ]
+    },
+    {
+      "topic_id": "F05",
+      "split": "dev",
+      "answerable": true,
+      "negative_kind": null,
+      "path": "docs/support-surface-policy.md",
+      "complete_answer_rule": "Every obligation and all qualifications required. Witness coverage certifies retrieval delivery, not answer correctness.",
+      "facts": [
+        {
+          "fact_id": "F05.F1",
+          "obligation": "No current Task 29 core change; migration condition on retained core; browser/crawler and hosted extras; conditional Qdrant/FastEmbed move with installer/default-fallback tests; USPTO existing versus future dependencies.",
+          "quote": "Current core dependencies stay unchanged in Task 29 to avoid an accidental packaging break. Task 24 must move dependencies according to these boundaries:\n\n- Keep local Docs parsing, HTTP policy enforcement, MCP, SQLite/vector fallback, and file-format readers in core until an installation migration is proven.\n- Browser and Crawl4AI remain explicit extras.\n- Hosted embedding providers remain explicit provider extras.\n- Qdrant and FastEmbed are candidates for a vector/maintenance extra because Qdrant administration is maintenance-only; moving them requires installer and default-fallback tests.\n- USPTO parsing uses existing core parsers but the command/service remains maintenance-only; specialist dependencies added later belong in a USPTO extra.",
+          "path": "docs/support-surface-policy.md",
+          "line_start": 47,
+          "line_end": 53,
+          "char_start": 4088,
+          "char_end": 4840,
+          "source_sha256": "8103ff0c0d7a92db1b62b1cfc76365748c75de0973ce866f609b0c628441b9f5",
+          "required": true
+        }
+      ]
+    },
+    {
+      "topic_id": "F06",
+      "split": "dev",
+      "answerable": true,
+      "negative_kind": null,
+      "path": "docs/sdk-delivery-budgets.md",
+      "complete_answer_rule": "Every obligation and all qualifications required. Witness coverage certifies retrieval delivery, not answer correctness.",
+      "facts": [
+        {
+          "fact_id": "F06.F1",
+          "obligation": "Entire formatted-string formula including paths/titles/escaping/separators; approximate units, no tokenizer guarantee; external instructions/questions excluded.",
+          "quote": "`get_context` / `query_context` additionally bound the entire formatted string,\nincluding source paths, titles, XML escaping and separators, by\n`ceil(len(formatted_text) / 4) <= budget`. This preserves the formatter's\napproximate character-based units, not a guarantee for an embedding or answering\nmodel's tokenizer. External prompt instructions and questions are not included.",
+          "path": "docs/sdk-delivery-budgets.md",
+          "line_start": 9,
+          "line_end": 13,
+          "char_start": 418,
+          "char_end": 796,
+          "source_sha256": "89cc4acbbe6479d88976f2a40edcc9233bff8545749c81bb4bcc7663a55036e4",
+          "required": true
+        },
+        {
+          "fact_id": "F06.F2",
+          "obligation": "Corrected versus previous behavior; source whitespace and XML caveat; omit whole windows and continue in order without cropping; possibly empty despite get_chunks; zero/negative/None semantics.",
+          "quote": "Previously formatting budgets counted only bodies, stripped source whitespace\nand permitted an oversized first window. The corrected formatter charges the\nrendered string and preserves source whitespace (XML still escapes content).\nIt omits whole nonfitting windows and continues in input order, without cropping.\nConsequently a tight budget may legitimately produce an empty string, even if\n`get_chunks` can return a body under its stored estimate. Zero means zero output;\nnegative caps are rejected. `None` uses SDK configuration defaults.",
+          "path": "docs/sdk-delivery-budgets.md",
+          "line_start": 17,
+          "line_end": 23,
+          "char_start": 847,
+          "char_end": 1388,
+          "source_sha256": "89cc4acbbe6479d88976f2a40edcc9233bff8545749c81bb4bcc7663a55036e4",
+          "required": true
+        }
+      ]
+    },
+    {
+      "topic_id": "F07",
+      "split": "holdout",
+      "answerable": true,
+      "negative_kind": null,
+      "path": "docs/release-identity.md",
+      "complete_answer_rule": "Every obligation and all qualifications required. Witness coverage certifies retrieval delivery, not answer correctness.",
+      "facts": [
+        {
+          "fact_id": "F07.F1",
+          "obligation": "Existing-project Publishing location, not account-level pending publisher; all four exact fields; environment generally optional but must match this workflow.",
+          "quote": "Because `doc-atlas` is an **existing PyPI project**, configure the publisher inside that project:\n\n```text\nPyPI → Your projects → doc-atlas → Manage → Publishing\n```\n\nDo not rely on an account-level **pending publisher** intended to create a new project. Add or replace the GitHub Actions publisher with exactly:\n\n```text\nowner: Vanilla1999\nrepository: DocAtlas\nworkflow filename: publish.yml\nenvironment: release-current\n```\n\nEnvironment is optional in PyPI generally, but this workflow deliberately uses `release-current`; a publisher configured with a different environment does not match these claims.",
+          "path": "docs/release-identity.md",
+          "line_start": 81,
+          "line_end": 96,
+          "char_start": 3471,
+          "char_end": 4076,
+          "source_sha256": "004e26a57e5a54cc7fb2013ee5db74c372d1388b5c695cdab2c0d0d2e3b04b45",
+          "required": true
+        }
+      ]
+    },
+    {
+      "topic_id": "F08",
+      "split": "holdout",
+      "answerable": true,
+      "negative_kind": null,
+      "path": "docs/RELEASE_CHECKLIST.md",
+      "complete_answer_rule": "Every obligation and all qualifications required. Witness coverage certifies retrieval delivery, not answer correctness.",
+      "facts": [
+        {
+          "fact_id": "F08.F1",
+          "obligation": "Reviewed PR; required-ci on exact resulting main commit; unchanged main; create/idempotently verify immutable annotated tag; canonical dispatch; all artifact jobs prerequisite and environment-protection condition for human approval; dispatch-only, not tags/PRs.",
+          "quote": "- [ ] Merge one reviewed release-request PR. The controller waits for `required-ci` on the exact resulting `main` commit, verifies that `main` has not moved, creates or idempotently verifies the immutable annotated tag, and then dispatches the canonical `publish.yml`.\n- [ ] The `release-current` environment approval is granted only after all artifact jobs pass; this is the explicit human publication authorization when environment protection is enabled.\n- [ ] Publish has one explicit publication trigger (`workflow_dispatch`); neither tag pushes nor pull requests publish.",
+          "path": "docs/RELEASE_CHECKLIST.md",
+          "line_start": 44,
+          "line_end": 46,
+          "char_start": 3986,
+          "char_end": 4562,
+          "source_sha256": "8a1eaa8a03d2fe838df84219ea1e96359b9fc66dff2b638eac3a772026e3e87f",
+          "required": true
+        }
+      ]
+    },
+    {
+      "topic_id": "F09",
+      "split": "holdout",
+      "answerable": true,
+      "negative_kind": null,
+      "path": "docs/RELEASE_CHECKLIST.md",
+      "complete_answer_rule": "Every obligation and all qualifications required. Witness coverage certifies retrieval delivery, not answer correctness.",
+      "facts": [
+        {
+          "fact_id": "F09.F1",
+          "obligation": "All P0/P1/P2 clauses including residual risk, installed frozen model benchmark, value or unsupported/wrong-version reduction and trajectory cost; separate parity protocol and conditional prerequisite; Beta despite artifact green.",
+          "quote": "Do not call the product Stable until all of the following are true:\n\n1. P0 public truth is closed: release-source provenance is explicit, the unprotected-`main` residual risk is recorded rather than hidden, namespace/state isolation and contract consistency are green, and the exact public artifact plus cross-platform installed smoke are green.\n2. P1 agent truth demonstrates that a real coding model can acquire the intended evidence through the installed public MCP contract under a frozen benchmark.\n3. P2 product truth demonstrates real coding-task value or a material reduction in unsupported/wrong-version claims at acceptable total trajectory cost.\n4. Context7 parity is claimed only if a separate comparable parity protocol demonstrates it; parity is not a prerequisite for Stable unless the active product decision makes it one.\n\nUntil then, public maturity remains **Beta** even when all artifact/release checks are green.",
+          "path": "docs/RELEASE_CHECKLIST.md",
+          "line_start": 83,
+          "line_end": 90,
+          "char_start": 8257,
+          "char_end": 9190,
+          "source_sha256": "8a1eaa8a03d2fe838df84219ea1e96359b9fc66dff2b638eac3a772026e3e87f",
+          "required": true
+        }
+      ]
+    },
+    {
+      "topic_id": "F10",
+      "split": "holdout",
+      "answerable": true,
+      "negative_kind": null,
+      "path": "docs/change-aware-docs.md",
+      "complete_answer_rule": "Every obligation and all qualifications required. Witness coverage certifies retrieval delivery, not answer correctness.",
+      "facts": [
+        {
+          "fact_id": "F10.F1",
+          "obligation": "All three statuses with maintained-document/recognized-module conditions; PR job summary; informational default and opt-in fail-on-missing.",
+          "quote": "The report distinguishes:\n\n- `updated`: a maintained project-doc file changed in the diff.\n- `review_required`: code or dependency metadata changed and a maintained document maps to that area.\n- `missing`: a recognized module changed but has no maintained module documentation.\n\nThe GitHub Actions `docs-impact` job writes a Markdown version to the pull-request job summary. It is informational by default. Teams that want a blocking policy can run the same command with `--fail-on-missing`.",
+          "path": "docs/change-aware-docs.md",
+          "line_start": 24,
+          "line_end": 30,
+          "char_start": 1698,
+          "char_end": 2189,
+          "source_sha256": "e4a5c932205823b5dacf2dbce4c93d73e5d362fa0e2b50ebd7f754ee189e1ffe",
+          "required": true
+        }
+      ]
+    },
+    {
+      "topic_id": "F11",
+      "split": "holdout",
+      "answerable": true,
+      "negative_kind": null,
+      "path": "docs/change-aware-docs.md",
+      "complete_answer_rule": "Every obligation and all qualifications required. Witness coverage certifies retrieval delivery, not answer correctness.",
+      "facts": [
+        {
+          "fact_id": "F11.F1",
+          "obligation": "Advisory inspection only; no autonomous generation/modification.",
+          "quote": "DocAtlas can inspect a diff and report which maintained documentation should be reviewed. The feature is intentionally advisory: it does not generate or modify repository docs on its own.",
+          "path": "docs/change-aware-docs.md",
+          "line_start": 3,
+          "line_end": 3,
+          "char_start": 37,
+          "char_end": 224,
+          "source_sha256": "e4a5c932205823b5dacf2dbce4c93d73e5d362fa0e2b50ebd7f754ee189e1ffe",
+          "required": true
+        },
+        {
+          "fact_id": "F11.F2",
+          "obligation": "Allowed files/headings, code/config/test verification, missing evidence, forbidden invented claims, no DocAtlas Markdown writes.",
+          "quote": "The JSON report contains `authoring_brief`, an evidence-bounded instruction for the host coding model. It names allowed files and headings, code/config/test facts to verify, missing evidence, and claims that must not be invented. DocAtlas itself never writes project Markdown.",
+          "path": "docs/change-aware-docs.md",
+          "line_start": 16,
+          "line_end": 16,
+          "char_start": 734,
+          "char_end": 1010,
+          "source_sha256": "e4a5c932205823b5dacf2dbce4c93d73e5d362fa0e2b50ebd7f754ee189e1ffe",
+          "required": true
+        },
+        {
+          "fact_id": "F11.F3",
+          "obligation": "Map is not correctness proof; read selected docs and propose reviewable diff; rejected or merely proposed patch must not sync as accepted truth.",
+          "quote": "This is a review map, not proof that documentation is correct. An agent should use `get_docs_context` to read the selected docs and propose a normal, reviewable documentation diff when an update is needed. A rejected or merely proposed patch must not be synced as accepted project truth.",
+          "path": "docs/change-aware-docs.md",
+          "line_start": 36,
+          "line_end": 36,
+          "char_start": 2598,
+          "char_end": 2885,
+          "source_sha256": "e4a5c932205823b5dacf2dbce4c93d73e5d362fa0e2b50ebd7f754ee189e1ffe",
+          "required": true
+        }
+      ]
+    },
+    {
+      "topic_id": "F12",
+      "split": "holdout",
+      "answerable": true,
+      "negative_kind": null,
+      "path": "docs/capabilities.md",
+      "complete_answer_rule": "Every obligation and all qualifications required. Witness coverage certifies retrieval delivery, not answer correctness.",
+      "facts": [
+        {
+          "fact_id": "F12.F1",
+          "obligation": "Reread metadata; A ineligible but retained for other/historical use; matching B or actionable fail-closed request; no ambiguous latest; host re-query/no retroactive revocation; Pub between-call coverage not atomic/universal ecosystems; limited external coverage and explicit-source/unsupported result.",
+          "quote": "DocAtlas binds dependency documentation to the current resolved version in supported project manifests and lockfiles. After a lockfile changes from version A to B, the next current-project query reads the metadata again: cached documentation A is no longer eligible evidence. DocAtlas must return matching documentation B or fail closed with an actionable preparation/source request. An unresolved or ambiguous version must not silently become `latest`.\n\nOld snapshots need not be deleted: another project or an explicit historical/exact-version query may still use them (`cached != eligible`). The host must re-query after changing dependency state; already delivered conversation context is not automatically revoked.\n\n### Version-transition validation boundary\n\nThe stateful regression in `tests/docs/test_dependency_version_transition.py` covers supported Pub lockfile changes between calls, missing/new snapshots, shared-cache isolation and rollback. It does not claim an atomic snapshot when files change during a running request, or universal exact-version support across ecosystems.\n\nCurrent exact external-source coverage is limited and under evaluation. If a safe source or version is unavailable, the result should request an explicit source or report unsupported coverage.",
+          "path": "docs/capabilities.md",
+          "line_start": 35,
+          "line_end": 43,
+          "char_start": 1763,
+          "char_end": 3047,
+          "source_sha256": "c1d1339157113508ce26c65951315520131458cbe11a79a70434fcc86e01f504",
+          "required": true
+        }
+      ]
+    }
+  ]
+}

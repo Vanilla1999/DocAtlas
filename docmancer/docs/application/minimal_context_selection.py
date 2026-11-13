@@ -120,6 +120,123 @@ def delivery_size(packet: dict) -> int:
     return projection_token_count(text.encode("utf-8"))
 
 
+def _wire_tokens(packet: dict) -> int:
+    """Q6 budget cost of the exact minimal-mode MCP text.
+
+    Mirrors _mcp_tool_result: standalone rendering when it exists, otherwise
+    canonical JSON. Both token and UTF-8 byte bounds apply.
+    """
+    from docmancer.docs.application.model_context_view import canonical as _canonical
+    rendered = render_standalone_text(packet)
+    text = rendered.text if rendered.text is not None else _canonical(packet)
+    raw = text.encode("utf-8")
+    return max(projection_token_count(raw), (len(raw) + 3) // 4)
+
+
+def _research_delivery_budget() -> int | None:
+    """Opt-in experiment-branch delivery budget for the minimal-context path.
+
+    Unset by default: production minimal-context behaviour is unchanged. When
+    set, it must be a positive integer no larger than the emergency ceiling.
+    """
+    raw = os.environ.get("DOCATLAS_EXPERIMENT_MINIMAL_DELIVERY_BUDGET_TOKENS")
+    if raw is None or raw == "":
+        return None
+    try:
+        budget = int(raw)
+    except ValueError as exc:
+        raise ValueError("DOCATLAS_EXPERIMENT_MINIMAL_DELIVERY_BUDGET_TOKENS must be an integer") from exc
+    if not 1 <= budget <= EMERGENCY_TOKENS:
+        raise ValueError("DOCATLAS_EXPERIMENT_MINIMAL_DELIVERY_BUDGET_TOKENS must be in [1, 50000]")
+    return budget
+
+
+def _scored_units_with_cache(original, structure, model_path, diagnostics):
+    """Reuse per-unit scores of the pinned scorer across calls.
+
+    Experiment-branch-only (DOCATLAS_EXPERIMENT_EVIDENCE_SCORE_CACHE). The
+    scorer is strictly per-unit: each unit is one independent (original,
+    document) model forward with batch=1 and no cross-unit normalization, so
+    a unit with an identical prompt yields the identical score regardless of
+    which other units accompany it in the call. For every unit already
+    recorded in the cache no forward is made; the remaining units go through
+    the untouched pinned scorer in one call. Model asset verification runs on
+    every call, exactly like the pinned path. The returned receipt is
+    truthful: model_pairs/model_forwards count only forwards actually made
+    this call, score_cache_hits counts units served from the cache, and the
+    SHA-256 of every receipt that produced cached scores is listed.
+    Selection semantics are unchanged.
+    """
+    from .context_evidence_structure import EvidenceDocuments
+
+    cache_dir = os.environ.get("DOCATLAS_EXPERIMENT_EVIDENCE_SCORE_CACHE")
+    unit_ids = tuple(unit.identity for unit in structure.units)
+    documents = EvidenceDocuments(structure)
+    if not cache_dir:
+        return evidence_scoring.score_evidence_units(
+            original, unit_ids, documents, model_path, diagnostics=diagnostics)
+    cache_root = Path(cache_dir)
+    cache_root.mkdir(parents=True, exist_ok=True)
+    evidence_scoring.verify_assets(model_path)
+
+    def unit_key(identity):
+        blob = json.dumps({
+            "original": original,
+            "model_id": evidence_scoring.MODEL_ID,
+            "revision": evidence_scoring.REVISION,
+            "contract_sha256": evidence_scoring.CONTRACT_SHA256,
+            "document": documents.document(identity),
+        }, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        return hashlib.sha256(blob).hexdigest()
+
+    keys = {unit.identity: unit_key(unit.identity) for unit in structure.units}
+    scores, missing, source_digests = [], [], set()
+    for unit in structure.units:
+        path = cache_root / f"{keys[unit.identity]}.json"
+        try:
+            entry = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            entry = None
+        if isinstance(entry, dict) and entry.get("score_key") == keys[unit.identity] \
+                and isinstance(entry.get("score"), float):
+            scores.append({"identity": unit.identity, "score": entry["score"]})
+            source_digests.add(entry.get("receipt_sha256", ""))
+        else:
+            missing.append(unit.identity)
+    fresh_scores, fresh_receipt = [], None
+    if missing:
+        fresh_scores, fresh_receipt = evidence_scoring.score_evidence_units(
+            original, tuple(missing), documents, model_path, diagnostics=diagnostics)
+        for row in fresh_scores:
+            identity = row["identity"]
+            score = row["score"]
+            receipt_sha = hashlib.sha256(evidence_scoring.canonical(fresh_receipt).encode()).hexdigest()
+            tmp = cache_root / f"{keys[identity]}.tmp"
+            tmp.write_text(json.dumps({
+                "score_key": keys[identity], "score": score,
+                "receipt_sha256": receipt_sha, "source_receipt": fresh_receipt,
+            }, ensure_ascii=False), encoding="utf-8")
+            os.replace(tmp, cache_root / f"{keys[identity]}.json")
+            source_digests.add(receipt_sha)
+    scores.extend(fresh_scores)
+    scores.sort(key=lambda row: unit_ids.index(row["identity"]))
+    if fresh_receipt is not None:
+        receipt = dict(fresh_receipt)
+        receipt["units"] = len(unit_ids)
+        receipt["score_cache_hits"] = len(unit_ids) - len(missing)
+        receipt["diagnostics_omitted"] = receipt.get("diagnostics_omitted", 0) + (len(unit_ids) - len(missing)) if not diagnostics else receipt.get("diagnostics_omitted", 0)
+    else:
+        receipt = {"recipe": evidence_scoring.RECIPE, "contract_sha256": evidence_scoring.CONTRACT_SHA256,
+                   "status": "complete", "units": len(unit_ids), "model_pairs": 0, "model_forwards": 0,
+                   "model_input_tokens": 0, "planned_input_tokens": 0, "preflight_units": 0,
+                   "model_loads": 0, "runtime_cache_hits": 0, "score_cache_hits": len(unit_ids),
+                   "diagnostics_recorded": 0, "diagnostics_omitted": len(unit_ids),
+                   "inference_seconds": 0.0}
+    receipt["score_cache_dir"] = str(cache_root)
+    receipt["score_cache_source_receipt_sha256s"] = sorted(d for d in source_digests if d)
+    return scores, receipt
+
+
 def model_closure_receipt(closure: dict) -> dict:
     """Keep actionable literal gaps, not the host's full successful-edge trace.
 
@@ -147,6 +264,139 @@ def model_closure_receipt(closure: dict) -> dict:
             for item in closure.get("incomplete_dependencies", ())
         ],
     }
+
+
+def _fit_research_budget(payload, snapshot, retrieval, *, structure, selected,
+                         scores, scoring, policy_digest, policy, token,
+                         link_expansion, reference_mode, evidence_mode,
+                         observations, work_observation, budget, finalize_packet):
+    """Diagnostic-only unit pruning; price only complete finalized packets.
+
+    Rebuild from the checked original pool on every iteration. A dependency row
+    is never independently removed, and an empty budget result is not a semantic
+    rejection. This is not a same-pool controlled selector comparison.
+    """
+    from .minimal_context_structure import close_selection, recheck_structural_row
+    from .source_continuation import attach_source_continuation_locators
+
+    current = set(selected)
+    ranked = sorted((row for row in scores if row["identity"] in current),
+                    key=lambda row: (row["score"], row["identity"]))
+    dropped = []
+
+    def finish(result, bound):
+        if finalize_packet is not None:
+            result, bound = finalize_packet(result, bound)
+        return result, bound
+
+    def gate(result, bound):
+        # Never return an oversized packet, even when the failure envelope alone
+        # exceeds the requested budget. The caller must surface this failure;
+        # it is not a successful empty search.
+        measured = _wire_tokens(result)
+        if measured > budget:
+            raise RuntimeError(
+                f"minimal_context_delivery_budget_exceeded: {measured} > {budget}")
+        if work_observation is not None:
+            work_observation["delivery_status"] = "returned"
+        return result, bound
+
+    while True:
+        try:
+            rows, bound, closure = close_selection(
+                structure, current, payload, snapshot, retrieval,
+                **({"reference_expansion": link_expansion} if link_expansion != OFF else {}))
+        except (ValueError, OSError) as exc:
+            result, bound = stop_packet(
+                payload, snapshot, retrieval, "scan_incomplete",
+                failed_stage="structural_source_check", error=str(exc))
+            result, bound = finish(result, bound)
+            return gate(result, bound)
+        closure = {**closure, "delivery_budget_tokens": budget,
+                   "budget_limited": bool(dropped), "omitted_units": len(dropped)}
+        diagnostics = retrieval.setdefault("retrieval_diagnostics", {})
+        diagnostics["minimal_context_budget"] = {
+            "delivery_budget_tokens": budget, "dropped_units": list(dropped)}
+        diagnostics["minimal_context"] = {
+            **({"scores": scores} if not evidence_mode or observations is not None else {}),
+            "receipt": scoring, "policy_sha256": policy_digest, "closure": closure}
+        if reference_mode and closure["incomplete_dependencies"]:
+            result, bound = stop_packet(
+                payload, snapshot, retrieval, "dependency_incomplete",
+                failed_stage="reference_closure", receipt=scoring, closure=closure,
+                scan_complete=True)
+            result.update(status="error", hard_stop=True)
+            _refresh_estimate(result)
+            result, bound = finish(result, bound)
+            return gate(result, bound)
+
+        result, bound = _rebuild(payload, bound, retrieval, rows, reason=POLICY)
+        bound = {row["evidence_id"]: {
+            **_snapshot_entry(bound[row["evidence_id"]]["source"], row),
+            **{key: bound[row["evidence_id"]][key]
+               for key in ("structural_native_candidate", "structural_recipe")
+               if key in bound[row["evidence_id"]]},
+        } for row in result.get("sources", ())}
+        result["source_selection"] = {
+            "policy": POLICY, "calibration_sha256": policy_digest,
+            "calibration_status": "diagnostic_unverified" if policy is None else "empirical",
+            "candidate_units": len(scores), "selected_units": len(current),
+            "delivered_rows": len(rows), "scan_complete": True,
+            "model_pairs": scoring["model_pairs"], "closure": model_closure_receipt(closure),
+            "delivery_budget_tokens": budget, "budget_limited": bool(dropped),
+            "omitted_units": len(dropped),
+        }
+        if link_expansion != OFF:
+            result["source_selection"]["calibration_scope"] = "selected_units_before_link_expansion"
+        result["context_quality"] = {
+            "status": "unverified" if rows else "unavailable",
+            "reasons": ["coverage_unverified"]}
+        if closure.get("incomplete_dependencies"):
+            result["context_quality"]["reasons"].append("incomplete_structural_dependency")
+        if rows:
+            result["status"] = "ok"
+        elif dropped:
+            result.update(status="insufficient_evidence", reason_code="context_budget_exhausted",
+                          missing=["No selected structural unit could be delivered within the budget."])
+            result["context_quality"]["reasons"] = ["context_budget_exhausted"]
+        elif not selected and policy is not None:
+            result.update(status="insufficient_evidence", reason_code="no_relevant_source_context",
+                          missing=["No structural unit met the frozen empirical relevance threshold."])
+        else:
+            result.update(status="insufficient_evidence", reason_code="no_deliverable_source_context",
+                          missing=["Structural closure produced no deliverable source context."])
+        result["more_context"] = continuation_metadata(1, token, len(rows), len(rows))
+        root = str(retrieval.get("_source_continuation_project_root") or "")
+        if root and rows:
+            attach_source_continuation_locators(result, bound, root=root, max_tokens=EMERGENCY_TOKENS)
+        _refresh_estimate(result)
+        result, bound = finish(result, bound)
+
+        # A finalizer refusal is not permission to retry with fewer sources.
+        if result.get("hard_stop") or result.get("status") == "error":
+            return gate(result, bound)
+        # Finalization is part of the priced candidate, never a post-gate edit.
+        if _wire_tokens(result) > budget and current:
+            victim = next(row for row in ranked if row["identity"] in current)
+            current.remove(victim["identity"])
+            dropped.append({"identity": victim["identity"], "score": victim["score"]})
+            continue
+        try:
+            for row in result.get("sources", ()):
+                recheck_structural_row(row, bound[row["evidence_id"]], retrieval)
+        except (ValueError, OSError) as exc:
+            result, bound = stop_packet(
+                result, bound, retrieval, "scan_incomplete",
+                failed_stage="terminal_structural_recheck", error=str(exc))
+            result, bound = finish(result, bound)
+            return gate(result, bound)
+        errors = validate_model_visible_projection(result, snapshot=bound)
+        if errors:
+            result, bound = stop_packet(
+                result, bound, retrieval, "scan_incomplete",
+                failed_stage="delivery_validation", errors=errors)
+            result, bound = finish(result, bound)
+        return gate(result, bound)
 
 
 def select_minimal_context(payload: dict, snapshot: dict, retrieval: dict, *,
@@ -228,12 +478,10 @@ def select_minimal_context(payload: dict, snapshot: dict, retrieval: dict, *,
         structure = build_units(payload, snapshot, retrieval,
                                 **({"recipe": structural_recipe} if evidence_mode else {}))
         if evidence_mode:
-            from .context_evidence_structure import EvidenceDocuments
-            documents = EvidenceDocuments(structure)
-            scores, scoring = evidence_scoring.score_evidence_units(
-                original, tuple(unit.identity for unit in structure.units), documents,
+            scores, scoring = _scored_units_with_cache(
+                original, structure,
                 os.environ.get("DOCATLAS_EXPERIMENT_EVIDENCE_MODEL_PATH", ""),
-                diagnostics=_OBSERVER.get() is not None)
+                _OBSERVER.get() is not None)
             if reference_mode:
                 scoring = {**scoring, "selection_recipe": reference_closure.RECIPE,
                            "closure_contract_sha256": reference_closure.CONTRACT_SHA256}
@@ -251,10 +499,12 @@ def select_minimal_context(payload: dict, snapshot: dict, retrieval: dict, *,
             work_observation["scores"] = [{**row, **structure.metadata.get(row["identity"], {})} for row in scores]
         selected = {row["identity"] for row in scores
                     if policy is None or row["score"] >= policy["threshold"]}
-        rows, bound, closure = close_selection(
-            structure, selected, payload, snapshot, retrieval,
-            **({"reference_expansion": link_expansion} if link_expansion != OFF else {}))
-        if reference_mode and closure["incomplete_dependencies"]:
+        budget = _research_delivery_budget()
+        if budget is None:
+            rows, bound, closure = close_selection(
+                structure, selected, payload, snapshot, retrieval,
+                **({"reference_expansion": link_expansion} if link_expansion != OFF else {}))
+        if budget is None and reference_mode and closure["incomplete_dependencies"]:
             stopped, bound = stop_packet(payload, snapshot, retrieval, "dependency_incomplete",
                                         failed_stage="reference_closure", receipt=scoring, closure=closure,
                                         scan_complete=True)
@@ -268,6 +518,14 @@ def select_minimal_context(payload: dict, snapshot: dict, retrieval: dict, *,
     except (ValueError, OSError) as exc:
         return stop_packet(payload, snapshot, retrieval, "scan_incomplete",
                            failed_stage="structural_source_check", error=str(exc))
+    if budget is not None:
+        return _fit_research_budget(
+            payload, snapshot, retrieval, structure=structure, selected=selected,
+            scores=scores, scoring=scoring, policy_digest=policy_digest,
+            policy=policy, token=token, link_expansion=link_expansion,
+            reference_mode=reference_mode, evidence_mode=evidence_mode,
+            observations=observations, work_observation=work_observation,
+            budget=budget, finalize_packet=finalize_packet)
     result, bound = _rebuild(payload, bound, retrieval, rows, reason=POLICY)
     # Closure produces trusted checked rows with transient attribution fields;
     # _payload canonicalizes the public row shape. Bind that canonical shape,

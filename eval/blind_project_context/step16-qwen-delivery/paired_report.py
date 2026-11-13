@@ -1,6 +1,7 @@
 """Offline paired-trace evidence; no production imports, scorer calls or gold injection."""
 from collections import defaultdict
 import hashlib
+import gzip
 import json
 from pathlib import Path
 
@@ -14,9 +15,12 @@ def digest(value):
 
 def trace(path):
     events, errors = [], []
+    if not path.exists() and Path(str(path) + '.gz').is_file():
+        path = Path(str(path) + '.gz')
     if not path.exists():
         return events, ['trace missing']
-    with path.open(encoding='utf-8') as stream:
+    opener = gzip.open(path, 'rt', encoding='utf-8') if path.suffix == '.gz' else path.open(encoding='utf-8')
+    with opener as stream:
         for number, line in enumerate(stream, 1):
             try:
                 event = json.loads(line)

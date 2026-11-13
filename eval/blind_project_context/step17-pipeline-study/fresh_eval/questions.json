@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "state": "FINAL_FROZEN_DO_NOT_EDIT",
+  "holdout_policy": "DO_NOT_OPEN_UNTIL_VARIANTS_FROZEN",
+  "corpus": "FRESH17",
+  "cases": [
+    {
+      "id": "F01-ru",
+      "topic_id": "F01",
+      "split": "dev",
+      "lang": "ru",
+      "question": "Какой жёсткий предел размера действует для написанных вручную Python-модулей, какие файлы проверка охватывает или исключает и что требуется при превышении?",
+      "search_question": "What hard size bound applies to hand-written Python modules, what files does its gate scan or exclude, and what is required if a module crosses it?"
+    },
+    {
+      "id": "F01-en",
+      "topic_id": "F01",
+      "split": "dev",
+      "lang": "en",
+      "question": "What hard size bound applies to hand-written Python modules, what files does its gate scan or exclude, and what is required if a module crosses it?"
+    },
+    {
+      "id": "F02-ru",
+      "topic_id": "F02",
+      "split": "dev",
+      "lang": "ru",
+      "question": "Какие границы и целевой размер рекомендуются при разделении Python-модуля и какие обязанности совместимости действуют для публичных импортов и документированных точек monkeypatch?",
+      "search_question": "When splitting a Python module, what boundaries and target size are recommended, and what compatibility duties apply to public imports and documented monkeypatch seams?"
+    },
+    {
+      "id": "F02-en",
+      "topic_id": "F02",
+      "split": "dev",
+      "lang": "en",
+      "question": "When splitting a Python module, what boundaries and target size are recommended, and what compatibility duties apply to public imports and documented monkeypatch seams?"
+    },
+    {
+      "id": "F03-ru",
+      "topic_id": "F03",
+      "split": "dev",
+      "lang": "ru",
+      "question": "Обещает ли реестр поддержки переходный период для удалённых интерфейсов, является ли пространство имён Python устаревшим псевдонимом и как публичные сервисы получают статус поддерживаемых?",
+      "search_question": "Does the support inventory promise a migration window for removed surfaces, is the Python import namespace a deprecated alias, and how must public services gain supported status?"
+    },
+    {
+      "id": "F03-en",
+      "topic_id": "F03",
+      "split": "dev",
+      "lang": "en",
+      "question": "Does the support inventory promise a migration window for removed surfaces, is the Python import namespace a deprecated alias, and how must public services gain supported status?"
+    },
+    {
+      "id": "F04-ru",
+      "topic_id": "F04",
+      "split": "dev",
+      "lang": "ru",
+      "question": "Согласно бюджетам отказов поддержки, какие сбои блокируют релиз и как отказ продвинутого провайдера должен влиять на здоровье локального Docs? Укажите исключение для хранилища Qdrant по умолчанию и статус live-наборов.",
+      "search_question": "Under the support failure budgets, which failures block a release and how must an advanced-provider outage affect local Docs health? Include the Qdrant default-store exception and live-suite status."
+    },
+    {
+      "id": "F04-en",
+      "topic_id": "F04",
+      "split": "dev",
+      "lang": "en",
+      "question": "Under the support failure budgets, which failures block a release and how must an advanced-provider outage affect local Docs health? Include the Qdrant default-store exception and live-suite status."
+    },
+    {
+      "id": "F05-ru",
+      "topic_id": "F05",
+      "split": "dev",
+      "lang": "ru",
+      "question": "Каково документированное решение о размещении зависимостей для Task 29 и Task 24: что остаётся в core, что относится к extras и каковы условия переноса Qdrant/FastEmbed?",
+      "search_question": "What is the documented dependency-placement decision for Task 29 versus Task 24, including retained core dependencies, extras, and the prerequisites for moving Qdrant/FastEmbed?"
+    },
+    {
+      "id": "F05-en",
+      "topic_id": "F05",
+      "split": "dev",
+      "lang": "en",
+      "question": "What is the documented dependency-placement decision for Task 29 versus Task 24, including retained core dependencies, extras, and the prerequisites for moving Qdrant/FastEmbed?"
+    },
+    {
+      "id": "F06-ru",
+      "topic_id": "F06",
+      "split": "dev",
+      "lang": "ru",
+      "question": "Как измеряется бюджет форматированного SDK-контекста, что не входит в измерение и что происходит с неумещающимися окнами, пробелами, нулевым, отрицательным и None-бюджетом?",
+      "search_question": "How is the formatted SDK context budget measured, what is excluded from that measurement, and what happens to nonfitting windows, whitespace, zero, negative, and None budgets?"
+    },
+    {
+      "id": "F06-en",
+      "topic_id": "F06",
+      "split": "dev",
+      "lang": "en",
+      "question": "How is the formatted SDK context budget measured, what is excluded from that measurement, and what happens to nonfitting windows, whitespace, zero, negative, and None budgets?"
+    },
+    {
+      "id": "F07-ru",
+      "topic_id": "F07",
+      "split": "holdout",
+      "lang": "ru",
+      "question": "Для зафиксированного несовпадения PyPI publisher существующего проекта где следует настроить publisher, какие точные поля идентичности должны совпасть и почему pending publisher или другое environment не подходят?",
+      "search_question": "For the recorded existing-project PyPI publisher mismatch, where must the publisher be configured, which exact identity fields must match, and why is a pending publisher or a different environment insufficient?"
+    },
+    {
+      "id": "F07-en",
+      "topic_id": "F07",
+      "split": "holdout",
+      "lang": "en",
+      "question": "For the recorded existing-project PyPI publisher mismatch, where must the publisher be configured, which exact identity fields must match, and why is a pending publisher or a different environment insufficient?"
+    },
+    {
+      "id": "F08-ru",
+      "topic_id": "F08",
+      "split": "holdout",
+      "lang": "ru",
+      "question": "Какова последовательность работы проверенного release controller от PR запроса релиза до публикации, что может запустить публикацию и когда человеческое одобрение environment её разрешает?",
+      "search_question": "What is the reviewed release controller sequence from release-request PR to publication, what can actually trigger publication, and when does human environment approval authorize it?"
+    },
+    {
+      "id": "F08-en",
+      "topic_id": "F08",
+      "split": "holdout",
+      "lang": "en",
+      "question": "What is the reviewed release controller sequence from release-request PR to publication, what can actually trigger publication, and when does human environment approval authorize it?"
+    },
+    {
+      "id": "F09-ru",
+      "topic_id": "F09",
+      "split": "holdout",
+      "lang": "ru",
+      "question": "Какие условия нужны для повышения DocAtlas до Stable, всегда ли паритет с Context7 обязателен и какая зрелость сохраняется, если зелёные только проверки артефактов/релиза?",
+      "search_question": "Which gates are required to promote DocAtlas to Stable, is Context7 parity always a prerequisite, and what maturity remains when only artifact/release checks are green?"
+    },
+    {
+      "id": "F09-en",
+      "topic_id": "F09",
+      "split": "holdout",
+      "lang": "en",
+      "question": "Which gates are required to promote DocAtlas to Stable, is Context7 parity always a prerequisite, and what maturity remains when only artifact/release checks are green?"
+    },
+    {
+      "id": "F10-ru",
+      "topic_id": "F10",
+      "split": "holdout",
+      "lang": "ru",
+      "question": "Чем в отчёте docs-impact отличаются updated, review_required и missing и когда обычно информационный отчёт CI становится блокирующим?",
+      "search_question": "In a docs-impact report, what distinguishes updated, review_required, and missing, and when does its normally informational CI report become blocking?"
+    },
+    {
+      "id": "F10-en",
+      "topic_id": "F10",
+      "split": "holdout",
+      "lang": "en",
+      "question": "In a docs-impact report, what distinguishes updated, review_required, and missing, and when does its normally informational CI report become blocking?"
+    },
+    {
+      "id": "F11-ru",
+      "topic_id": "F11",
+      "split": "holdout",
+      "lang": "ru",
+      "question": "Что authoring_brief в docs-impact предписывает модели-хосту включить или проверить и какие ограничения не дают рекомендательному обзору или непринятому патчу стать принятой истиной документации?",
+      "search_question": "What does the docs-impact authoring_brief instruct the host model to include or verify, and what limits prevent advisory review or an unaccepted patch from becoming accepted documentation truth?"
+    },
+    {
+      "id": "F11-en",
+      "topic_id": "F11",
+      "split": "holdout",
+      "lang": "en",
+      "question": "What does the docs-impact authoring_brief instruct the host model to include or verify, and what limits prevent advisory review or an unaccepted patch from becoming accepted documentation truth?"
+    },
+    {
+      "id": "F12-ru",
+      "topic_id": "F12",
+      "split": "holdout",
+      "lang": "ru",
+      "question": "После смены зависимости с A на B в поддерживаемом lockfile проекта какие свидетельства допустимы новому запросу, что происходит при недоступной или неоднозначной B и каковы ограничения кэша, повторного запроса хоста и валидации?",
+      "search_question": "After a supported project lockfile changes a dependency from A to B, what evidence may a new query use, what happens if B is unavailable or ambiguous, and what are the cache, host re-query, and validation limits?"
+    },
+    {
+      "id": "F12-en",
+      "topic_id": "F12",
+      "split": "holdout",
+      "lang": "en",
+      "question": "After a supported project lockfile changes a dependency from A to B, what evidence may a new query use, what happens if B is unavailable or ambiguous, and what are the cache, host re-query, and validation limits?"
+    }
+  ]
+}

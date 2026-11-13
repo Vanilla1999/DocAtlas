@@ -1,0 +1,113 @@
+{
+  "state": "SEALED_DO_NOT_OPEN_UNTIL_VARIANTS_FROZEN",
+  "method": "All old questions and gold read to exclude semantic families, not merely words. No outputs or scores consulted. Separate corpus because exposed L0 heavily covers MCP/retrieval operations; independent repository documents, not an independent repository.",
+  "old_questions_sha256": "884b30dbf7101fbf0a722765209460aa5e106a42000ec0cd0d83772295871c27",
+  "old_oracle_sha256": "2355fe563a2dca03dc92939c99253b5bf1e4f7ae10e63108864a0bd18dbb252d",
+  "families": [
+    {
+      "family_id": "F01",
+      "split": "dev",
+      "nearest_old_topics": [
+        "T01"
+      ],
+      "independence_rationale": "Module-size enforcement and waiver policy, not the old PR submission checklist."
+    },
+    {
+      "family_id": "F02",
+      "split": "dev",
+      "nearest_old_topics": [
+        "T01"
+      ],
+      "independence_rationale": "Architecture decomposition and import/seam compatibility are absent from old PR gold; related development domain is acknowledged."
+    },
+    {
+      "family_id": "F03",
+      "split": "dev",
+      "nearest_old_topics": [
+        "T22"
+      ],
+      "independence_rationale": "Support lifecycle and service-inventory admission, not MCP runtime settings."
+    },
+    {
+      "family_id": "F04",
+      "split": "dev",
+      "nearest_old_topics": [
+        "T07",
+        "T19"
+      ],
+      "independence_rationale": "Release health and outage isolation, not general security guarantees or Qdrant commands."
+    },
+    {
+      "family_id": "F05",
+      "split": "dev",
+      "nearest_old_topics": [
+        "T19",
+        "T24"
+      ],
+      "independence_rationale": "Packaging dependency boundaries, not Qdrant commands or pack source formats."
+    },
+    {
+      "family_id": "F06",
+      "split": "dev",
+      "nearest_old_topics": [
+        "T09",
+        "T20"
+      ],
+      "independence_rationale": "SDK formatted-delivery arithmetic and boundary values, not project fragment admission or retrieval controls; expansion deliberately excluded."
+    },
+    {
+      "family_id": "F07",
+      "split": "holdout",
+      "nearest_old_topics": [],
+      "independence_rationale": "External package-publisher identity remediation absent from all old topics."
+    },
+    {
+      "family_id": "F08",
+      "split": "holdout",
+      "nearest_old_topics": [
+        "T01"
+      ],
+      "independence_rationale": "Release-controller state/authorization sequence, not contributor PR checklist; PR vocabulary is not the obligation."
+    },
+    {
+      "family_id": "F09",
+      "split": "holdout",
+      "nearest_old_topics": [
+        "T04",
+        "T05"
+      ],
+      "independence_rationale": "Conjunctive maturity promotion policy, not evaluation-document locations or OpenCode verification coverage; domain proximity acknowledged."
+    },
+    {
+      "family_id": "F10",
+      "split": "holdout",
+      "nearest_old_topics": [
+        "T23"
+      ],
+      "independence_rationale": "Change-impact triage/report policy, not refetching registered documentation sources."
+    },
+    {
+      "family_id": "F11",
+      "split": "holdout",
+      "nearest_old_topics": [
+        "T12"
+      ],
+      "independence_rationale": "Host authoring-brief content and accepted-patch boundary, not catalog/read retrieval. Shared no-write principle acknowledged; brief and acceptance semantics are new."
+    },
+    {
+      "family_id": "F12",
+      "split": "holdout",
+      "nearest_old_topics": [
+        "T23",
+        "T24"
+      ],
+      "independence_rationale": "Lockfile eligibility transition and temporal validation, not source refresh command or pack formats."
+    }
+  ],
+  "limitations": [
+    "Same repository and author; no claim of unseen pretraining or Lead exposure.",
+    "Sibling decisions share documents: do not treat 12 families as 12 independent domains or ru/en as independent samples.",
+    "All answerable; no retrieval or answerability negatives.",
+    "Policies may be historical/planned: judge frozen documented claims, not current implementation truth."
+  ]
+}

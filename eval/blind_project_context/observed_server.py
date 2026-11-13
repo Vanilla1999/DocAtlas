@@ -73,6 +73,34 @@ def _install() -> None:
     if os.environ.get("BLIND_OBSERVER_SELECTION") == "1":
         _install_selection(facts)
 
+    if os.environ.get("BLIND_OBSERVER_EVIDENCE") == "1":
+        _install_evidence_receipt()
+
+
+def _install_evidence_receipt() -> None:
+    """Log per-call receipts of the opt-in Qwen evidence scorer.
+
+    Pure instrumentation: the wrapped function and its arguments are unchanged,
+    only the returned receipt is appended to the observer log.
+    """
+    from docmancer.docs.application import context_evidence_scoring as scoring
+
+    original = scoring.score_evidence_units
+
+    def observed_score(query, identities, documents, model_path, **kwargs):
+        scores, receipt = original(query, identities, documents, model_path, **kwargs)
+        _append({"event": "evidence_scoring",
+                 "units": len(identities),
+                 "scored_units": len(scores),
+                 "forwards": receipt.get("model_forwards"),
+                 "input_tokens": receipt.get("model_input_tokens"),
+                 "inference_seconds": receipt.get("inference_seconds"),
+                 "peak_vram_allocated_bytes": receipt.get("peak_vram_allocated_bytes"),
+                 "status": receipt.get("status")})
+        return scores, receipt
+
+    scoring.score_evidence_units = observed_score
+
 
 def _install_selection(facts: dict[str, str]) -> None:
     """Optional loss-stage observation; gold never reaches a ranking function.
