@@ -1,0 +1,50 @@
+[
+  {
+    "trial_id": "pair-01-current",
+    "agent": "general",
+    "model": "openai/gpt-6.1-terra",
+    "prompt": "Read /tmp/opencode/step16-generator-inputs/pair-01-current.txt exactly once using the read tool. That file is the complete user task and supplied evidence. Follow its instructions. Do not read any other files, use any other tools, delegate, or consult other context. After this single input load, return only the final answer to the task."
+  },
+  {
+    "trial_id": "pair-01-aspect-conditions-v1",
+    "agent": "general",
+    "model": "openai/gpt-6.1-terra",
+    "prompt": "Read /tmp/opencode/step16-generator-inputs/pair-01-aspect-conditions-v1.txt exactly once using the read tool. That file is the complete user task and supplied evidence. Follow its instructions. Do not read any other files, use any other tools, delegate, or consult other context. After this single input load, return only the final answer to the task."
+  },
+  {
+    "trial_id": "pair-02-aspect-conditions-v1",
+    "agent": "general",
+    "model": "openai/gpt-6.1-terra",
+    "prompt": "Read /tmp/opencode/step16-generator-inputs/pair-02-aspect-conditions-v1.txt exactly once using the read tool. That file is the complete user task and supplied evidence. Follow its instructions. Do not read any other files, use any other tools, delegate, or consult other context. After this single input load, return only the final answer to the task."
+  },
+  {
+    "trial_id": "pair-02-current",
+    "agent": "general",
+    "model": "openai/gpt-6.1-terra",
+    "prompt": "Read /tmp/opencode/step16-generator-inputs/pair-02-current.txt exactly once using the read tool. That file is the complete user task and supplied evidence. Follow its instructions. Do not read any other files, use any other tools, delegate, or consult other context. After this single input load, return only the final answer to the task."
+  },
+  {
+    "trial_id": "pair-03-current",
+    "agent": "general",
+    "model": "openai/gpt-6.1-terra",
+    "prompt": "Read /tmp/opencode/step16-generator-inputs/pair-03-current.txt exactly once using the read tool. That file is the complete user task and supplied evidence. Follow its instructions. Do not read any other files, use any other tools, delegate, or consult other context. After this single input load, return only the final answer to the task."
+  },
+  {
+    "trial_id": "pair-03-aspect-conditions-v1",
+    "agent": "general",
+    "model": "openai/gpt-6.1-terra",
+    "prompt": "Read /tmp/opencode/step16-generator-inputs/pair-03-aspect-conditions-v1.txt exactly once using the read tool. That file is the complete user task and supplied evidence. Follow its instructions. Do not read any other files, use any other tools, delegate, or consult other context. After this single input load, return only the final answer to the task."
+  },
+  {
+    "trial_id": "pair-04-aspect-conditions-v1",
+    "agent": "general",
+    "model": "openai/gpt-6.1-terra",
+    "prompt": "Read /tmp/opencode/step16-generator-inputs/pair-04-aspect-conditions-v1.txt exactly once using the read tool. That file is the complete user task and supplied evidence. Follow its instructions. Do not read any other files, use any other tools, delegate, or consult other context. After this single input load, return only the final answer to the task."
+  },
+  {
+    "trial_id": "pair-04-current",
+    "agent": "general",
+    "model": "openai/gpt-6.1-terra",
+    "prompt": "Read /tmp/opencode/step16-generator-inputs/pair-04-current.txt exactly once using the read tool. That file is the complete user task and supplied evidence. Follow its instructions. Do not read any other files, use any other tools, delegate, or consult other context. After this single input load, return only the final answer to the task."
+  }
+]

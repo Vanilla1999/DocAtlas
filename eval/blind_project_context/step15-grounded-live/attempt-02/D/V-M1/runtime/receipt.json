@@ -1,0 +1,109 @@
+{
+  "session_status": "interrupted",
+  "retrieval_status": "not_observed",
+  "answer_status": "not_produced",
+  "answer": "",
+  "failures": [
+    {
+      "kind": "client_error"
+    }
+  ],
+  "capture_errors": [],
+  "tool_calls": 0,
+  "retrieval_calls": 0,
+  "expected_host_rejections": [],
+  "transport_pass": false,
+  "answer_quality": "not_graded",
+  "termination": "fail_fast",
+  "returncode": 130,
+  "seconds": 11.690754958999605,
+  "cleanup": {
+    "strategy": "held private group plus explicitly registered MCP pidfds; no foreign-group signals",
+    "group": 283808,
+    "observed_processes": [
+      {
+        "pid": 283808,
+        "state": "S",
+        "pgid": 283808,
+        "sid": 283808,
+        "start_ticks": 831352,
+        "name": "opencode"
+      },
+      {
+        "pid": 283844,
+        "state": "S",
+        "pgid": 283844,
+        "sid": 283844,
+        "start_ticks": 831407,
+        "name": "python",
+        "role": "transport",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/attempt-02/D/V-M1/mcp-process.json"
+      },
+      {
+        "pid": 283845,
+        "state": "R",
+        "pgid": 283844,
+        "sid": 283844,
+        "start_ticks": 831408,
+        "name": "node",
+        "role": "server",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/attempt-02/D/V-M1/mcp-process.json"
+      }
+    ],
+    "before_cleanup": [
+      {
+        "pid": 283808,
+        "state": "S",
+        "pgid": 283808,
+        "sid": 283808,
+        "start_ticks": 831352,
+        "name": "opencode"
+      }
+    ],
+    "signals": [
+      {
+        "signal": "SIGTERM",
+        "private_group": 283808
+      },
+      {
+        "signal": "SIGTERM",
+        "registered_pid": 283844,
+        "role": "transport"
+      },
+      {
+        "signal": "SIGTERM",
+        "registered_pid": 283845,
+        "role": "server"
+      }
+    ],
+    "remaining_live": [],
+    "escaped_live_observed": [],
+    "registered_processes": [
+      {
+        "role": "transport",
+        "pid": 283844,
+        "pgid": 283844,
+        "sid": 283844,
+        "start_ticks": 831407,
+        "pid_namespace": "pid:[4026531836]",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/attempt-02/D/V-M1/mcp-process.json",
+        "exit_verified": true
+      },
+      {
+        "role": "server",
+        "pid": 283845,
+        "pgid": 283844,
+        "sid": 283844,
+        "start_ticks": 831408,
+        "pid_namespace": "pid:[4026531836]",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/attempt-02/D/V-M1/mcp-process.json",
+        "exit_verified": true
+      }
+    ],
+    "registration_errors": {},
+    "no_live_owned_processes": true,
+    "leader_reaped": true,
+    "boundary": "Private group plus explicit MCP launch registrations/observed identities; unseen detached descendants and GPU VRAM are not measured."
+  },
+  "provider_capture_completed_before_cleanup": false
+}

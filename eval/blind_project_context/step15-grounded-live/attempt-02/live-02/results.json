@@ -1,0 +1,936 @@
+[
+  {
+    "arm": "D",
+    "task": "V-M1",
+    "status": "CAPTURED",
+    "provider_requests": 3,
+    "provider_requests_by_kind": {
+      "primary": 3
+    },
+    "session_ids": [
+      "ses_e459d7aefffeG0N6YIjIoyZgeq"
+    ],
+    "session_ids_count": 1,
+    "requests_with_usage": 3,
+    "usage": {
+      "input": 5171,
+      "output": 643,
+      "cached": 1408,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 3763
+    },
+    "usage_coverage_complete": true,
+    "provider_records": [
+      {
+        "id": "resp_0412ec723373e460016af039ffcf7887d29388b93ea463ef99",
+        "usage": {
+          "input_tokens": 1359,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 71,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1430,
+          "attribution": {
+            "items": {
+              "fc_0412ec723373e460016af03a00f8c487d2954b48977c30f218": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 71
+              },
+              "msg_0412ec723373e460016af039ffcf9887d2b7a77b7dc6517404": {
+                "input_tokens": 35,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 35,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 1044,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 278,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_0412ec723373e460016af03a029df887d28670247784840d94",
+        "usage": {
+          "input_tokens": 1501,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 49,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1550,
+          "attribution": {
+            "items": {
+              "fc_0412ec723373e460016af03a00f8c487d2954b48977c30f218": {
+                "input_tokens": 73,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0412ec723373e460016af03a029e1c87d28d077779100b9718": {
+                "input_tokens": 69,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 69,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0412ec723373e460016af03a0377b487d28471461ecd8ff2e9": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 49
+              },
+              "msg_0412ec723373e460016af039ffcf9887d2b7a77b7dc6517404": {
+                "input_tokens": 35,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 35,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 1044,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 278,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_0412ec723373e460016af03a047d6487d2b5e1c7043f5d5495",
+        "usage": {
+          "input_tokens": 2311,
+          "input_tokens_details": {
+            "cached_tokens": 1408,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 523,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 2834,
+          "attribution": {
+            "items": {
+              "fc_0412ec723373e460016af03a00f8c487d2954b48977c30f218": {
+                "input_tokens": 73,
+                "cached_tokens": 51,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0412ec723373e460016af03a029e1c87d28d077779100b9718": {
+                "input_tokens": 69,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 69,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_0412ec723373e460016af03a0377b487d28471461ecd8ff2e9": {
+                "input_tokens": 51,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0412ec723373e460016af03a047d8487d2977751aac608b71a": {
+                "input_tokens": 759,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 759,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_0412ec723373e460016af039ffcf9887d2b7a77b7dc6517404": {
+                "input_tokens": 35,
+                "cached_tokens": 35,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 35,
+                    "cached_tokens": 35,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_0412ec723373e460016af03a05441c87d28e866fe6b61d0ea5": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 523,
+                "content": [
+                  {
+                    "input_tokens": 2,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 523
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 1044,
+                "cached_tokens": 1044,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 278,
+                "cached_tokens": 278,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      }
+    ],
+    "retries": 0,
+    "capture_errors": [],
+    "first_provider_monotonic_ns": 2347189119,
+    "first_provider_language_hints": [],
+    "first_provider_wall_time_ms": 1794128383383,
+    "original_question_in_first_request": true,
+    "status_observations": [],
+    "host_preflight_verified": null,
+    "host_hint_binding_verified": null,
+    "host_timestamp_order_verified": null,
+    "host_timestamp_reason": null,
+    "model_tool_calls": {
+      "grounded_search_docs": 2
+    },
+    "actual_mcp_calls": {
+      "search_docs": 2
+    },
+    "mcp_missing_responses": 0,
+    "qwen_receipts": [],
+    "qwen_pairs": null,
+    "answer": "Для подтверждённого ночного наблюдения на общем инструменте порядок такой:\n\n1. Получите согласие принимающего наблюдателя и одобрение передачи от дежурного оператора.\n2. **Оставьте передачу ожидающей**, пока действует блокировка обслуживания, даже если согласие и одобрение уже получены. Сначала блокировку должна снять команда инструмента.\n3. При передаче сохраните исходный идентификатор бронирования и укажите обоих наблюдателей в журнале аудита. [Источник: Confirmed reservations — Transfer, Locked instrument](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/reservations.md)\n\n**Передача не отменяет погодную приостановку.** Для возобновления наружных наблюдений ветровая защитная блокировка должна закрыться, а дежурный оператор — зафиксировать разрешение на возобновление. При приостановке также сохраняется идентификатор бронирования. Инструмент, явно классифицированный как внутренний, может продолжать работу во время ветровой приостановки, если его собственные защитные блокировки остаются закрытыми; изображение закрытой крыши в календаре само по себе не подтверждает такую классификацию. [Источник: Weather decisions — Suspension, Indoor instrument](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/weather.md)\n\nКалендарь служит только для отображения состояния: обновление страницы не снимает блокировку обслуживания и не разрешает выполнение наблюдения. [Источники: Calendar display — Colours](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/calendar.md); [Meridian scheduler — Services](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/overview.md)",
+    "answer_quality": "NOT_GRADED",
+    "source_facts_quality": "NOT_GRADED",
+    "timing_boundary": "wall-v2: Python time.time_ns versus JS Date.now, same-host epoch clock; JS millisecond resolution, wall-clock steps not excluded. Monotonic clocks are process-local only. Legacy Python wall time is never reconstructed. Not remote arrival.",
+    "accounting_branch": "C: skip only DocAtlas binding extraction"
+  },
+  {
+    "arm": "D",
+    "task": "V-M2",
+    "status": "CAPTURED",
+    "provider_requests": 2,
+    "provider_requests_by_kind": {
+      "primary": 2
+    },
+    "session_ids": [
+      "ses_e459c8017ffeLkQodSuBSV6reh"
+    ],
+    "session_ids_count": 1,
+    "requests_with_usage": 2,
+    "usage": {
+      "input": 3493,
+      "output": 227,
+      "cached": 1152,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 2341
+    },
+    "usage_coverage_complete": true,
+    "provider_records": [
+      {
+        "id": "resp_06da6f20fc057af8016af03a3fe82c87d28374aebaf3113441",
+        "usage": {
+          "input_tokens": 1347,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 59,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1406,
+          "attribution": {
+            "items": {
+              "fc_06da6f20fc057af8016af03a40c9f487d2aa2c4a8484cc013b": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 59
+              },
+              "msg_06da6f20fc057af8016af03a3fe85887d29001f6d0223d1e92": {
+                "input_tokens": 23,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 23,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 1044,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 278,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_06da6f20fc057af8016af03a41f1a487d29bc629835b3e02d1",
+        "usage": {
+          "input_tokens": 2146,
+          "input_tokens_details": {
+            "cached_tokens": 1152,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 168,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 2314,
+          "attribution": {
+            "items": {
+              "fc_06da6f20fc057af8016af03a40c9f487d2aa2c4a8484cc013b": {
+                "input_tokens": 61,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_06da6f20fc057af8016af03a41f1c887d2a21e738f9fa4371b": {
+                "input_tokens": 738,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 738,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_06da6f20fc057af8016af03a3fe85887d29001f6d0223d1e92": {
+                "input_tokens": 23,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 23,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_06da6f20fc057af8016af03a42a8bc87d29dc48a9c19bff387": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 168,
+                "content": [
+                  {
+                    "input_tokens": 2,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 168
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 1044,
+                "cached_tokens": 874,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 278,
+                "cached_tokens": 278,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      }
+    ],
+    "retries": 0,
+    "capture_errors": [],
+    "first_provider_monotonic_ns": 2417814825,
+    "first_provider_language_hints": [],
+    "first_provider_wall_time_ms": 1794128447661,
+    "original_question_in_first_request": true,
+    "status_observations": [],
+    "host_preflight_verified": null,
+    "host_hint_binding_verified": null,
+    "host_timestamp_order_verified": null,
+    "host_timestamp_reason": null,
+    "model_tool_calls": {
+      "grounded_search_docs": 1
+    },
+    "actual_mcp_calls": {
+      "search_docs": 1
+    },
+    "mcp_missing_responses": 0,
+    "qwen_receipts": [],
+    "qwen_pairs": null,
+    "answer": "- **Stop outdoor observations when the wind interlock opens.** Preserve reservation identifiers during the suspension.\n- **Restart only after both** the interlock closes and the duty operator records restart approval. A favourable forecast is not an interlock signal and cannot authorize a restart.\n- **An indoor instrument may continue** during the wind suspension if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish that classification.\n\nSource: [Weather decisions — Suspension, Indoor instrument, and Forecast display](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/weather.md).",
+    "answer_quality": "NOT_GRADED",
+    "source_facts_quality": "NOT_GRADED",
+    "timing_boundary": "wall-v2: Python time.time_ns versus JS Date.now, same-host epoch clock; JS millisecond resolution, wall-clock steps not excluded. Monotonic clocks are process-local only. Legacy Python wall time is never reconstructed. Not remote arrival.",
+    "accounting_branch": "C: skip only DocAtlas binding extraction"
+  },
+  {
+    "arm": "D",
+    "task": "V-M3",
+    "status": "CAPTURED",
+    "provider_requests": 2,
+    "provider_requests_by_kind": {
+      "primary": 2
+    },
+    "session_ids": [
+      "ses_e459c5e87ffep24iA5S22pD7im"
+    ],
+    "session_ids_count": 1,
+    "requests_with_usage": 2,
+    "usage": {
+      "input": 3487,
+      "output": 322,
+      "cached": 1152,
+      "cache_write": 0,
+      "reasoning": 0,
+      "uncached": 2335
+    },
+    "usage_coverage_complete": true,
+    "provider_records": [
+      {
+        "id": "resp_0fd2382ed69fa9f0016af03a48517087d2931bff9aae140e40",
+        "usage": {
+          "input_tokens": 1347,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 59,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1406,
+          "attribution": {
+            "items": {
+              "fc_0fd2382ed69fa9f0016af03a495d6c87d2b1a429768f302b3b": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 59
+              },
+              "msg_0fd2382ed69fa9f0016af03a48519887d292f3c2b1429c0cdc": {
+                "input_tokens": 23,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 23,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 1044,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 278,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_0fd2382ed69fa9f0016af03a4a8a5c87d28e9b8065bdb36f4a",
+        "usage": {
+          "input_tokens": 2140,
+          "input_tokens_details": {
+            "cached_tokens": 1152,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 263,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 2403,
+          "attribution": {
+            "items": {
+              "fc_0fd2382ed69fa9f0016af03a495d6c87d2b1a429768f302b3b": {
+                "input_tokens": 61,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_0fd2382ed69fa9f0016af03a4a8a8087d2aca8e8ccce722321": {
+                "input_tokens": 732,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 732,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_0fd2382ed69fa9f0016af03a48519887d292f3c2b1429c0cdc": {
+                "input_tokens": 23,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 23,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_0fd2382ed69fa9f0016af03a4b23d087d29868abedec723d56": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 263,
+                "content": [
+                  {
+                    "input_tokens": 2,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 263
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 1044,
+                "cached_tokens": 874,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 278,
+                "cached_tokens": 278,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      }
+    ],
+    "retries": 0,
+    "capture_errors": [],
+    "first_provider_monotonic_ns": 2249969121,
+    "first_provider_language_hints": [],
+    "first_provider_wall_time_ms": 1794128456084,
+    "original_question_in_first_request": true,
+    "status_observations": [],
+    "host_preflight_verified": null,
+    "host_hint_binding_verified": null,
+    "host_timestamp_order_verified": null,
+    "host_timestamp_reason": null,
+    "model_tool_calls": {
+      "grounded_search_docs": 1
+    },
+    "actual_mcp_calls": {
+      "search_docs": 1
+    },
+    "mcp_missing_responses": 0,
+    "qwen_receipts": [],
+    "qwen_pairs": null,
+    "answer": "If the absolute clock offset **exceeds two seconds**, the gateway must:\n\n- Pause schedule execution and notify the duty operator.\n- Keep queued reservations unchanged.\n- Resume only after **two consecutive checks against the observatory reference clock** each report an offset within two seconds.\n\nIf the reference clock is unavailable, execution must remain paused. A local clock reading alone cannot satisfy either recovery check. [Time coordination: Clock offset and Missing reference](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/clock.md)\n\nThe retired prototype’s recovery behavior—clearing pending reservations and restarting on the first local clock sample—must not be used for the current gateway. The planner may compute a plan while execution is suspended, but that plan does not bypass the clock check or a weather interlock. [Scheduler architecture: Planner and Prototype recovery](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/architecture.md)",
+    "answer_quality": "NOT_GRADED",
+    "source_facts_quality": "NOT_GRADED",
+    "timing_boundary": "wall-v2: Python time.time_ns versus JS Date.now, same-host epoch clock; JS millisecond resolution, wall-clock steps not excluded. Monotonic clocks are process-local only. Legacy Python wall time is never reconstructed. Not remote arrival.",
+    "accounting_branch": "C: skip only DocAtlas binding extraction"
+  },
+  {
+    "arm": "D",
+    "task": "V-M4",
+    "status": "CAPTURED",
+    "provider_requests": 3,
+    "provider_requests_by_kind": {
+      "primary": 3
+    },
+    "session_ids": [
+      "ses_e459c3678ffeilXN4ngzrEcThc"
+    ],
+    "session_ids_count": 1,
+    "requests_with_usage": 3,
+    "usage": {
+      "input": 5143,
+      "output": 242,
+      "cached": 2432,
+      "cache_write": 0,
+      "reasoning": 9,
+      "uncached": 2711
+    },
+    "usage_coverage_complete": true,
+    "provider_records": [
+      {
+        "id": "resp_01851dacd2460733016af03a528ec087d297b7fff17bf9a8be",
+        "usage": {
+          "input_tokens": 1346,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 58,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1404,
+          "attribution": {
+            "items": {
+              "fc_01851dacd2460733016af03a5357ec87d2969c34b6eda5f989": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 58
+              },
+              "msg_01851dacd2460733016af03a528eec87d28290ee9eabb6bbb2": {
+                "input_tokens": 22,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 22,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 1044,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 278,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_01851dacd2460733016af03a547f5c87d28aeedab7b5e6d764",
+        "usage": {
+          "input_tokens": 1462,
+          "input_tokens_details": {
+            "cached_tokens": 1152,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 58,
+          "output_tokens_details": {
+            "reasoning_tokens": 9
+          },
+          "total_tokens": 1520,
+          "attribution": {
+            "items": {
+              "fc_01851dacd2460733016af03a5357ec87d2969c34b6eda5f989": {
+                "input_tokens": 60,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_01851dacd2460733016af03a547f8887d2b66950eac734c8cf": {
+                "input_tokens": 56,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 56,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_01851dacd2460733016af03a576eac87d2b41950738a9d7a6d": {
+                "input_tokens": 0,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 49
+              },
+              "msg_01851dacd2460733016af03a528eec87d28290ee9eabb6bbb2": {
+                "input_tokens": 22,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 22,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "rs_01851dacd2460733016af03a55048087d2834cdc7181c41330": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 9
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 1044,
+                "cached_tokens": 874,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 278,
+                "cached_tokens": 278,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "resp_01851dacd2460733016af03a57c5cc87d28e3100967d309619",
+        "usage": {
+          "input_tokens": 2335,
+          "input_tokens_details": {
+            "cached_tokens": 1280,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 126,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 2461,
+          "attribution": {
+            "items": {
+              "fc_01851dacd2460733016af03a5357ec87d2969c34b6eda5f989": {
+                "input_tokens": 60,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_01851dacd2460733016af03a547f8887d2b66950eac734c8cf": {
+                "input_tokens": 56,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 56,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "fc_01851dacd2460733016af03a576eac87d2b41950738a9d7a6d": {
+                "input_tokens": 49,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "fc_01851dacd2460733016af03a57c5fc87d2a67d67788d462d64": {
+                "input_tokens": 813,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 813,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_01851dacd2460733016af03a528eec87d28290ee9eabb6bbb2": {
+                "input_tokens": 22,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0,
+                "content": [
+                  {
+                    "input_tokens": 22,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 0
+                  }
+                ]
+              },
+              "msg_01851dacd2460733016af03a583f2487d2ad5e2e8543983227": {
+                "input_tokens": 2,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 126,
+                "content": [
+                  {
+                    "input_tokens": 2,
+                    "cached_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "output_tokens": 126
+                  }
+                ]
+              },
+              "rs_01851dacd2460733016af03a55048087d2834cdc7181c41330": {
+                "input_tokens": 11,
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            },
+            "request_fields": {
+              "instructions": {
+                "input_tokens": 1044,
+                "cached_tokens": 1002,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              },
+              "tools": {
+                "input_tokens": 278,
+                "cached_tokens": 278,
+                "cache_write_tokens": 0,
+                "output_tokens": 0
+              }
+            }
+          }
+        }
+      }
+    ],
+    "retries": 0,
+    "capture_errors": [],
+    "first_provider_monotonic_ns": 2237005097,
+    "first_provider_language_hints": [],
+    "first_provider_wall_time_ms": 1794128466327,
+    "original_question_in_first_request": true,
+    "status_observations": [],
+    "host_preflight_verified": null,
+    "host_hint_binding_verified": null,
+    "host_timestamp_order_verified": null,
+    "host_timestamp_reason": null,
+    "model_tool_calls": {
+      "grounded_search_docs": 2
+    },
+    "actual_mcp_calls": {
+      "search_docs": 2
+    },
+    "mcp_missing_responses": 0,
+    "qwen_receipts": [],
+    "qwen_pairs": null,
+    "answer": "В найденной документации Meridian 1.0.0 **не указана обязательная температура охлаждения для всех общих приборов обсерватории**. Поэтому назвать конкретное значение по доступным источникам нельзя; это не исключает, что требование описано в другом месте.\n\nИсточник: [Meridian scheduler — Services](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/overview.md).",
+    "answer_quality": "NOT_GRADED",
+    "source_facts_quality": "NOT_GRADED",
+    "timing_boundary": "wall-v2: Python time.time_ns versus JS Date.now, same-host epoch clock; JS millisecond resolution, wall-clock steps not excluded. Monotonic clocks are process-local only. Legacy Python wall time is never reconstructed. Not remote arrival.",
+    "accounting_branch": "C: skip only DocAtlas binding extraction"
+  }
+]

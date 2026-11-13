@@ -1,0 +1,1042 @@
+[
+  {
+    "task": "V-M1",
+    "models": [],
+    "all_model_requests_terra_low": true,
+    "original_question_unchanged": true,
+    "common_prompt_present": true,
+    "visible_tools": [
+      "grounded_fetch_url",
+      "grounded_search_docs"
+    ],
+    "only_grounded_tools_visible": true,
+    "calls": [
+      {
+        "id": 2,
+        "tool": "search_docs",
+        "arguments": {
+          "library": "meridian-step15-e62fa9e3",
+          "version": "1.0.0",
+          "query": "Как передать подтверждённое ночное наблюдение другому наблюдателю при активной блокировке обслуживания и погодной приостановке?"
+        },
+        "scope_valid": true,
+        "response_bytes": 338,
+        "no_results": true
+      },
+      {
+        "id": 3,
+        "tool": "search_docs",
+        "arguments": {
+          "library": "meridian-step15-e62fa9e3",
+          "version": "1.0.0",
+          "query": "transfer confirmed overnight observation observer maintenance lock weather suspension"
+        },
+        "scope_valid": true,
+        "response_bytes": 3772,
+        "no_results": false
+      }
+    ],
+    "delivered": [
+      {
+        "request_id": 3,
+        "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/reservations",
+        "path": "reservations.md",
+        "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+        "delivered_sha256": "10548b5bb4e8bfab5191a20e27540a1cdd68defef7c817e20ce336028aa8ada4",
+        "all_nonblank_lines_exact": true,
+        "line_mapping": [
+          {
+            "text": "# Confirmed reservations",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "text": "These rules apply to confirmed night-time reservations on shared instruments.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "text": "For orientation, the reservation console links to the calendar's [colour legend](calendar.md#colours).",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "text": "## Transfer",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "text": "Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "text": "## Locked instrument",
+            "source_lines": [
+              11
+            ]
+          },
+          {
+            "text": "If the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.",
+            "source_lines": [
+              13
+            ]
+          }
+        ]
+      },
+      {
+        "request_id": 3,
+        "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/calendar",
+        "path": "calendar.md",
+        "source_sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+        "delivered_sha256": "c129d56039db53ff07d629a7308af65840cd141c653486b9acba3e141c3bf6f3",
+        "all_nonblank_lines_exact": true,
+        "line_mapping": [
+          {
+            "text": "# Calendar display",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "text": "The calendar is a read-only projection of reservation and instrument state.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "text": "## Colours",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "text": "Amber indicates a pending assignment, blue a confirmed slot, and grey a suspended interval. Changing a browser theme changes colours locally without changing instrument execution. A visual refresh cannot clear a maintenance lock.",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "text": "## Timezones",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "text": "Observers may display the same reservation in different timezones. The stored start time and reservation identifier remain unchanged. Calendar export is a view, not a gateway command.",
+            "source_lines": [
+              11
+            ]
+          }
+        ]
+      },
+      {
+        "request_id": 3,
+        "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/overview",
+        "path": "overview.md",
+        "source_sha256": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+        "delivered_sha256": "738174e18453401063579edf13e36118be899852d95cb62f3c7af310d5227ee5",
+        "all_nonblank_lines_exact": true,
+        "line_mapping": [
+          {
+            "text": "# Meridian scheduler",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "text": "Meridian schedules shared observatory instruments. Reservation rules below concern confirmed night-time observations, not daytime training sessions.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "text": "## Services",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "text": "The reservation service accepts requests, a planner assigns intervals, and an instrument gateway executes approved schedules. The calendar displays plans but cannot authorize execution.",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "text": "## Navigation",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "text": "Read [Transfer](reservations.md#transfer), [Weather](weather.md#suspension), and [Clock](clock.md#clock-offset) for operational details. The calendar's [colours](calendar.md#colours) are display conventions.",
+            "source_lines": [
+              11
+            ]
+          }
+        ]
+      },
+      {
+        "request_id": 3,
+        "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/weather",
+        "path": "weather.md",
+        "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+        "delivered_sha256": "652f8aaa77df45a4cafd17a4c4f779986bee7c5b513ce6e12a5107ecab7584a9",
+        "all_nonblank_lines_exact": true,
+        "line_mapping": [
+          {
+            "text": "# Weather decisions",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "text": "Weather decisions govern execution, not ownership of reservations.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "text": "## Suspension",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "text": "Suspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "text": "## Indoor instrument",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "text": "An instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.",
+            "source_lines": [
+              11
+            ]
+          }
+        ]
+      },
+      {
+        "request_id": 3,
+        "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/reservations",
+        "path": "reservations.md",
+        "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+        "delivered_sha256": "53c1a6c0d06fdb0a9000a2d2115121274aac1a3c692d480d8b99163bb428280d",
+        "all_nonblank_lines_exact": true,
+        "line_mapping": [
+          {
+            "text": "## Training slots",
+            "source_lines": [
+              15
+            ]
+          },
+          {
+            "text": "Daytime training slots can be reassigned by an instructor without the night-time approval workflow. This shortcut does not apply to confirmed observations.",
+            "source_lines": [
+              17
+            ]
+          }
+        ]
+      }
+    ],
+    "answer_urls": [
+      "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/reservations.md",
+      "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/weather.md",
+      "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/calendar.md",
+      "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/overview.md"
+    ],
+    "all_answer_urls_allowlisted": true,
+    "index_unchanged": true,
+    "semantic_grade": null,
+    "line_mapping_boundary": "Checks delivered English source lines only, not whether the answer covers required facts; original blank lines may be omitted."
+  },
+  {
+    "task": "V-M2",
+    "models": [],
+    "all_model_requests_terra_low": true,
+    "original_question_unchanged": true,
+    "common_prompt_present": true,
+    "visible_tools": [
+      "grounded_fetch_url",
+      "grounded_search_docs"
+    ],
+    "only_grounded_tools_visible": true,
+    "calls": [
+      {
+        "id": 2,
+        "tool": "search_docs",
+        "arguments": {
+          "library": "meridian-step15-e62fa9e3",
+          "version": "1.0.0",
+          "query": "When should wind stop observations, what is required to restart, and may an indoor instrument continue?"
+        },
+        "scope_valid": true,
+        "response_bytes": 3715,
+        "no_results": false
+      }
+    ],
+    "delivered": [
+      {
+        "request_id": 2,
+        "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/weather",
+        "path": "weather.md",
+        "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+        "delivered_sha256": "652f8aaa77df45a4cafd17a4c4f779986bee7c5b513ce6e12a5107ecab7584a9",
+        "all_nonblank_lines_exact": true,
+        "line_mapping": [
+          {
+            "text": "# Weather decisions",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "text": "Weather decisions govern execution, not ownership of reservations.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "text": "## Suspension",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "text": "Suspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "text": "## Indoor instrument",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "text": "An instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.",
+            "source_lines": [
+              11
+            ]
+          }
+        ]
+      },
+      {
+        "request_id": 2,
+        "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/architecture",
+        "path": "architecture.md",
+        "source_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+        "delivered_sha256": "f8627ae4ac8eb1d3ddb3a6ac1d67d63401c58287bef56826c05bc728c7551a8b",
+        "all_nonblank_lines_exact": true,
+        "line_mapping": [
+          {
+            "text": "# Scheduler architecture",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "text": "Meridian separates ownership, planning, execution and display to permit independent restarts.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "text": "## Planner",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "text": "The planner solves interval conflicts using instrument availability and reservation priority. It can compute a plan while execution is suspended. A computed plan is not permission to bypass a weather interlock or clock check.",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "text": "## Prototype recovery",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "text": "The retired prototype cleared pending reservations when time drifted and restarted on its first local clock sample. These behaviours must not be used to recover the current gateway.",
+            "source_lines": [
+              11
+            ]
+          }
+        ]
+      },
+      {
+        "request_id": 2,
+        "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/weather",
+        "path": "weather.md",
+        "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+        "delivered_sha256": "6dcd93ce777f43c3e467ac3519b6a08f1a1368dfead3a55f80a929f0387b9dba",
+        "all_nonblank_lines_exact": true,
+        "line_mapping": [
+          {
+            "text": "## Forecast display",
+            "source_lines": [
+              13
+            ]
+          },
+          {
+            "text": "The forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.",
+            "source_lines": [
+              15
+            ]
+          }
+        ]
+      },
+      {
+        "request_id": 2,
+        "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/calendar",
+        "path": "calendar.md",
+        "source_sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+        "delivered_sha256": "c129d56039db53ff07d629a7308af65840cd141c653486b9acba3e141c3bf6f3",
+        "all_nonblank_lines_exact": true,
+        "line_mapping": [
+          {
+            "text": "# Calendar display",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "text": "The calendar is a read-only projection of reservation and instrument state.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "text": "## Colours",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "text": "Amber indicates a pending assignment, blue a confirmed slot, and grey a suspended interval. Changing a browser theme changes colours locally without changing instrument execution. A visual refresh cannot clear a maintenance lock.",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "text": "## Timezones",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "text": "Observers may display the same reservation in different timezones. The stored start time and reservation identifier remain unchanged. Calendar export is a view, not a gateway command.",
+            "source_lines": [
+              11
+            ]
+          }
+        ]
+      },
+      {
+        "request_id": 2,
+        "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/reservations",
+        "path": "reservations.md",
+        "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+        "delivered_sha256": "10548b5bb4e8bfab5191a20e27540a1cdd68defef7c817e20ce336028aa8ada4",
+        "all_nonblank_lines_exact": true,
+        "line_mapping": [
+          {
+            "text": "# Confirmed reservations",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "text": "These rules apply to confirmed night-time reservations on shared instruments.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "text": "For orientation, the reservation console links to the calendar's [colour legend](calendar.md#colours).",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "text": "## Transfer",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "text": "Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "text": "## Locked instrument",
+            "source_lines": [
+              11
+            ]
+          },
+          {
+            "text": "If the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.",
+            "source_lines": [
+              13
+            ]
+          }
+        ]
+      }
+    ],
+    "answer_urls": [
+      "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/weather.md"
+    ],
+    "all_answer_urls_allowlisted": true,
+    "index_unchanged": true,
+    "semantic_grade": null,
+    "line_mapping_boundary": "Checks delivered English source lines only, not whether the answer covers required facts; original blank lines may be omitted."
+  },
+  {
+    "task": "V-M3",
+    "models": [],
+    "all_model_requests_terra_low": true,
+    "original_question_unchanged": true,
+    "common_prompt_present": true,
+    "visible_tools": [
+      "grounded_fetch_url",
+      "grounded_search_docs"
+    ],
+    "only_grounded_tools_visible": true,
+    "calls": [
+      {
+        "id": 2,
+        "tool": "search_docs",
+        "arguments": {
+          "library": "meridian-step15-e62fa9e3",
+          "version": "1.0.0",
+          "query": "What must the gateway do after excessive clock drift, including recovery when the reference clock is unavailable?"
+        },
+        "scope_valid": true,
+        "response_bytes": 3703,
+        "no_results": false
+      }
+    ],
+    "delivered": [
+      {
+        "request_id": 2,
+        "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/architecture",
+        "path": "architecture.md",
+        "source_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+        "delivered_sha256": "f8627ae4ac8eb1d3ddb3a6ac1d67d63401c58287bef56826c05bc728c7551a8b",
+        "all_nonblank_lines_exact": true,
+        "line_mapping": [
+          {
+            "text": "# Scheduler architecture",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "text": "Meridian separates ownership, planning, execution and display to permit independent restarts.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "text": "## Planner",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "text": "The planner solves interval conflicts using instrument availability and reservation priority. It can compute a plan while execution is suspended. A computed plan is not permission to bypass a weather interlock or clock check.",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "text": "## Prototype recovery",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "text": "The retired prototype cleared pending reservations when time drifted and restarted on its first local clock sample. These behaviours must not be used to recover the current gateway.",
+            "source_lines": [
+              11
+            ]
+          }
+        ]
+      },
+      {
+        "request_id": 2,
+        "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/clock",
+        "path": "clock.md",
+        "source_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+        "delivered_sha256": "d8ef94d835f9b02f75666d82c77c1b3c421a5e13d293ee81a3aaab13dc62a998",
+        "all_nonblank_lines_exact": true,
+        "line_mapping": [
+          {
+            "text": "# Time coordination",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "text": "The gateway compares instrument time with the observatory reference before executing a schedule.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "text": "## Clock offset",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "text": "If the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator. Keep queued reservations unchanged. Resume only after two consecutive reference checks report an offset within two seconds.",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "text": "## Missing reference",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "text": "If the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.",
+            "source_lines": [
+              11
+            ]
+          }
+        ]
+      },
+      {
+        "request_id": 2,
+        "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/weather",
+        "path": "weather.md",
+        "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+        "delivered_sha256": "652f8aaa77df45a4cafd17a4c4f779986bee7c5b513ce6e12a5107ecab7584a9",
+        "all_nonblank_lines_exact": true,
+        "line_mapping": [
+          {
+            "text": "# Weather decisions",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "text": "Weather decisions govern execution, not ownership of reservations.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "text": "## Suspension",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "text": "Suspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "text": "## Indoor instrument",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "text": "An instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.",
+            "source_lines": [
+              11
+            ]
+          }
+        ]
+      },
+      {
+        "request_id": 2,
+        "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/reservations",
+        "path": "reservations.md",
+        "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+        "delivered_sha256": "10548b5bb4e8bfab5191a20e27540a1cdd68defef7c817e20ce336028aa8ada4",
+        "all_nonblank_lines_exact": true,
+        "line_mapping": [
+          {
+            "text": "# Confirmed reservations",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "text": "These rules apply to confirmed night-time reservations on shared instruments.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "text": "For orientation, the reservation console links to the calendar's [colour legend](calendar.md#colours).",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "text": "## Transfer",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "text": "Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "text": "## Locked instrument",
+            "source_lines": [
+              11
+            ]
+          },
+          {
+            "text": "If the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.",
+            "source_lines": [
+              13
+            ]
+          }
+        ]
+      },
+      {
+        "request_id": 2,
+        "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/clock",
+        "path": "clock.md",
+        "source_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+        "delivered_sha256": "4ac146f8e46837f49f62b202feaf722f8780752a0857e54032e8f01ebfb77268",
+        "all_nonblank_lines_exact": true,
+        "line_mapping": [
+          {
+            "text": "## Simulation clock",
+            "source_lines": [
+              13
+            ]
+          },
+          {
+            "text": "The simulator advances time manually and never waits for reference checks. Its accelerated clock is isolated from the real instrument gateway.",
+            "source_lines": [
+              15
+            ]
+          }
+        ]
+      }
+    ],
+    "answer_urls": [
+      "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/clock.md",
+      "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/architecture.md"
+    ],
+    "all_answer_urls_allowlisted": true,
+    "index_unchanged": true,
+    "semantic_grade": null,
+    "line_mapping_boundary": "Checks delivered English source lines only, not whether the answer covers required facts; original blank lines may be omitted."
+  },
+  {
+    "task": "V-M4",
+    "models": [],
+    "all_model_requests_terra_low": true,
+    "original_question_unchanged": true,
+    "common_prompt_present": true,
+    "visible_tools": [
+      "grounded_fetch_url",
+      "grounded_search_docs"
+    ],
+    "only_grounded_tools_visible": true,
+    "calls": [
+      {
+        "id": 2,
+        "tool": "search_docs",
+        "arguments": {
+          "library": "meridian-step15-e62fa9e3",
+          "version": "1.0.0",
+          "query": "Какая температура охлаждения обязательна для всех общих приборов обсерватории?"
+        },
+        "scope_valid": true,
+        "response_bytes": 245,
+        "no_results": true
+      },
+      {
+        "id": 3,
+        "tool": "search_docs",
+        "arguments": {
+          "library": "meridian-step15-e62fa9e3",
+          "version": "1.0.0",
+          "query": "observatory shared instruments mandatory cooling temperature"
+        },
+        "scope_valid": true,
+        "response_bytes": 4102,
+        "no_results": false
+      }
+    ],
+    "delivered": [
+      {
+        "request_id": 3,
+        "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/overview",
+        "path": "overview.md",
+        "source_sha256": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+        "delivered_sha256": "738174e18453401063579edf13e36118be899852d95cb62f3c7af310d5227ee5",
+        "all_nonblank_lines_exact": true,
+        "line_mapping": [
+          {
+            "text": "# Meridian scheduler",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "text": "Meridian schedules shared observatory instruments. Reservation rules below concern confirmed night-time observations, not daytime training sessions.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "text": "## Services",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "text": "The reservation service accepts requests, a planner assigns intervals, and an instrument gateway executes approved schedules. The calendar displays plans but cannot authorize execution.",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "text": "## Navigation",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "text": "Read [Transfer](reservations.md#transfer), [Weather](weather.md#suspension), and [Clock](clock.md#clock-offset) for operational details. The calendar's [colours](calendar.md#colours) are display conventions.",
+            "source_lines": [
+              11
+            ]
+          }
+        ]
+      },
+      {
+        "request_id": 3,
+        "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/clock",
+        "path": "clock.md",
+        "source_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+        "delivered_sha256": "d8ef94d835f9b02f75666d82c77c1b3c421a5e13d293ee81a3aaab13dc62a998",
+        "all_nonblank_lines_exact": true,
+        "line_mapping": [
+          {
+            "text": "# Time coordination",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "text": "The gateway compares instrument time with the observatory reference before executing a schedule.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "text": "## Clock offset",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "text": "If the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator. Keep queued reservations unchanged. Resume only after two consecutive reference checks report an offset within two seconds.",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "text": "## Missing reference",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "text": "If the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.",
+            "source_lines": [
+              11
+            ]
+          }
+        ]
+      },
+      {
+        "request_id": 3,
+        "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/reservations",
+        "path": "reservations.md",
+        "source_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+        "delivered_sha256": "10548b5bb4e8bfab5191a20e27540a1cdd68defef7c817e20ce336028aa8ada4",
+        "all_nonblank_lines_exact": true,
+        "line_mapping": [
+          {
+            "text": "# Confirmed reservations",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "text": "These rules apply to confirmed night-time reservations on shared instruments.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "text": "For orientation, the reservation console links to the calendar's [colour legend](calendar.md#colours).",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "text": "## Transfer",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "text": "Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "text": "## Locked instrument",
+            "source_lines": [
+              11
+            ]
+          },
+          {
+            "text": "If the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.",
+            "source_lines": [
+              13
+            ]
+          }
+        ]
+      },
+      {
+        "request_id": 3,
+        "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/weather",
+        "path": "weather.md",
+        "source_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+        "delivered_sha256": "652f8aaa77df45a4cafd17a4c4f779986bee7c5b513ce6e12a5107ecab7584a9",
+        "all_nonblank_lines_exact": true,
+        "line_mapping": [
+          {
+            "text": "# Weather decisions",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "text": "Weather decisions govern execution, not ownership of reservations.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "text": "## Suspension",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "text": "Suspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "text": "## Indoor instrument",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "text": "An instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.",
+            "source_lines": [
+              11
+            ]
+          }
+        ]
+      },
+      {
+        "request_id": 3,
+        "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/calendar",
+        "path": "calendar.md",
+        "source_sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+        "delivered_sha256": "c129d56039db53ff07d629a7308af65840cd141c653486b9acba3e141c3bf6f3",
+        "all_nonblank_lines_exact": true,
+        "line_mapping": [
+          {
+            "text": "# Calendar display",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "text": "The calendar is a read-only projection of reservation and instrument state.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "text": "## Colours",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "text": "Amber indicates a pending assignment, blue a confirmed slot, and grey a suspended interval. Changing a browser theme changes colours locally without changing instrument execution. A visual refresh cannot clear a maintenance lock.",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "text": "## Timezones",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "text": "Observers may display the same reservation in different timezones. The stored start time and reservation identifier remain unchanged. Calendar export is a view, not a gateway command.",
+            "source_lines": [
+              11
+            ]
+          }
+        ]
+      }
+    ],
+    "answer_urls": [
+      "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/overview.md"
+    ],
+    "all_answer_urls_allowlisted": true,
+    "index_unchanged": true,
+    "semantic_grade": null,
+    "line_mapping_boundary": "Checks delivered English source lines only, not whether the answer covers required facts; original blank lines may be omitted."
+  }
+]

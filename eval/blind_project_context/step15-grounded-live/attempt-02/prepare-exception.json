@@ -1,0 +1,5 @@
+{
+  "type": "FileExistsError",
+  "message": "[Errno 17] File exists: '/home/viadmin/.local/share/docatlas-eval/step15/work/attempt-02'",
+  "no_model_retry": true
+}

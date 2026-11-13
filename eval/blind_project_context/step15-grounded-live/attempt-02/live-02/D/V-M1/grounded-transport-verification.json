@@ -1,0 +1,23 @@
+{
+  "checks": {
+    "session_finished": true,
+    "answer_produced": true,
+    "exit_zero": true,
+    "not_terminated": true,
+    "no_failures": true,
+    "no_capture_errors": true,
+    "capture_completed": true,
+    "cleanup": true,
+    "no_fatal": true,
+    "no_retries": true,
+    "usage_complete": true,
+    "single_session": true,
+    "responses_complete": true,
+    "original_question": true,
+    "grounded_retrieval": true,
+    "allowed_tools_only": true
+  },
+  "transport_pass": true,
+  "legacy_receipt_unchanged": true,
+  "boundary": "Legacy classifier counts only DocAtlas/files retrieval names. Grounded retrieval independently verified from actual stdio calls; no model rerun or semantic grade."
+}

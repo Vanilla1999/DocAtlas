@@ -1,0 +1,344 @@
+[
+  {
+    "path": "architecture.md",
+    "chunks": [
+      {
+        "chunk_id": 114,
+        "lines": [
+          {
+            "line": "# Scheduler architecture",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "line": "Meridian separates ownership, planning, execution and display to permit independent restarts.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "line": "## Planner",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "line": "The planner solves interval conflicts using instrument availability and reservation priority. It can compute a plan while execution is suspended. A computed plan is not permission to bypass a weather interlock or clock check.",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "line": "## Prototype recovery",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "line": "The retired prototype cleared pending reservations when time drifted and restarted on its first local clock sample. These behaviours must not be used to recover the current gateway.",
+            "source_lines": [
+              11
+            ]
+          }
+        ],
+        "all_lines_exact": true
+      }
+    ]
+  },
+  {
+    "path": "calendar.md",
+    "chunks": [
+      {
+        "chunk_id": 115,
+        "lines": [
+          {
+            "line": "# Calendar display",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "line": "The calendar is a read-only projection of reservation and instrument state.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "line": "## Colours",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "line": "Amber indicates a pending assignment, blue a confirmed slot, and grey a suspended interval. Changing a browser theme changes colours locally without changing instrument execution. A visual refresh cannot clear a maintenance lock.",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "line": "## Timezones",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "line": "Observers may display the same reservation in different timezones. The stored start time and reservation identifier remain unchanged. Calendar export is a view, not a gateway command.",
+            "source_lines": [
+              11
+            ]
+          }
+        ],
+        "all_lines_exact": true
+      }
+    ]
+  },
+  {
+    "path": "clock.md",
+    "chunks": [
+      {
+        "chunk_id": 116,
+        "lines": [
+          {
+            "line": "# Time coordination",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "line": "The gateway compares instrument time with the observatory reference before executing a schedule.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "line": "## Clock offset",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "line": "If the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator. Keep queued reservations unchanged. Resume only after two consecutive reference checks report an offset within two seconds.",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "line": "## Missing reference",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "line": "If the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.",
+            "source_lines": [
+              11
+            ]
+          }
+        ],
+        "all_lines_exact": true
+      },
+      {
+        "chunk_id": 117,
+        "lines": [
+          {
+            "line": "## Simulation clock",
+            "source_lines": [
+              13
+            ]
+          },
+          {
+            "line": "The simulator advances time manually and never waits for reference checks. Its accelerated clock is isolated from the real instrument gateway.",
+            "source_lines": [
+              15
+            ]
+          }
+        ],
+        "all_lines_exact": true
+      }
+    ]
+  },
+  {
+    "path": "overview.md",
+    "chunks": [
+      {
+        "chunk_id": 118,
+        "lines": [
+          {
+            "line": "# Meridian scheduler",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "line": "Meridian schedules shared observatory instruments. Reservation rules below concern confirmed night-time observations, not daytime training sessions.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "line": "## Services",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "line": "The reservation service accepts requests, a planner assigns intervals, and an instrument gateway executes approved schedules. The calendar displays plans but cannot authorize execution.",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "line": "## Navigation",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "line": "Read [Transfer](reservations.md#transfer), [Weather](weather.md#suspension), and [Clock](clock.md#clock-offset) for operational details. The calendar's [colours](calendar.md#colours) are display conventions.",
+            "source_lines": [
+              11
+            ]
+          }
+        ],
+        "all_lines_exact": true
+      }
+    ]
+  },
+  {
+    "path": "reservations.md",
+    "chunks": [
+      {
+        "chunk_id": 119,
+        "lines": [
+          {
+            "line": "# Confirmed reservations",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "line": "These rules apply to confirmed night-time reservations on shared instruments.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "line": "For orientation, the reservation console links to the calendar's [colour legend](calendar.md#colours).",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "line": "## Transfer",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "line": "Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "line": "## Locked instrument",
+            "source_lines": [
+              11
+            ]
+          },
+          {
+            "line": "If the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.",
+            "source_lines": [
+              13
+            ]
+          }
+        ],
+        "all_lines_exact": true
+      },
+      {
+        "chunk_id": 120,
+        "lines": [
+          {
+            "line": "## Training slots",
+            "source_lines": [
+              15
+            ]
+          },
+          {
+            "line": "Daytime training slots can be reassigned by an instructor without the night-time approval workflow. This shortcut does not apply to confirmed observations.",
+            "source_lines": [
+              17
+            ]
+          }
+        ],
+        "all_lines_exact": true
+      }
+    ]
+  },
+  {
+    "path": "weather.md",
+    "chunks": [
+      {
+        "chunk_id": 121,
+        "lines": [
+          {
+            "line": "# Weather decisions",
+            "source_lines": [
+              1
+            ]
+          },
+          {
+            "line": "Weather decisions govern execution, not ownership of reservations.",
+            "source_lines": [
+              3
+            ]
+          },
+          {
+            "line": "## Suspension",
+            "source_lines": [
+              5
+            ]
+          },
+          {
+            "line": "Suspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.",
+            "source_lines": [
+              7
+            ]
+          },
+          {
+            "line": "## Indoor instrument",
+            "source_lines": [
+              9
+            ]
+          },
+          {
+            "line": "An instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.",
+            "source_lines": [
+              11
+            ]
+          }
+        ],
+        "all_lines_exact": true
+      },
+      {
+        "chunk_id": 122,
+        "lines": [
+          {
+            "line": "## Forecast display",
+            "source_lines": [
+              13
+            ]
+          },
+          {
+            "line": "The forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.",
+            "source_lines": [
+              15
+            ]
+          }
+        ],
+        "all_lines_exact": true
+      }
+    ]
+  }
+]

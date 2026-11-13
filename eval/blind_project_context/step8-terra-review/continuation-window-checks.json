@@ -1,0 +1,27 @@
+[
+  {
+    "case": "L2/clarified/T12-ru.jsonl",
+    "portion": 2,
+    "repeated_windows": 0
+  },
+  {
+    "case": "L2/clarified/T01-ru.jsonl",
+    "portion": 2,
+    "repeated_windows": 0
+  },
+  {
+    "case": "L2/docatlas/T01-ru.jsonl",
+    "portion": 2,
+    "repeated_windows": 0
+  },
+  {
+    "case": "L0/clarified/T01-ru.jsonl",
+    "portion": 2,
+    "repeated_windows": 0
+  },
+  {
+    "case": "L0/docatlas/T02-ru.jsonl",
+    "portion": 2,
+    "repeated_windows": 0
+  }
+]

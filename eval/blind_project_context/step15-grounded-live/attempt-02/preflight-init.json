@@ -1,0 +1,26 @@
+{
+  "meta": null,
+  "protocolVersion": "2025-11-25",
+  "capabilities": {
+    "experimental": null,
+    "logging": null,
+    "prompts": null,
+    "resources": {
+      "subscribe": null,
+      "listChanged": true
+    },
+    "tools": {
+      "listChanged": true
+    },
+    "completions": null,
+    "tasks": null
+  },
+  "serverInfo": {
+    "name": "docs-mcp-server",
+    "title": null,
+    "version": "0.1.0",
+    "websiteUrl": null,
+    "icons": null
+  },
+  "instructions": null
+}

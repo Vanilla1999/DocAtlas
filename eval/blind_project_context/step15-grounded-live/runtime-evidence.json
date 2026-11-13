@@ -1,0 +1,48 @@
+{
+  "installed_package": "/home/viadmin/.npm/_npx/cb869cd955fb8070/node_modules/@arabold/docs-mcp-server/package.json",
+  "package_version": "3.2.1",
+  "package_sha256": "2832d98ee74c430f66211770c960003bb65f87098d76b759eda463c637651fdb",
+  "mcp_server_reported_version": "0.1.0",
+  "boundary": "MCP serverInfo version differs from installed package version; both preserved",
+  "fetch_delivery": [
+    {
+      "path": "architecture.md",
+      "fetch_bytes_equal_frozen": true,
+      "fetch_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+      "raw_sha256": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b"
+    },
+    {
+      "path": "calendar.md",
+      "fetch_bytes_equal_frozen": true,
+      "fetch_sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+      "raw_sha256": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad"
+    },
+    {
+      "path": "clock.md",
+      "fetch_bytes_equal_frozen": true,
+      "fetch_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+      "raw_sha256": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10"
+    },
+    {
+      "path": "overview.md",
+      "fetch_bytes_equal_frozen": true,
+      "fetch_sha256": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+      "raw_sha256": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7"
+    },
+    {
+      "path": "reservations.md",
+      "fetch_bytes_equal_frozen": true,
+      "fetch_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+      "raw_sha256": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080"
+    },
+    {
+      "path": "weather.md",
+      "fetch_bytes_equal_frozen": true,
+      "fetch_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a",
+      "raw_sha256": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+    }
+  ],
+  "default_embedding_model": "text-embedding-3-small",
+  "indexed_embedding_count": 0,
+  "paid_embedding_credentials_added": false
+}

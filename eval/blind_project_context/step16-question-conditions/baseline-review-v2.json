@@ -1,0 +1,66 @@
+{
+  "rubric": "question-relative-conditions-v2-draft.1",
+  "status": "NONBLIND_EXECUTOR_REVIEW_PENDING_INDEPENDENT_REVIEW",
+  "scope": "four historical current answers only; no new generation",
+  "provider_delivery": "unknown; prepared prompt equality is verified separately",
+  "approved_required_condition_score": null,
+  "candidate_retention": null,
+  "candidate_erroneous_restrictions": null,
+  "provider_usage": null,
+  "reviews": [
+    {
+      "trial": "trial-001",
+      "case_id": "V-M1",
+      "items": [
+        {"id":"M1","grade":"full","quote":"Получите согласие принимающего наблюдателя и одобрение передачи дежурным оператором.","reason":"Two required parties are attached to transfer, not restart."},
+        {"id":"M2","grade":"full","quote":"Сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита.","reason":"Identity and both audit participants preserved for transfer."},
+        {"id":"M3","grade":"full","quote":"не отменяет и не изменяет погодную приостановку","reason":"Transfer explicitly leaves existing suspension unchanged."},
+        {"id":"M4","grade":"full","quote":"**Не завершайте передачу, пока действует блокировка обслуживания:** даже после согласия и одобрения она должна оставаться в ожидании. Сначала команда инструмента должна снять блокировку.","reason":"Lock, persistence despite approvals, pending action, responsible team and precedence all preserved."},
+        {"id":"M5","grade":"full","quote":"Погодные решения регулируют выполнение наблюдения, а не владение бронированием.","reason":"Execution/ownership distinction explicit."},
+        {"id":"M6","grade":"partial","quote":"Если наружные наблюдения приостановлены из-за разомкнутой ветровой блокировки","reason":"Describes existing state, not duty to initiate suspension. Semantic partial remains; relevance to this question is disputed."},
+        {"id":"M7","grade":"partial","quote":"Сохраните исходный идентификатор бронирования","reason":"Transfer scope only; explicit preservation throughout suspension is absent. Requiredness remains disputed."},
+        {"id":"M8","grade":"full","quote":"возобновлять их можно только после её замыкания и записи дежурным оператором разрешения на возобновление.","reason":"Both conditions govern resuming observations, not transfer. No false transfer restriction found."},
+        {"id":"M9","grade":"full","quote":"Для подтверждённого ночного наблюдения на общем инструменте порядок такой:","reason":"Applicable scope stated; not an assertion that every instrument is shared."},
+        {"id":"M10","grade":"full","quote":"Календарь доступен только для просмотра; его обновление не снимает блокировку обслуживания.","reason":"Supported peripheral information, not a required calendar operation. Training shortcut also excluded correctly; not counted as core coverage."}
+      ],
+      "erroneous_added_restrictions": [],
+      "unsupported_additions": [],
+      "background": ["calendar view", "daytime training shortcut", "restart follow-up"]
+    },
+    {
+      "trial":"trial-015",
+      "case_id":"fresh-en-print-queue-recovery",
+      "items":[
+        {"id":"P1","grade":"full","quote":"For a **RillPrint 4 queue already in maintenance mode**","reason":"Does not assume maintenance mode follows merely from stalled status."},
+        {"id":"P2","grade":"full","quote":"Before purging, export the job manifest.","reason":"Mandatory export precedes purge."},
+        {"id":"P3","grade":"full","quote":"Purge only when the upstream feeder is stopped **and** the device buffer is empty.","reason":"Both conditions jointly required for purge."},
+        {"id":"P4","grade":"full","quote":"If any job is marked `held`, **stop recovery and leave the queue paused**. Do not purge or resume it.","reason":"Any held job blocks both actions; paused state preserved."},
+        {"id":"P5","grade":"full","quote":"After the purge, run `spool-verify` successfully before resuming the queue.","reason":"Success, order and resume binding retained."},
+        {"id":"P6","grade":"full","quote":"Uploading a diagnostic bundle is optional.","reason":"Optionality retained; whether omission should count as lost required coverage is disputed."},
+        {"id":"P7","grade":"full","quote":"Keep archived job receipts unchanged throughout recovery.","reason":"Whole-recovery invariant retained."}
+      ],
+      "erroneous_added_restrictions": [],
+      "unsupported_additions": []
+    },
+    {
+      "trial":"trial-019",
+      "case_id":"fresh-en-single-attachment-limit",
+      "items":[
+        {"id":"A1","grade":"full","quote":"In a standard RelayPost mailbox, one attachment can be at most **18 MiB**.","reason":"Mailbox class, per-attachment scope, maximum and binary unit retained."},
+        {"id":"A2","grade":"missing","quote":null,"reason":"Unasked upload workflow omitted appropriately; not a missing necessary condition."}
+      ],
+      "erroneous_added_restrictions": [],
+      "unsupported_additions": []
+    },
+    {
+      "trial":"trial-024",
+      "case_id":"fresh-ru-undocumented-journal-retention",
+      "items":[
+        {"id":"J1","grade":"full","quote":"В предоставленной документации срок автоматического удаления записей журнала проходов не указан.","reason":"Bounded abstention, no universal absence claim; answer additionally says other docs may differ."},
+        {"id":"J2","grade":"full","quote":"Указанные 24 часа — это периодичность сверки устройств, а не срок хранения журнала","reason":"Does not substitute device reconciliation period for deletion; manual export not needed."}
+      ],
+      "erroneous_added_restrictions": [],
+      "unsupported_additions": []
+    }
+  ]
+}

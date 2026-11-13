@@ -1,0 +1,20 @@
+{
+  "name": "fetch_url",
+  "arguments": {
+    "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/reservations.md",
+    "followRedirects": false
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "# Confirmed reservations\n\nThese rules apply to confirmed night-time reservations on shared instruments.\n\nFor orientation, the reservation console links to the calendar's [colour legend](calendar.md#colours).\n\n## Transfer\n\nTransfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer. Retain the original reservation identifier and record both observers in the audit trail. A transfer does not alter the [weather suspension](weather.md#suspension).\n\n## Locked instrument\n\nIf the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval. The lock must be cleared by the instrument team first.\n\n## Training slots\n\nDaytime training slots can be reassigned by an instructor without the night-time approval workflow. This shortcut does not apply to confirmed observations.\n",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

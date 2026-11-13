@@ -1,0 +1,72 @@
+{
+  "version": "question-relative-conditions-v2-draft.1",
+  "approval": "PROPOSED_FOR_INDEPENDENT_REVIEW_NOT_GOLD",
+  "historical_revision": "420e21924e486a7ebca8f4aa891cc176e07280f6",
+  "unit": "whole assertion: governed action + applicability/condition + obligation/preservation + temporal scope",
+  "grades": ["full", "partial", "missing", "contradicted", "unknown"],
+  "delivery_grades": ["provider_input_verified", "prepared_input_only", "absent", "unknown"],
+  "rules": [
+    "A source quote present in a prepared prompt is not proof of provider delivery.",
+    "Full requires semantic entailment of the whole assertion, including AND/OR, negation, modality and action binding; keywords and citations alone do not count.",
+    "Do not require repetition of an already established circumstance unless omission changes applicability; do not infer other circumstances.",
+    "Score every added restriction against its actual governed action. A true rule bound to the wrong action is an erroneous added restriction.",
+    "Keep disputed items out of a single approved denominator; report both inclusion and exclusion sensitivity, never overwrite historical verdicts.",
+    "Background is not an error unless presented as mandatory for the requested action. Optional becoming mandatory is an error.",
+    "No aggregate candidate gain without actual answers, captured delivery and provider usage. Length is not a win criterion."
+  ],
+  "cases": [
+    {
+      "id": "V-M1",
+      "known": ["confirmed night observation", "active maintenance lock", "active weather suspension"],
+      "unknown": ["receiver acceptance", "operator transfer approval", "instrument-team lock clearance", "shared instrument applicability"],
+      "core_aspects": ["transfer prerequisites", "pending status under lock", "identity and audit preservation", "effect on existing weather suspension"],
+      "items": [
+        {"id":"M1","historical":["V-M1-fact-2"],"role":"core","action":"transfer","condition":"receiver accepts AND duty operator approves","obligation":"only then transfer","source":"reservations.md:9"},
+        {"id":"M2","historical":["V-M1-fact-3"],"role":"core","action":"transfer","condition":"during transfer","obligation":"retain original reservation identifier AND record both observers in audit trail","source":"reservations.md:9"},
+        {"id":"M3","historical":[],"role":"core","action":"transfer","condition":"weather suspension already active","obligation":"transfer does not alter suspension","source":"reservations.md:9"},
+        {"id":"M4","historical":["V-M1-fact-4","V-M1-fact-5"],"role":"core","action":"complete transfer","condition":"maintenance lock active, even after both approvals","obligation":"leave pending until instrument team clears lock","source":"reservations.md:13"},
+        {"id":"M5","historical":[],"role":"core","action":"weather decision","condition":"existing suspension","obligation":"governs execution, not reservation ownership","source":"weather.md:3"},
+        {"id":"M6","historical":"V-M1-fact-6","role":"background","disputed":true,"action":"start outdoor suspension","condition":"wind interlock opens","obligation":"suspend outdoor observations","source":"weather.md:7","review_question":"Question already states a suspension. Proposed exclusion from transfer requirements; approve relevance separately from semantic correctness."},
+        {"id":"M7","historical":"V-M1-fact-7","role":"core-proposed","disputed":true,"action":"preserve reservation identifier","condition":"throughout suspension, not only at transfer","obligation":"preserve identifier","source":"weather.md:7","review_question":"Is explicit temporal preservation necessary beyond transfer-ID retention and unchanged suspension? Report separately pending approval."},
+        {"id":"M8","historical":"V-M1-fact-8","role":"follow-up","disputed":true,"action":"resume outdoor observations","condition":"interlock closes AND duty operator records restart approval","obligation":"resume only afterwards","source":"weather.md:7","review_question":"Proposed optional follow-up, never a prerequisite to transferring ownership. Approve whether it belongs in required answer coverage."},
+        {"id":"M9","historical":["V-M1-fact-1"],"role":"applicability","action":"apply transfer rules","condition":"confirmed night reservation on shared instrument","obligation":"state scope without assuming an unspecified instrument type","source":"reservations.md:3"},
+        {"id":"M10","role":"background","action":"calendar display / daytime training reassignment","condition":"different operation or different reservation class","obligation":"not additional transfer steps; do not apply instructor shortcut to confirmed observation","source":"calendar.md:3,7; reservations.md:17"}
+      ]
+    },
+    {
+      "id":"fresh-en-print-queue-recovery",
+      "known":["RillPrint 4", "stalled queue"],
+      "unknown":["maintenance mode", "feeder stopped", "buffer empty", "held jobs", "successful verification"],
+      "core_aspects":["applicability", "before purge", "stop exception", "resume", "preservation"],
+      "items":[
+        {"id":"P1","role":"core","action":"apply recovery procedure","condition":"RillPrint 4 queue already in maintenance mode","obligation":"procedure applies only here; question does not establish maintenance mode","source":"docs/rillprint/recover-stalled-queue.md:3"},
+        {"id":"P2","role":"core","action":"purge","condition":"before any purge","obligation":"export job manifest","source":"docs/rillprint/recover-stalled-queue.md:4"},
+        {"id":"P3","role":"core","action":"purge","condition":"upstream feeder stopped AND device buffer empty","obligation":"purge permitted only then","source":"docs/rillprint/recover-stalled-queue.md:5"},
+        {"id":"P4","role":"core","action":"recovery","condition":"any job marked held","obligation":"stop recovery, leave paused, neither purge nor resume","source":"docs/rillprint/recover-stalled-queue.md:6"},
+        {"id":"P5","role":"core","action":"resume queue","condition":"after purge AND successful spool-verify","obligation":"resume only after successful verification","source":"docs/rillprint/recover-stalled-queue.md:7"},
+        {"id":"P6","role":"background-optionality","action":"upload diagnostic bundle","condition":"recovery","obligation":"optional, never mandatory","source":"docs/rillprint/recover-stalled-queue.md:8","disputed":true,"review_question":"Optionality is an error guard if mentioned; is mentioning the optional action itself required? Proposed no."},
+        {"id":"P7","role":"core","action":"recovery","condition":"throughout recovery","obligation":"archived job receipts remain unchanged","source":"docs/rillprint/recover-stalled-queue.md:9"}
+      ]
+    },
+    {
+      "id":"fresh-en-single-attachment-limit",
+      "known":["standard RelayPost mailbox", "one attachment"],
+      "unknown":[],
+      "core_aspects":["maximum single attachment size"],
+      "items":[
+        {"id":"A1","role":"core","action":"attach one file","condition":"standard mailbox","obligation":"at most 18 MiB, not MB and not total message size","source":"docs/relaypost/attachments.md:3"},
+        {"id":"A2","role":"background","action":"upload/send workflow","condition":"adding attachment","obligation":"not a condition changing maximum size","source":"docs/relaypost/attachments.md:5–8"}
+      ]
+    },
+    {
+      "id":"fresh-ru-undocumented-journal-retention",
+      "known":["automatic access-journal deletion requested"],
+      "unknown":["automatic deletion period"],
+      "core_aspects":["whether supplied evidence states deletion period"],
+      "items":[
+        {"id":"J1","role":"abstention","action":"answer deletion period","condition":"no retention period in supplied source","obligation":"state bounded evidence gap, do not claim global absence","source":"docs/mostik/access-journal.md:1–6"},
+        {"id":"J2","role":"background","action":"device reconciliation / manual CSV export","condition":"24-hour reconciliation or manual export","obligation":"neither establishes automatic deletion period","source":"docs/mostik/access-journal.md:5–6"}
+      ]
+    }
+  ]
+}

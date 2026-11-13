@@ -1,0 +1,20 @@
+{
+  "name": "fetch_url",
+  "arguments": {
+    "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/overview.md",
+    "followRedirects": false
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "# Meridian scheduler\n\nMeridian schedules shared observatory instruments. Reservation rules below concern confirmed night-time observations, not daytime training sessions.\n\n## Services\n\nThe reservation service accepts requests, a planner assigns intervals, and an instrument gateway executes approved schedules. The calendar displays plans but cannot authorize execution.\n\n## Navigation\n\nRead [Transfer](reservations.md#transfer), [Weather](weather.md#suspension), and [Clock](clock.md#clock-offset) for operational details. The calendar's [colours](calendar.md#colours) are display conventions.\n",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

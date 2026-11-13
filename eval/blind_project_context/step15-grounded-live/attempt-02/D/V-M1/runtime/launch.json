@@ -1,0 +1,24 @@
+{
+  "command": [
+    "/home/viadmin/.opencode/bin/opencode",
+    "run",
+    "--standalone",
+    "--format",
+    "json",
+    "--agent",
+    "measure",
+    "--model",
+    "openai/gpt-6.1-terra#low",
+    "--title",
+    "Step15 D V-M1"
+  ],
+  "cwd": "/home/viadmin/.local/share/docatlas-eval/step15/work/attempt-02/locations/D/V-M1",
+  "question": "Как передать подтверждённое ночное наблюдение другому наблюдателю при активной блокировке обслуживания и погодной приостановке?",
+  "timeout_seconds": 900,
+  "capture_drain_seconds": 10,
+  "environment_values_recorded": false,
+  "automatic_retries": false,
+  "owned_process_files": [
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/attempt-02/D/V-M1/mcp-process.json"
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "status": "DRAFT_NONBLIND_NOT_OWNER_APPROVED",
+  "arms": {
+    "current": {
+      "sensitivity": {
+        "without_M7": {
+          "required_groups": 12,
+          "delivered_in_harness_read_result": 12,
+          "retention": {
+            "full": 11,
+            "partial": 1
+          },
+          "delivery_level": "harness_transcript_not_raw_provider_body"
+        },
+        "with_M7": {
+          "required_groups": 13,
+          "delivered_in_harness_read_result": 13,
+          "retention": {
+            "full": 12,
+            "partial": 1
+          },
+          "delivery_level": "harness_transcript_not_raw_provider_body"
+        }
+      },
+      "erroneous_added_restrictions": 0,
+      "secondary_observations": 0,
+      "harness_reported_provider_usage": {
+        "input": 16794,
+        "output": 873,
+        "reasoning": 0,
+        "cache": {
+          "read": 49408,
+          "write": 0
+        },
+        "input_plus_cache_read": 66202
+      },
+      "abstention_J1": "full",
+      "separate_positions": {
+        "M6": "missing",
+        "M8": "full",
+        "M10": "full",
+        "P6": "full",
+        "A2": "missing",
+        "J1": "full",
+        "J2": "full"
+      }
+    },
+    "aspect-conditions-v1": {
+      "sensitivity": {
+        "without_M7": {
+          "required_groups": 12,
+          "delivered_in_harness_read_result": 12,
+          "retention": {
+            "full": 12
+          },
+          "delivery_level": "harness_transcript_not_raw_provider_body"
+        },
+        "with_M7": {
+          "required_groups": 13,
+          "delivered_in_harness_read_result": 13,
+          "retention": {
+            "full": 12,
+            "partial": 1
+          },
+          "delivery_level": "harness_transcript_not_raw_provider_body"
+        }
+      },
+      "erroneous_added_restrictions": 0,
+      "secondary_observations": 1,
+      "harness_reported_provider_usage": {
+        "input": 5646,
+        "output": 806,
+        "reasoning": 0,
+        "cache": {
+          "read": 60928,
+          "write": 0
+        },
+        "input_plus_cache_read": 66574
+      },
+      "abstention_J1": "full",
+      "separate_positions": {
+        "M6": "partial",
+        "M8": "full",
+        "M10": "missing",
+        "P6": "full",
+        "A2": "missing",
+        "J1": "full",
+        "J2": "full"
+      }
+    }
+  },
+  "checks": {
+    "review_trials": 8,
+    "review_positions": 42,
+    "exact_quotes": 38,
+    "raw_provider_capture": false,
+    "generations_by_summarizer": 0,
+    "generated_answers": 8
+  },
+  "usage_basis": "Sum of 16 assistant-message tokens, including input-loading turns; reconciled against 8 session totals. Harness-reported provider usage, not raw HTTP usage.",
+  "cost_warning": "cost=0 is an exported field, not evidence of zero billing; cache warming/order were not controlled."
+}

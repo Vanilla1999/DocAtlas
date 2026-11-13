@@ -1,0 +1,32 @@
+{
+  "status": "PASS_ARTIFACT_INTEGRITY_ONLY",
+  "manifest_hashes": 43,
+  "source_spans_and_hashes": 11,
+  "historical_quotes_in_prepared_evidence": 16,
+  "review_rows": 21,
+  "exact_answer_quotes": 20,
+  "git_diff_check": "PASS",
+  "semantic_review_independent": false,
+  "provider_delivery_verified": false,
+  "model_calls_by_artifact_verifier": 0,
+  "product_tests_run": 0,
+  "live_delivery_checks": {
+    "sessions": 8,
+    "exact_read_results": 8,
+    "one_read_then_answer": 8,
+    "assistant_messages": 16,
+    "usage_reconciled": 8,
+    "same_reported_model_settings": true,
+    "raw_provider_capture": false,
+    "new_generations_by_collector": 0
+  },
+  "live_review_checks": {
+    "review_trials": 8,
+    "review_positions": 42,
+    "exact_quotes": 38,
+    "raw_provider_capture": false,
+    "generations_by_summarizer": 0,
+    "generated_answers": 8
+  },
+  "generated_answers": 8
+}

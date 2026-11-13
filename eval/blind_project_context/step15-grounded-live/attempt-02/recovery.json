@@ -1,0 +1,7 @@
+{
+  "reason": "parent authorized preparation recovery; prior receipts unchanged",
+  "change": "Explicit CLI --store-path plus DOCS_MCP_APP_STORE_PATH; no --config dependency",
+  "started_cases": 0,
+  "default_embedding_configuration": true,
+  "provider_keys_forwarded": false
+}

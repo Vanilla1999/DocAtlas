@@ -1,0 +1,3 @@
+В найденной документации Meridian 1.0.0 **не указана обязательная температура охлаждения для всех общих приборов обсерватории**. Поэтому назвать конкретное значение по доступным источникам нельзя; это не исключает, что требование описано в другом месте.
+
+Источник: [Meridian scheduler — Services](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/overview.md).

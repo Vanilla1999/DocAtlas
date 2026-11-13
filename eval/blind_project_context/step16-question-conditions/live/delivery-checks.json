@@ -1,0 +1,10 @@
+{
+  "sessions": 8,
+  "exact_read_results": 8,
+  "one_read_then_answer": 8,
+  "assistant_messages": 16,
+  "usage_reconciled": 8,
+  "same_reported_model_settings": true,
+  "raw_provider_capture": false,
+  "new_generations_by_collector": 0
+}

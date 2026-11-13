@@ -1,0 +1,20 @@
+{
+  "name": "fetch_url",
+  "arguments": {
+    "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/architecture.md",
+    "followRedirects": false
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "# Scheduler architecture\n\nMeridian separates ownership, planning, execution and display to permit independent restarts.\n\n## Planner\n\nThe planner solves interval conflicts using instrument availability and reservation priority. It can compute a plan while execution is suspended. A computed plan is not permission to bypass a weather interlock or clock check.\n\n## Prototype recovery\n\nThe retired prototype cleared pending reservations when time drifted and restarted on its first local clock sample. These behaviours must not be used to recover the current gateway.\n",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

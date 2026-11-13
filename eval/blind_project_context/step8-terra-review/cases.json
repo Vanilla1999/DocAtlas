@@ -1,0 +1,64 @@
+[
+  {
+    "id": "T01-ru",
+    "topic_id": "T01",
+    "split": "dev",
+    "lang": "ru",
+    "question": "Что от меня ожидается, когда я отправляю pull request в DocAtlas?",
+    "search_question": "What is expected of me when I submit a pull request to DocAtlas?"
+  },
+  {
+    "id": "T01-en",
+    "topic_id": "T01",
+    "split": "dev",
+    "lang": "en",
+    "question": "What is expected of me when I submit a pull request to DocAtlas?"
+  },
+  {
+    "id": "T02-ru",
+    "topic_id": "T02",
+    "split": "dev",
+    "lang": "ru",
+    "question": "Как безопасно очистить индекс DocAtlas, не удалив данные, которые ещё нужны?",
+    "search_question": "How can I safely clean up the DocAtlas index without deleting data I still need?"
+  },
+  {
+    "id": "T05-ru",
+    "topic_id": "T05",
+    "split": "dev",
+    "lang": "ru",
+    "question": "Что проверяет верификация привязанной к проекту интеграции с OpenCode и чего она не доказывает?",
+    "search_question": "What does verification of the project-bound OpenCode integration cover, and what does it not prove?"
+  },
+  {
+    "id": "T10-ru",
+    "topic_id": "T10",
+    "split": "dev",
+    "lang": "ru",
+    "question": "Какой публичный сценарий предлагается для сравнения запусков с выключенным и включённым логированием?",
+    "search_question": "What public scenario is proposed for comparing runs with logging turned off and on?"
+  },
+  {
+    "id": "T12-ru",
+    "topic_id": "T12",
+    "split": "dev",
+    "lang": "ru",
+    "question": "Как MCP-сервер документации работает с собственной документацией проекта?",
+    "search_question": "How does the docs MCP server handle a project's own documentation?"
+  },
+  {
+    "id": "T15-en",
+    "topic_id": "T15",
+    "split": "dev",
+    "lang": "en",
+    "question": "Why shouldn't OpenCode users simply enable DOCATLAS_MCP_MODEL_VIEW=1?"
+  },
+  {
+    "id": "T19-ru",
+    "topic_id": "T19",
+    "split": "dev",
+    "lang": "ru",
+    "question": "Какие команды DocAtlas используются для управления Qdrant?",
+    "search_question": "Which DocAtlas commands are used to manage Qdrant?"
+  }
+]

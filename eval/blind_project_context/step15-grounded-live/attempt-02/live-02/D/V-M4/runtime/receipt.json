@@ -1,0 +1,90 @@
+{
+  "session_status": "finished",
+  "retrieval_status": "not_observed",
+  "answer_status": "produced",
+  "answer": "В найденной документации Meridian 1.0.0 **не указана обязательная температура охлаждения для всех общих приборов обсерватории**. Поэтому назвать конкретное значение по доступным источникам нельзя; это не исключает, что требование описано в другом месте.\n\nИсточник: [Meridian scheduler — Services](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/overview.md).",
+  "failures": [],
+  "capture_errors": [],
+  "tool_calls": 2,
+  "retrieval_calls": 0,
+  "expected_host_rejections": [],
+  "transport_pass": false,
+  "answer_quality": "not_graded",
+  "termination": null,
+  "returncode": 0,
+  "seconds": 10.934372580000854,
+  "cleanup": {
+    "strategy": "held private group plus explicitly registered MCP pidfds; no foreign-group signals",
+    "group": 292122,
+    "observed_processes": [
+      {
+        "pid": 292122,
+        "state": "Z",
+        "pgid": 292122,
+        "sid": 292122,
+        "start_ticks": 855556,
+        "name": "opencode"
+      },
+      {
+        "pid": 292238,
+        "state": "S",
+        "pgid": 292238,
+        "sid": 292238,
+        "start_ticks": 855613,
+        "name": "python",
+        "role": "transport",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/attempt-02/live-02/D/V-M4/mcp-process.json"
+      },
+      {
+        "pid": 292239,
+        "state": "R",
+        "pgid": 292238,
+        "sid": 292238,
+        "start_ticks": 855615,
+        "name": "node",
+        "role": "server",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/attempt-02/live-02/D/V-M4/mcp-process.json"
+      }
+    ],
+    "before_cleanup": [
+      {
+        "pid": 292122,
+        "state": "Z",
+        "pgid": 292122,
+        "sid": 292122,
+        "start_ticks": 855556,
+        "name": "opencode"
+      }
+    ],
+    "signals": [],
+    "remaining_live": [],
+    "escaped_live_observed": [],
+    "registered_processes": [
+      {
+        "role": "transport",
+        "pid": 292238,
+        "pgid": 292238,
+        "sid": 292238,
+        "start_ticks": 855613,
+        "pid_namespace": "pid:[4026531836]",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/attempt-02/live-02/D/V-M4/mcp-process.json",
+        "exit_verified": true
+      },
+      {
+        "role": "server",
+        "pid": 292239,
+        "pgid": 292238,
+        "sid": 292238,
+        "start_ticks": 855615,
+        "pid_namespace": "pid:[4026531836]",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/attempt-02/live-02/D/V-M4/mcp-process.json",
+        "exit_verified": true
+      }
+    ],
+    "registration_errors": {},
+    "no_live_owned_processes": true,
+    "leader_reaped": true,
+    "boundary": "Private group plus explicit MCP launch registrations/observed identities; unseen detached descendants and GPU VRAM are not measured."
+  },
+  "provider_capture_completed_before_cleanup": true
+}

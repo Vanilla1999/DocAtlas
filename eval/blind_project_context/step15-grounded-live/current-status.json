@@ -1,0 +1,12 @@
+{
+  "status": "4_COMPLETED_SEMANTIC_REVIEW_PENDING",
+  "active_result": "attempt-02/live-02/results.json",
+  "draft_report": "REPORT_DRAFT_RU.md",
+  "historical_blocker_preserved": "BLOCKER_RU.md",
+  "model_sessions": 4,
+  "provider_requests": 10,
+  "model_retries": 0,
+  "semantic_grade": null,
+  "new_qwen_runs": 0,
+  "commit_push": false
+}

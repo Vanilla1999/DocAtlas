@@ -1,0 +1,184 @@
+{
+  "arm": "D",
+  "task": "V-M3",
+  "status": "CAPTURED",
+  "provider_requests": 2,
+  "provider_requests_by_kind": {
+    "primary": 2
+  },
+  "session_ids": [
+    "ses_e459c5e87ffep24iA5S22pD7im"
+  ],
+  "session_ids_count": 1,
+  "requests_with_usage": 2,
+  "usage": {
+    "input": 3487,
+    "output": 322,
+    "cached": 1152,
+    "cache_write": 0,
+    "reasoning": 0,
+    "uncached": 2335
+  },
+  "usage_coverage_complete": true,
+  "provider_records": [
+    {
+      "id": "resp_0fd2382ed69fa9f0016af03a48517087d2931bff9aae140e40",
+      "usage": {
+        "input_tokens": 1347,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0
+        },
+        "output_tokens": 59,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 1406,
+        "attribution": {
+          "items": {
+            "fc_0fd2382ed69fa9f0016af03a495d6c87d2b1a429768f302b3b": {
+              "input_tokens": 2,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 59
+            },
+            "msg_0fd2382ed69fa9f0016af03a48519887d292f3c2b1429c0cdc": {
+              "input_tokens": 23,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 23,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            }
+          },
+          "request_fields": {
+            "instructions": {
+              "input_tokens": 1044,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "tools": {
+              "input_tokens": 278,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "resp_0fd2382ed69fa9f0016af03a4a8a5c87d28e9b8065bdb36f4a",
+      "usage": {
+        "input_tokens": 2140,
+        "input_tokens_details": {
+          "cached_tokens": 1152,
+          "cache_write_tokens": 0
+        },
+        "output_tokens": 263,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 2403,
+        "attribution": {
+          "items": {
+            "fc_0fd2382ed69fa9f0016af03a495d6c87d2b1a429768f302b3b": {
+              "input_tokens": 61,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "fc_0fd2382ed69fa9f0016af03a4a8a8087d2aca8e8ccce722321": {
+              "input_tokens": 732,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 732,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "msg_0fd2382ed69fa9f0016af03a48519887d292f3c2b1429c0cdc": {
+              "input_tokens": 23,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 0,
+              "content": [
+                {
+                  "input_tokens": 23,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 0
+                }
+              ]
+            },
+            "msg_0fd2382ed69fa9f0016af03a4b23d087d29868abedec723d56": {
+              "input_tokens": 2,
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "output_tokens": 263,
+              "content": [
+                {
+                  "input_tokens": 2,
+                  "cached_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "output_tokens": 263
+                }
+              ]
+            }
+          },
+          "request_fields": {
+            "instructions": {
+              "input_tokens": 1044,
+              "cached_tokens": 874,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            },
+            "tools": {
+              "input_tokens": 278,
+              "cached_tokens": 278,
+              "cache_write_tokens": 0,
+              "output_tokens": 0
+            }
+          }
+        }
+      }
+    }
+  ],
+  "retries": 0,
+  "capture_errors": [],
+  "first_provider_monotonic_ns": 2249969121,
+  "first_provider_language_hints": [],
+  "first_provider_wall_time_ms": 1794128456084,
+  "original_question_in_first_request": true,
+  "status_observations": [],
+  "host_preflight_verified": null,
+  "host_hint_binding_verified": null,
+  "host_timestamp_order_verified": null,
+  "host_timestamp_reason": null,
+  "model_tool_calls": {
+    "grounded_search_docs": 1
+  },
+  "actual_mcp_calls": {
+    "search_docs": 1
+  },
+  "mcp_missing_responses": 0,
+  "qwen_receipts": [],
+  "qwen_pairs": null,
+  "answer": "If the absolute clock offset **exceeds two seconds**, the gateway must:\n\n- Pause schedule execution and notify the duty operator.\n- Keep queued reservations unchanged.\n- Resume only after **two consecutive checks against the observatory reference clock** each report an offset within two seconds.\n\nIf the reference clock is unavailable, execution must remain paused. A local clock reading alone cannot satisfy either recovery check. [Time coordination: Clock offset and Missing reference](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/clock.md)\n\nThe retired prototype’s recovery behavior—clearing pending reservations and restarting on the first local clock sample—must not be used for the current gateway. The planner may compute a plan while execution is suspended, but that plan does not bypass the clock check or a weather interlock. [Scheduler architecture: Planner and Prototype recovery](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/architecture.md)",
+  "answer_quality": "NOT_GRADED",
+  "source_facts_quality": "NOT_GRADED",
+  "timing_boundary": "wall-v2: Python time.time_ns versus JS Date.now, same-host epoch clock; JS millisecond resolution, wall-clock steps not excluded. Monotonic clocks are process-local only. Legacy Python wall time is never reconstructed. Not remote arrival.",
+  "accounting_branch": "C: skip only DocAtlas binding extraction"
+}

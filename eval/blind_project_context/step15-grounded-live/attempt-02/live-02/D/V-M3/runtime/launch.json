@@ -1,0 +1,24 @@
+{
+  "command": [
+    "/home/viadmin/.opencode/bin/opencode",
+    "run",
+    "--standalone",
+    "--format",
+    "json",
+    "--agent",
+    "measure",
+    "--model",
+    "openai/gpt-6.1-terra#low",
+    "--title",
+    "Step15 D V-M3"
+  ],
+  "cwd": "/home/viadmin/.local/share/docatlas-eval/step15/work/attempt-02/locations/live-02/D/V-M3",
+  "question": "What must the gateway do after excessive clock drift, including recovery when the reference clock is unavailable?",
+  "timeout_seconds": 900,
+  "capture_drain_seconds": 10,
+  "environment_values_recorded": false,
+  "automatic_retries": false,
+  "owned_process_files": [
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/attempt-02/live-02/D/V-M3/mcp-process.json"
+  ]
+}

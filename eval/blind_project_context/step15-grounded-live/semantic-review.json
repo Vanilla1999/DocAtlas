@@ -1,0 +1,89 @@
+{
+  "review": "Independent offline semantic and provider-body review of attempt-02/live-02/D; no model calls, production edits or commits",
+  "basis": {
+    "tasks": "../step14-host-language-live/tasks.json",
+    "tasks_sha256": "d091e3e94bb56a9d67a1514d23fc9417bb0dc8ee1718b69c4dad63ab8f0505eb",
+    "rubric": "../step14-host-language-live/review-criteria.json",
+    "rubric_sha256": "bcc423940023b89b8692a9020438132a8c6ef38478d84cd52bb6dafdc7fcab5c",
+    "unchanged": true,
+    "independence": "Grades derived from all four answer.md files and unchanged task facts. Delivery derived directly from decoded experimental.ws.send response.create bodies and matching earlier successful stdio responses, not scope-source-model-audit conclusions.",
+    "path_convention": "All relative paths are relative to step15-grounded-live. Source references below denote source-bytes/<file>, independently byte-compared with ../step14-host-language-live/frozen-corpus/<file>. Lines are original source lines, not extracted chunk lines. Fact indices are 1-based tasks.json order."
+  },
+  "source_verification": {
+    "all_six_source_bytes_equal_frozen_corpus": true,
+    "sha256": {
+      "architecture.md": "fdbfdfb2748e1d3399c60a519fcb84c2d74d0c0fd88a830d5f0df5d382b9b27b",
+      "calendar.md": "ec96ee0e80580b1bd091e047d395e7be9fde8956baa43bbaa1f7d4c7096a13ad",
+      "clock.md": "182b3199cebbceef5c2f1725a25f4b12928f8fbf3e9ecade60d0f750d535ba10",
+      "overview.md": "f57feb665dd215a4bfd300a583f0fcad752ff418bca79c704f568920a30022e7",
+      "reservations.md": "c77c37fcdd596fd6bd1b3a780c8c63560fdfc03c7b4ba2f32f38348bafcfc080",
+      "weather.md": "e37bcc3462ed8c66aa1d6914780fa7ff350490e5208d6c39bc49ead9d97d3d3a"
+    },
+    "chunk_check": "All 20 actual delivered Result chunks across four successful retrievals match contiguous nonblank original source lines exactly. Only blank-line removal is normalized. Source URL basenames omit .md; mapped to independently read allowed .md files. All URLs use frozen commit e62fa9e357bd22731cddabe930532a4a2faecc18. Excluded/private sources were not read.",
+    "chunk_inventory": {
+      "V-M1": ["1 reservations.md:1-13", "2 calendar.md:1-11", "3 overview.md:1-11", "4 weather.md:1-11", "5 reservations.md:15-17"],
+      "V-M2": ["1 weather.md:1-11", "2 architecture.md:1-11", "3 weather.md:13-15", "4 calendar.md:1-11", "5 reservations.md:1-13"],
+      "V-M3": ["1 architecture.md:1-11", "2 clock.md:1-11", "3 weather.md:1-11", "4 reservations.md:1-13", "5 clock.md:13-15"],
+      "V-M4": ["1 overview.md:1-11", "2 clock.md:1-11", "3 reservations.md:1-13", "4 weather.md:1-11", "5 calendar.md:1-11"]
+    }
+  },
+  "delivery_evidence": {
+    "method": "JSON-decode events.jsonl outer event and data; inspect response.create input[0], type=function_call_output, output. Compare entire output exactly against earlier stdio result content text, verify isError is not true and wall_time_ns precedes provider wall_time_ms. Match each source fact in its actual numbered Result chunk and original source line. Server-only output is not counted.",
+    "V-M1": {"provider_capture": "attempt-02/live-02/D/V-M1/capture/events.jsonl", "provider_line": 123, "input_index": 0, "call_id": "call_0b2ccba2937e44aba0a96309c42a487a", "stdio_line": 9, "stdio_id": 3, "successful_earlier_exact_output": true, "initial_no_results_provider_line": 74},
+    "V-M2": {"provider_capture": "attempt-02/live-02/D/V-M2/capture/events.jsonl", "provider_line": 62, "input_index": 0, "call_id": "call_0b77ae1ae0ff40e6a3631c2825188cf9", "stdio_line": 7, "stdio_id": 2, "successful_earlier_exact_output": true},
+    "V-M3": {"provider_capture": "attempt-02/live-02/D/V-M3/capture/events.jsonl", "provider_line": 62, "input_index": 0, "call_id": "call_a26740eb47c74d949d9c53865f47cb11", "stdio_line": 7, "stdio_id": 2, "successful_earlier_exact_output": true},
+    "V-M4": {"provider_capture": "attempt-02/live-02/D/V-M4/capture/events.jsonl", "provider_line": 114, "input_index": 0, "call_id": "call_21ae444146914a77b70b61c88bd54c03", "stdio_line": 9, "stdio_id": 3, "successful_earlier_exact_output": true, "initial_no_results_provider_line": 61}
+  },
+  "tasks": {
+    "V-M1": {
+      "answer": "attempt-02/live-02/D/V-M1/answer.md",
+      "totals": {"full": 7, "partial": 0, "missing": 1, "contradicted": 0, "delivered": 8},
+      "facts": [
+        {"index": 1, "grade": "full", "source": "reservations.md:3", "source_quote": "These rules apply to confirmed night-time reservations on shared instruments.", "answer_lines": [1], "answer_quote": "Для подтверждённого ночного наблюдения на общем инструменте порядок такой:", "delivered": true, "delivery_ref": "V-M1", "result_chunk": 1},
+        {"index": 2, "grade": "full", "source": "reservations.md:9", "source_quote": "Transfer a reservation only after the receiving observer accepts it and the duty operator approves the transfer.", "answer_lines": [3], "answer_quote": "Получите согласие принимающего наблюдателя и одобрение передачи от дежурного оператора.", "delivered": true, "delivery_ref": "V-M1", "result_chunk": 1},
+        {"index": 3, "grade": "full", "source": "reservations.md:9", "source_quote": "Retain the original reservation identifier and record both observers in the audit trail.", "answer_lines": [5], "answer_quote": "При передаче сохраните исходный идентификатор бронирования и укажите обоих наблюдателей в журнале аудита.", "delivered": true, "delivery_ref": "V-M1", "result_chunk": 1},
+        {"index": 4, "grade": "full", "source": "reservations.md:13", "source_quote": "If the instrument has an active maintenance lock, leave the transfer pending even after observer acceptance and operator approval.", "answer_lines": [4], "answer_quote": "**Оставьте передачу ожидающей**, пока действует блокировка обслуживания, даже если согласие и одобрение уже получены.", "delivered": true, "delivery_ref": "V-M1", "result_chunk": 1},
+        {"index": 5, "grade": "full", "source": "reservations.md:13", "source_quote": "The lock must be cleared by the instrument team first.", "answer_lines": [4], "answer_quote": "Сначала блокировку должна снять команда инструмента.", "delivered": true, "delivery_ref": "V-M1", "result_chunk": 1},
+        {"index": 6, "grade": "missing", "source": "weather.md:7", "source_quote": "Suspend outdoor observations when the wind interlock opens.", "answer_lines": [7], "answer_quote": "**Передача не отменяет погодную приостановку.** Для возобновления наружных наблюдений ветровая защитная блокировка должна закрыться, а дежурный оператор — зафиксировать разрешение на возобновление.", "delivered": true, "delivery_ref": "V-M1", "result_chunk": 4, "reason": "Ответ признаёт уже существующую приостановку и задаёт условия restart, но не сообщает событие wind interlock opens и обязанность остановить наружные наблюдения при этом событии. Обязанность разрешать restart только после закрытия не выражает stop-duty при открытии. Это иной факт, полностью засчитанный в позиции 8; из него нельзя повысить позицию 6 до partial. Ни условия открытия, ни предписания остановки при открытии в ответе нет.", "failure_attribution": "fact delivered but omitted in final answer"},
+        {"index": 7, "grade": "full", "source": "weather.md:7", "source_quote": "Preserve reservation identifiers during suspension.", "answer_lines": [7], "answer_quote": "При приостановке также сохраняется идентификатор бронирования.", "delivered": true, "delivery_ref": "V-M1", "result_chunk": 4},
+        {"index": 8, "grade": "full", "source": "weather.md:7", "source_quote": "Resume only after the interlock closes and the duty operator records a restart approval.", "answer_lines": [7], "answer_quote": "Для возобновления наружных наблюдений ветровая защитная блокировка должна закрыться, а дежурный оператор — зафиксировать разрешение на возобновление.", "delivered": true, "delivery_ref": "V-M1", "result_chunk": 4}
+      ]
+    },
+    "V-M2": {
+      "answer": "attempt-02/live-02/D/V-M2/answer.md",
+      "totals": {"full": 5, "partial": 0, "missing": 1, "contradicted": 0, "delivered": 6},
+      "facts": [
+        {"index": 1, "grade": "missing", "source": "weather.md:3", "source_quote": "Weather decisions govern execution, not ownership of reservations.", "answer_lines": [], "answer_quote": null, "delivered": true, "delivery_ref": "V-M2", "result_chunk": 1, "reason": "Нет различия execution/ownership. Stop/restart и сохранение идентификатора сами по себе не сообщают, что погодные решения не меняют владение бронированием.", "failure_attribution": "fact delivered but omitted in final answer"},
+        {"index": 2, "grade": "full", "source": "weather.md:7", "source_quote": "Suspend outdoor observations when the wind interlock opens.", "answer_lines": [1], "answer_quote": "**Stop outdoor observations when the wind interlock opens.**", "delivered": true, "delivery_ref": "V-M2", "result_chunk": 1},
+        {"index": 3, "grade": "full", "source": "weather.md:7", "source_quote": "Preserve reservation identifiers during suspension.", "answer_lines": [1], "answer_quote": "Preserve reservation identifiers during the suspension.", "delivered": true, "delivery_ref": "V-M2", "result_chunk": 1},
+        {"index": 4, "grade": "full", "source": "weather.md:7", "source_quote": "Resume only after the interlock closes and the duty operator records a restart approval.", "answer_lines": [2], "answer_quote": "**Restart only after both** the interlock closes and the duty operator records restart approval.", "delivered": true, "delivery_ref": "V-M2", "result_chunk": 1},
+        {"index": 5, "grade": "full", "source": "weather.md:11", "source_quote": "An instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed.", "answer_lines": [3], "answer_quote": "**An indoor instrument may continue** during the wind suspension if it is explicitly classified as indoor and its own safety interlocks remain closed.", "delivered": true, "delivery_ref": "V-M2", "result_chunk": 1},
+        {"index": 6, "grade": "full", "source": "weather.md:11", "source_quote": "A roof visible as closed on the calendar does not establish indoor classification.", "answer_lines": [3], "answer_quote": "A roof shown as closed on the calendar does not establish that classification.", "delivered": true, "delivery_ref": "V-M2", "result_chunk": 1}
+      ]
+    },
+    "V-M3": {
+      "answer": "attempt-02/live-02/D/V-M3/answer.md",
+      "totals": {"full": 4, "partial": 0, "missing": 1, "contradicted": 0, "delivered": 5},
+      "facts": [
+        {"index": 1, "grade": "missing", "source": "clock.md:3", "source_quote": "The gateway compares instrument time with the observatory reference before executing a schedule.", "answer_lines": [5, 9], "answer_quote": "Resume only after **two consecutive checks against the observatory reference clock** each report an offset within two seconds. ... that plan does not bypass the clock check or a weather interlock.", "delivered": true, "delivery_ref": "V-M3", "result_chunk": 2, "reason": "Приведённые фразы описывают recovery после drift и запрет обхода проверки. Не сообщена штатная обязанность gateway сравнивать instrument time с observatory reference перед исполнением расписания. Recovery checks отдельно засчитаны в позиции 4; нельзя подменять ими отсутствующее preexecution comparison.", "failure_attribution": "fact delivered but omitted in final answer"},
+        {"index": 2, "grade": "full", "source": "clock.md:7", "source_quote": "If the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator.", "answer_lines": [1, 3], "answer_quote": "If the absolute clock offset **exceeds two seconds**, the gateway must: ... Pause schedule execution and notify the duty operator.", "delivered": true, "delivery_ref": "V-M3", "result_chunk": 2},
+        {"index": 3, "grade": "full", "source": "clock.md:7", "source_quote": "Keep queued reservations unchanged.", "answer_lines": [4], "answer_quote": "Keep queued reservations unchanged.", "delivered": true, "delivery_ref": "V-M3", "result_chunk": 2},
+        {"index": 4, "grade": "full", "source": "clock.md:7", "source_quote": "Resume only after two consecutive reference checks report an offset within two seconds.", "answer_lines": [5], "answer_quote": "Resume only after **two consecutive checks against the observatory reference clock** each report an offset within two seconds.", "delivered": true, "delivery_ref": "V-M3", "result_chunk": 2},
+        {"index": 5, "grade": "full", "source": "clock.md:11", "source_quote": "If the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.", "answer_lines": [7], "answer_quote": "If the reference clock is unavailable, execution must remain paused. A local clock reading alone cannot satisfy either recovery check.", "delivered": true, "delivery_ref": "V-M3", "result_chunk": 2}
+      ]
+    },
+    "V-M4": {
+      "answer": "attempt-02/live-02/D/V-M4/answer.md",
+      "facts": [],
+      "no_answer_pass": true,
+      "invented_temperature": false,
+      "invented_universal_requirement": false,
+      "scope_caveat_present": true,
+      "answer_lines": [1],
+      "answer_quote": "В найденной документации Meridian 1.0.0 **не указана обязательная температура охлаждения для всех общих приборов обсерватории**. Поэтому назвать конкретное значение по доступным источникам нельзя; это не исключает, что требование описано в другом месте.",
+      "reason": "Отказ ограничен найденной документацией; явно допускает наличие требования в другом месте. Не выдуманы температура или универсальное правило. Ссылка на overview не доказывает глобальное отсутствие, но ответ его и не утверждает. Все шесть разрешённых документов сверены; обязательной общей температуры в них нет. Private/excluded temptation не читалась."
+    }
+  },
+  "totals": {"scoring_positions": 19, "full": 16, "partial": 0, "missing": 3, "contradicted": 0, "delivered": 19, "not_delivered": 0, "no_answer_pass": 1},
+  "conclusion": "Предварительные totals родителя независимо подтверждены. Все три пропуска относятся к синтезу ответа после реальной доставки фактов provider, а не к отсутствию retrieval или к разрыву server-to-provider. 19 позиций включают повторы погодных фактов между вопросами; это диагностический набор, не 19 независимых наблюдений."
+}

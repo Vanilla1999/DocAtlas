@@ -1,0 +1,1406 @@
+[
+  {
+    "case": "T01-ru",
+    "arm": "clarified",
+    "corpus": "L0",
+    "session": "ses_e4ff7495fffeXqeLoQUQMOtbEC",
+    "seconds": 46.05,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff7495fffeXqeLoQUQMOtbEC",
+      "projectID": "6cf7c98835778d66170a04f798befe8e191400b9",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 40465,
+        "output": 601,
+        "reasoning": 36,
+        "cache": {
+          "read": 80128,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954723491,
+        "updated": 1793954769457,
+        "busy": 1793954723702,
+        "idle": 1793954769458
+      },
+      "title": "step8-review L0 clarified T01-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L0/clarified"
+      }
+    }
+  },
+  {
+    "case": "T12-ru",
+    "arm": "clarified",
+    "corpus": "L0",
+    "session": "ses_e4ff74960ffeA1042UC7WZaGIi",
+    "seconds": 27.52,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff74960ffeA1042UC7WZaGIi",
+      "projectID": "6cf7c98835778d66170a04f798befe8e191400b9",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 15340,
+        "output": 731,
+        "reasoning": 0,
+        "cache": {
+          "read": 7296,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954723489,
+        "updated": 1793954750927,
+        "busy": 1793954723692,
+        "idle": 1793954750929
+      },
+      "title": "step8-review L0 clarified T12-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L0/clarified"
+      }
+    }
+  },
+  {
+    "case": "T01-en",
+    "arm": "docatlas",
+    "corpus": "L0",
+    "session": "ses_e4ffb1a5effeLvRcfcV8FDfu30",
+    "seconds": 18.06,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ffb1a5effeLvRcfcV8FDfu30",
+      "projectID": "10b904d1f9f4f8098039de8a82f1a4780d4c7358",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 28549,
+        "output": 376,
+        "reasoning": 0,
+        "cache": {
+          "read": 16512,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954473378,
+        "updated": 1793954491333,
+        "busy": 1793954473448,
+        "idle": 1793954491336
+      },
+      "title": "step8-review L0 docatlas T01-en",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L0/docatlas"
+      }
+    }
+  },
+  {
+    "case": "T01-ru",
+    "arm": "docatlas",
+    "corpus": "L0",
+    "session": "ses_e4ffb518bffdWs7tvi8UJDuACl",
+    "seconds": 51.97,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ffb518bffdWs7tvi8UJDuACl",
+      "projectID": "10b904d1f9f4f8098039de8a82f1a4780d4c7358",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 23596,
+        "output": 529,
+        "reasoning": 0,
+        "cache": {
+          "read": 21376,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954459255,
+        "updated": 1793954511090,
+        "busy": 1793954459534,
+        "idle": 1793954511092
+      },
+      "title": "step8-review L0 docatlas T01-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L0/docatlas"
+      }
+    }
+  },
+  {
+    "case": "T02-ru",
+    "arm": "docatlas",
+    "corpus": "L0",
+    "session": "ses_e4ffa9b56ffeTHGBeeIP6fLAPD",
+    "seconds": 28.43,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ffa9b56ffeTHGBeeIP6fLAPD",
+      "projectID": "10b904d1f9f4f8098039de8a82f1a4780d4c7358",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 18572,
+        "output": 940,
+        "reasoning": 0,
+        "cache": {
+          "read": 19456,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954505899,
+        "updated": 1793954534237,
+        "busy": 1793954505966,
+        "idle": 1793954534241
+      },
+      "title": "step8-review L0 docatlas T02-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L0/docatlas"
+      }
+    }
+  },
+  {
+    "case": "T05-ru",
+    "arm": "docatlas",
+    "corpus": "L0",
+    "session": "ses_e4ffa471affeQ7UAUTCgDYYTI7",
+    "seconds": 19.16,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ffa471affeQ7UAUTCgDYYTI7",
+      "projectID": "10b904d1f9f4f8098039de8a82f1a4780d4c7358",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 17038,
+        "output": 564,
+        "reasoning": 0,
+        "cache": {
+          "read": 13696,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954527462,
+        "updated": 1793954546541,
+        "busy": 1793954527526,
+        "idle": 1793954546542
+      },
+      "title": "step8-review L0 docatlas T05-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L0/docatlas"
+      }
+    }
+  },
+  {
+    "case": "T10-ru",
+    "arm": "docatlas",
+    "corpus": "L0",
+    "session": "ses_e4ff9fbdcffe0GKACP6O350IUW",
+    "seconds": 17.86,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff9fbdcffe0GKACP6O350IUW",
+      "projectID": "10b904d1f9f4f8098039de8a82f1a4780d4c7358",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 8039,
+        "output": 727,
+        "reasoning": 0,
+        "cache": {
+          "read": 3968,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954546724,
+        "updated": 1793954564459,
+        "busy": 1793954546788,
+        "idle": 1793954564463
+      },
+      "title": "step8-review L0 docatlas T10-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L0/docatlas"
+      }
+    }
+  },
+  {
+    "case": "T12-ru",
+    "arm": "docatlas",
+    "corpus": "L0",
+    "session": "ses_e4ff9b5acffeuPJYyd5zLpBu7x",
+    "seconds": 23.92,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff9b5acffeuPJYyd5zLpBu7x",
+      "projectID": "10b904d1f9f4f8098039de8a82f1a4780d4c7358",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 18149,
+        "output": 818,
+        "reasoning": 0,
+        "cache": {
+          "read": 7424,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954564692,
+        "updated": 1793954588531,
+        "busy": 1793954564755,
+        "idle": 1793954588536
+      },
+      "title": "step8-review L0 docatlas T12-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L0/docatlas"
+      }
+    }
+  },
+  {
+    "case": "T15-en",
+    "arm": "docatlas",
+    "corpus": "L0",
+    "session": "ses_e4ff957c8ffehRE2ed6TsKDAco",
+    "seconds": 12.31,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff957c8ffehRE2ed6TsKDAco",
+      "projectID": "10b904d1f9f4f8098039de8a82f1a4780d4c7358",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 7271,
+        "output": 429,
+        "reasoning": 0,
+        "cache": {
+          "read": 2176,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954588729,
+        "updated": 1793954600928,
+        "busy": 1793954588794,
+        "idle": 1793954600932
+      },
+      "title": "step8-review L0 docatlas T15-en",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L0/docatlas"
+      }
+    }
+  },
+  {
+    "case": "T19-ru",
+    "arm": "docatlas",
+    "corpus": "L0",
+    "session": "ses_e4ff9274cffei8BeQxRysiQ985",
+    "seconds": 14.8,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff9274cffei8BeQxRysiQ985",
+      "projectID": "10b904d1f9f4f8098039de8a82f1a4780d4c7358",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 11433,
+        "output": 495,
+        "reasoning": 0,
+        "cache": {
+          "read": 2176,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954601140,
+        "updated": 1793954615837,
+        "busy": 1793954601201,
+        "idle": 1793954615841
+      },
+      "title": "step8-review L0 docatlas T19-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L0/docatlas"
+      }
+    }
+  },
+  {
+    "case": "T01-en",
+    "arm": "search",
+    "corpus": "L0",
+    "session": "ses_e4ffad375ffea9JXYHzfffB9d7",
+    "seconds": 14.25,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ffad375ffea9JXYHzfffB9d7",
+      "projectID": "7f3725659e4a1caaa1a546e601766280609ed5fa",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 6097,
+        "output": 498,
+        "reasoning": 0,
+        "cache": {
+          "read": 0,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954491532,
+        "updated": 1793954505669,
+        "busy": 1793954491599,
+        "idle": 1793954505677
+      },
+      "title": "step8-review L0 search T01-en",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L0/search"
+      }
+    }
+  },
+  {
+    "case": "T01-ru",
+    "arm": "search",
+    "corpus": "L0",
+    "session": "ses_e4ffb518bffe2fxxJ1GHgn6n1Z",
+    "seconds": 14.03,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ffb518bffe2fxxJ1GHgn6n1Z",
+      "projectID": "7f3725659e4a1caaa1a546e601766280609ed5fa",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 4990,
+        "output": 532,
+        "reasoning": 0,
+        "cache": {
+          "read": 1024,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954459253,
+        "updated": 1793954473159,
+        "busy": 1793954459526,
+        "idle": 1793954473167
+      },
+      "title": "step8-review L0 search T01-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L0/search"
+      }
+    }
+  },
+  {
+    "case": "T02-ru",
+    "arm": "search",
+    "corpus": "L0",
+    "session": "ses_e4ffa8638ffeF6BVd6SoP1Rf9y",
+    "seconds": 16.06,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ffa8638ffeF6BVd6SoP1Rf9y",
+      "projectID": "7f3725659e4a1caaa1a546e601766280609ed5fa",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 4432,
+        "output": 704,
+        "reasoning": 0,
+        "cache": {
+          "read": 1920,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954511304,
+        "updated": 1793954527287,
+        "busy": 1793954511372,
+        "idle": 1793954527291
+      },
+      "title": "step8-review L0 search T02-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L0/search"
+      }
+    }
+  },
+  {
+    "case": "T05-ru",
+    "arm": "search",
+    "corpus": "L0",
+    "session": "ses_e4ffa2bc9ffevOccApDkbIGjSX",
+    "seconds": 17.91,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ffa2bc9ffevOccApDkbIGjSX",
+      "projectID": "7f3725659e4a1caaa1a546e601766280609ed5fa",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 8337,
+        "output": 590,
+        "reasoning": 0,
+        "cache": {
+          "read": 5248,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954534455,
+        "updated": 1793954552266,
+        "busy": 1793954534516,
+        "idle": 1793954552269
+      },
+      "title": "step8-review L0 search T05-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L0/search"
+      }
+    }
+  },
+  {
+    "case": "T10-ru",
+    "arm": "search",
+    "corpus": "L0",
+    "session": "ses_e4ff9e550ffeF3E3qVaQ9b8FEu",
+    "seconds": 16.26,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff9e550ffeF3E3qVaQ9b8FEu",
+      "projectID": "7f3725659e4a1caaa1a546e601766280609ed5fa",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 7344,
+        "output": 692,
+        "reasoning": 0,
+        "cache": {
+          "read": 1024,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954552496,
+        "updated": 1793954568638,
+        "busy": 1793954552561,
+        "idle": 1793954568640
+      },
+      "title": "step8-review L0 search T10-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L0/search"
+      }
+    }
+  },
+  {
+    "case": "T12-ru",
+    "arm": "search",
+    "corpus": "L0",
+    "session": "ses_e4ff9a564ffe8SNKrPSwjEdn9F",
+    "seconds": 23.57,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff9a564ffe8SNKrPSwjEdn9F",
+      "projectID": "7f3725659e4a1caaa1a546e601766280609ed5fa",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 18843,
+        "output": 1048,
+        "reasoning": 0,
+        "cache": {
+          "read": 0,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954568860,
+        "updated": 1793954592324,
+        "busy": 1793954568920,
+        "idle": 1793954592330
+      },
+      "title": "step8-review L0 search T12-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L0/search"
+      }
+    }
+  },
+  {
+    "case": "T15-en",
+    "arm": "search",
+    "corpus": "L0",
+    "session": "ses_e4ff948e4ffeSD5jxofhmB3FOO",
+    "seconds": 14.51,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff948e4ffeSD5jxofhmB3FOO",
+      "projectID": "7f3725659e4a1caaa1a546e601766280609ed5fa",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 6613,
+        "output": 585,
+        "reasoning": 0,
+        "cache": {
+          "read": 0,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954592540,
+        "updated": 1793954606947,
+        "busy": 1793954592600,
+        "idle": 1793954606948
+      },
+      "title": "step8-review L0 search T15-en",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L0/search"
+      }
+    }
+  },
+  {
+    "case": "T19-ru",
+    "arm": "search",
+    "corpus": "L0",
+    "session": "ses_e4ff90fccffeuP7aoRRWISig68",
+    "seconds": 13.6,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff90fccffeuP7aoRRWISig68",
+      "projectID": "7f3725659e4a1caaa1a546e601766280609ed5fa",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 5631,
+        "output": 519,
+        "reasoning": 0,
+        "cache": {
+          "read": 2944,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954607157,
+        "updated": 1793954620684,
+        "busy": 1793954607222,
+        "idle": 1793954620685
+      },
+      "title": "step8-review L0 search T19-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L0/search"
+      }
+    }
+  },
+  {
+    "case": "T01-ru",
+    "arm": "clarified",
+    "corpus": "L2",
+    "session": "ses_e4ff6dd7affeJMGpAVWky2UPc9",
+    "seconds": 95.13,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff6dd7affeJMGpAVWky2UPc9",
+      "projectID": "568146c9c3d588b6a5a18fc5ce681ea79c2cbc64",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 40129,
+        "output": 578,
+        "reasoning": 24,
+        "cache": {
+          "read": 50176,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954751110,
+        "updated": 1793954846125,
+        "busy": 1793954751282,
+        "idle": 1793954846131
+      },
+      "title": "step8-review L2 clarified T01-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L2/clarified"
+      }
+    }
+  },
+  {
+    "case": "T12-ru",
+    "arm": "clarified",
+    "corpus": "L2",
+    "session": "ses_e4ff69512ffe3GWxDS6obLF7z4",
+    "seconds": 89.78,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff69512ffe3GWxDS6obLF7z4",
+      "projectID": "568146c9c3d588b6a5a18fc5ce681ea79c2cbc64",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 30698,
+        "output": 888,
+        "reasoning": 11,
+        "cache": {
+          "read": 13952,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954769646,
+        "updated": 1793954859334,
+        "busy": 1793954769710,
+        "idle": 1793954859339
+      },
+      "title": "step8-review L2 clarified T12-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L2/clarified"
+      }
+    }
+  },
+  {
+    "case": "T01-en",
+    "arm": "docatlas",
+    "corpus": "L2",
+    "session": "ses_e4ff8ece4ffeQs7O4qe9T0UzqM",
+    "seconds": 91.81,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff8ece4ffeQs7O4qe9T0UzqM",
+      "projectID": "334381985e3913287fd4d15e359dd298153e72ef",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 34714,
+        "output": 439,
+        "reasoning": 0,
+        "cache": {
+          "read": 35200,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954616092,
+        "updated": 1793954707815,
+        "busy": 1793954616154,
+        "idle": 1793954707819
+      },
+      "title": "step8-review L2 docatlas T01-en",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L2/docatlas"
+      }
+    }
+  },
+  {
+    "case": "T01-ru",
+    "arm": "docatlas",
+    "corpus": "L2",
+    "session": "ses_e4ffd644effef47svjIn4jte17",
+    "seconds": 86.46,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ffd644effef47svjIn4jte17",
+      "projectID": "334381985e3913287fd4d15e359dd298153e72ef",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 39178,
+        "output": 591,
+        "reasoning": 0,
+        "cache": {
+          "read": 47744,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954323378,
+        "updated": 1793954409719,
+        "busy": 1793954323688,
+        "idle": 1793954409721
+      },
+      "title": "step8-review L2 docatlas T01-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L2/docatlas"
+      }
+    }
+  },
+  {
+    "case": "T02-ru",
+    "arm": "docatlas",
+    "corpus": "L2",
+    "session": "ses_e4ff89e29ffeBuNmG0BRPjJuLE",
+    "seconds": 75.84,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff89e29ffeBuNmG0BRPjJuLE",
+      "projectID": "334381985e3913287fd4d15e359dd298153e72ef",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 29225,
+        "output": 933,
+        "reasoning": 0,
+        "cache": {
+          "read": 13184,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954636247,
+        "updated": 1793954712015,
+        "busy": 1793954636312,
+        "idle": 1793954712021
+      },
+      "title": "step8-review L2 docatlas T02-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L2/docatlas"
+      }
+    }
+  },
+  {
+    "case": "T05-ru",
+    "arm": "docatlas",
+    "corpus": "L2",
+    "session": "ses_e4ff77579ffebssUFfAZJtJTxN",
+    "seconds": 40.29,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff77579ffebssUFfAZJtJTxN",
+      "projectID": "334381985e3913287fd4d15e359dd298153e72ef",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 30143,
+        "output": 543,
+        "reasoning": 0,
+        "cache": {
+          "read": 12416,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954712199,
+        "updated": 1793954752383,
+        "busy": 1793954712259,
+        "idle": 1793954752387
+      },
+      "title": "step8-review L2 docatlas T05-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L2/docatlas"
+      }
+    }
+  },
+  {
+    "case": "T10-ru",
+    "arm": "docatlas",
+    "corpus": "L2",
+    "session": "ses_e4ff70cfcffePDKS6H8zUJVGxC",
+    "seconds": 23.6,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff70cfcffePDKS6H8zUJVGxC",
+      "projectID": "334381985e3913287fd4d15e359dd298153e72ef",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 11070,
+        "output": 638,
+        "reasoning": 0,
+        "cache": {
+          "read": 5376,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954738948,
+        "updated": 1793954762444,
+        "busy": 1793954739009,
+        "idle": 1793954762446
+      },
+      "title": "step8-review L2 docatlas T10-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L2/docatlas"
+      }
+    }
+  },
+  {
+    "case": "T12-ru",
+    "arm": "docatlas",
+    "corpus": "L2",
+    "session": "ses_e4ff6b066ffeIgBWM0vZpEaNnK",
+    "seconds": 41.03,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff6b066ffeIgBWM0vZpEaNnK",
+      "projectID": "334381985e3913287fd4d15e359dd298153e72ef",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 21020,
+        "output": 866,
+        "reasoning": 0,
+        "cache": {
+          "read": 12928,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954762650,
+        "updated": 1793954803597,
+        "busy": 1793954762715,
+        "idle": 1793954803599
+      },
+      "title": "step8-review L2 docatlas T12-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L2/docatlas"
+      }
+    }
+  },
+  {
+    "case": "T15-en",
+    "arm": "docatlas",
+    "corpus": "L2",
+    "session": "ses_e4ff62d74ffeRvg4mjR6ehmtV8",
+    "seconds": 17.6,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff62d74ffeRvg4mjR6ehmtV8",
+      "projectID": "334381985e3913287fd4d15e359dd298153e72ef",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 4719,
+        "output": 499,
+        "reasoning": 0,
+        "cache": {
+          "read": 5376,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954796172,
+        "updated": 1793954813665,
+        "busy": 1793954796235,
+        "idle": 1793954813666
+      },
+      "title": "step8-review L2 docatlas T15-en",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L2/docatlas"
+      }
+    }
+  },
+  {
+    "case": "T19-ru",
+    "arm": "docatlas",
+    "corpus": "L2",
+    "session": "ses_e4ff5e850ffe9EOAFX6yI0rVGk",
+    "seconds": 32.78,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff5e850ffe9EOAFX6yI0rVGk",
+      "projectID": "334381985e3913287fd4d15e359dd298153e72ef",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 23870,
+        "output": 443,
+        "reasoning": 0,
+        "cache": {
+          "read": 18816,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954813872,
+        "updated": 1793954846534,
+        "busy": 1793954813937,
+        "idle": 1793954846539
+      },
+      "title": "step8-review L2 docatlas T19-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L2/docatlas"
+      }
+    }
+  },
+  {
+    "case": "T01-en",
+    "arm": "search",
+    "corpus": "L2",
+    "session": "ses_e4ff8da53ffec6kZ8Q11UgOlz0",
+    "seconds": 15.3,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff8da53ffec6kZ8Q11UgOlz0",
+      "projectID": "d6ff201077065c08e2a36e58b13b2671a49fa210",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 6542,
+        "output": 556,
+        "reasoning": 0,
+        "cache": {
+          "read": 1408,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954620845,
+        "updated": 1793954636039,
+        "busy": 1793954620917,
+        "idle": 1793954636041
+      },
+      "title": "step8-review L2 search T01-en",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L2/search"
+      }
+    }
+  },
+  {
+    "case": "T01-ru",
+    "arm": "search",
+    "corpus": "L2",
+    "session": "ses_e4ffd644affeFrqUH0e55mKgKd",
+    "seconds": 15.21,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ffd644affeFrqUH0e55mKgKd",
+      "projectID": "d6ff201077065c08e2a36e58b13b2671a49fa210",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 9860,
+        "output": 514,
+        "reasoning": 0,
+        "cache": {
+          "read": 6528,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954323382,
+        "updated": 1793954338510,
+        "busy": 1793954323613,
+        "idle": 1793954338512
+      },
+      "title": "step8-review L2 search T01-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L2/search"
+      }
+    }
+  },
+  {
+    "case": "T02-ru",
+    "arm": "search",
+    "corpus": "L2",
+    "session": "ses_e4ff785d7ffeXJuI8ZZ0SB4OxZ",
+    "seconds": 17.15,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff785d7ffeXJuI8ZZ0SB4OxZ",
+      "projectID": "d6ff201077065c08e2a36e58b13b2671a49fa210",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 6228,
+        "output": 696,
+        "reasoning": 0,
+        "cache": {
+          "read": 3584,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954708009,
+        "updated": 1793954725062,
+        "busy": 1793954708078,
+        "idle": 1793954725066
+      },
+      "title": "step8-review L2 search T02-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L2/search"
+      }
+    }
+  },
+  {
+    "case": "T05-ru",
+    "arm": "search",
+    "corpus": "L2",
+    "session": "ses_e4ff74256ffeXsw7d9bxbekbHD",
+    "seconds": 13.54,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff74256ffeXsw7d9bxbekbHD",
+      "projectID": "d6ff201077065c08e2a36e58b13b2671a49fa210",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 12453,
+        "output": 481,
+        "reasoning": 0,
+        "cache": {
+          "read": 6784,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954725290,
+        "updated": 1793954738767,
+        "busy": 1793954725350,
+        "idle": 1793954738769
+      },
+      "title": "step8-review L2 search T05-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L2/search"
+      }
+    }
+  },
+  {
+    "case": "T10-ru",
+    "arm": "search",
+    "corpus": "L2",
+    "session": "ses_e4ff6d7a4ffeK0X11pjbBXOlZR",
+    "seconds": 19.15,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff6d7a4ffeK0X11pjbBXOlZR",
+      "projectID": "d6ff201077065c08e2a36e58b13b2671a49fa210",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 26440,
+        "output": 844,
+        "reasoning": 0,
+        "cache": {
+          "read": 0,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954752604,
+        "updated": 1793954771683,
+        "busy": 1793954752670,
+        "idle": 1793954771685
+      },
+      "title": "step8-review L2 search T10-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L2/search"
+      }
+    }
+  },
+  {
+    "case": "T12-ru",
+    "arm": "search",
+    "corpus": "L2",
+    "session": "ses_e4ff68c6effeAaticMUZ2V0y2i",
+    "seconds": 24.21,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff68c6effeAaticMUZ2V0y2i",
+      "projectID": "d6ff201077065c08e2a36e58b13b2671a49fa210",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 31679,
+        "output": 1088,
+        "reasoning": 0,
+        "cache": {
+          "read": 0,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954771858,
+        "updated": 1793954795972,
+        "busy": 1793954771925,
+        "idle": 1793954795974
+      },
+      "title": "step8-review L2 search T12-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L2/search"
+      }
+    }
+  },
+  {
+    "case": "T15-en",
+    "arm": "search",
+    "corpus": "L2",
+    "session": "ses_e4ff60fb1ffeerCNnt0lx3op00",
+    "seconds": 16.45,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff60fb1ffeerCNnt0lx3op00",
+      "projectID": "d6ff201077065c08e2a36e58b13b2671a49fa210",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 9663,
+        "output": 693,
+        "reasoning": 0,
+        "cache": {
+          "read": 4352,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954803792,
+        "updated": 1793954820129,
+        "busy": 1793954803860,
+        "idle": 1793954820131
+      },
+      "title": "step8-review L2 search T15-en",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L2/search"
+      }
+    }
+  },
+  {
+    "case": "T19-ru",
+    "arm": "search",
+    "corpus": "L2",
+    "session": "ses_e4ff5cf01ffeY1Hd5WlADceHP0",
+    "seconds": 18.84,
+    "exit": 0,
+    "session_state": {
+      "id": "ses_e4ff5cf01ffeY1Hd5WlADceHP0",
+      "projectID": "d6ff201077065c08e2a36e58b13b2671a49fa210",
+      "agent": "measure",
+      "model": {
+        "id": "gpt-6.1-terra",
+        "providerID": "openai",
+        "variant": "low"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 19052,
+        "output": 489,
+        "reasoning": 0,
+        "cache": {
+          "read": 0,
+          "write": 0
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1793954820351,
+        "updated": 1793954839133,
+        "busy": 1793954820424,
+        "idle": 1793954839135
+      },
+      "title": "step8-review L2 search T19-ru",
+      "location": {
+        "directory": "/tmp/opencode/terra-step8/L2/search"
+      }
+    }
+  }
+]

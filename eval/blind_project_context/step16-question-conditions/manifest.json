@@ -1,0 +1,179 @@
+{
+  "schema": "question-relative-fixed-evidence-v1",
+  "status": "LIVE_COMPLETED_REVIEWED_NO_PROMOTION",
+  "historical_revision": "420e21924e486a7ebca8f4aa891cc176e07280f6",
+  "historical_path": "eval/blind_project_context/step15-answer-conditions/terra-small",
+  "requested_model": "openai/gpt-6.1-terra",
+  "effort_override": null,
+  "historical_effective_settings": null,
+  "provider_requests": null,
+  "provider_usage": {
+    "current": {
+      "input": 16794,
+      "output": 873,
+      "reasoning": 0,
+      "cache": {
+        "read": 49408,
+        "write": 0
+      },
+      "input_plus_cache_read": 66202
+    },
+    "aspect-conditions-v1": {
+      "input": 5646,
+      "output": 806,
+      "reasoning": 0,
+      "cache": {
+        "read": 60928,
+        "write": 0
+      },
+      "input_plus_cache_read": 66574
+    }
+  },
+  "actual_provider_input_delivery": "raw_provider_body_unknown; exact input confirmed in harness read result before final answer for all 8 sessions",
+  "candidate_results": "live/summary.json",
+  "historical_reproduction_limit": "Historical effective defaults are unknown; this does not block a new paired experiment in the current harness.",
+  "launch_status": "Parent executed 8 fresh direct functions.subagent calls in two batches of 4; no variant/sessionID override, no repeats. Child exported only those sessions.",
+  "blockers": [],
+  "checks": {
+    "cases": 4,
+    "prepared_trials": 8,
+    "source_texts_in_prepared_inputs": true,
+    "baseline_prompt_hashes_match": true,
+    "only_instruction_replaced": true
+  },
+  "roster": [
+    {
+      "id": "pair-01-current",
+      "case_id": "V-M1",
+      "arm": "current",
+      "input": "generator-inputs/pair-01-current.txt",
+      "sha256": "0baacaae348e1771ac6842c824d5d1d4ffe5e1bb030d3e002f8a2455172f59c4",
+      "historical_baseline_id": "trial-001",
+      "evidence_sha256": "46939efcea743a4ca2e381778f5faf7e4a385d3a446016b12dff649bd38aae0a"
+    },
+    {
+      "id": "pair-01-aspect-conditions-v1",
+      "case_id": "V-M1",
+      "arm": "aspect-conditions-v1",
+      "input": "generator-inputs/pair-01-aspect-conditions-v1.txt",
+      "sha256": "41279d6841397cc3f8ebcee59b029e3bddba5ee7916650fe8f6cbd1b4cfe6b2f",
+      "historical_baseline_id": "trial-001",
+      "evidence_sha256": "46939efcea743a4ca2e381778f5faf7e4a385d3a446016b12dff649bd38aae0a"
+    },
+    {
+      "id": "pair-02-aspect-conditions-v1",
+      "case_id": "fresh-en-print-queue-recovery",
+      "arm": "aspect-conditions-v1",
+      "input": "generator-inputs/pair-02-aspect-conditions-v1.txt",
+      "sha256": "fcb1597ea1a57e2afed4a8bfc0ba9dfaca5031917257c098ef470de6bb11e7b2",
+      "historical_baseline_id": "trial-015",
+      "evidence_sha256": "736cee85a59a88fc987fb5a7788ecb53b3f4841c2f4ca29ba42625c8760cc178"
+    },
+    {
+      "id": "pair-02-current",
+      "case_id": "fresh-en-print-queue-recovery",
+      "arm": "current",
+      "input": "generator-inputs/pair-02-current.txt",
+      "sha256": "b63e4bc8db9f0acbfee4e32fcbe4930838d65b7803b4f4efa89f403b75353b25",
+      "historical_baseline_id": "trial-015",
+      "evidence_sha256": "736cee85a59a88fc987fb5a7788ecb53b3f4841c2f4ca29ba42625c8760cc178"
+    },
+    {
+      "id": "pair-03-current",
+      "case_id": "fresh-en-single-attachment-limit",
+      "arm": "current",
+      "input": "generator-inputs/pair-03-current.txt",
+      "sha256": "5b036aba2d2a72a6b9438c5e01d373cb905b2c7d645e7c15ab0071542861a3d3",
+      "historical_baseline_id": "trial-019",
+      "evidence_sha256": "f6533f8b10ddd3035b4fe5bc3aa93f0a2965992162b46b92e0eaf0f83f0dae82"
+    },
+    {
+      "id": "pair-03-aspect-conditions-v1",
+      "case_id": "fresh-en-single-attachment-limit",
+      "arm": "aspect-conditions-v1",
+      "input": "generator-inputs/pair-03-aspect-conditions-v1.txt",
+      "sha256": "341c11e5565be4b9d3c274cd3f4a0afcaf9506d2e01b074c5fea7ed1f336471c",
+      "historical_baseline_id": "trial-019",
+      "evidence_sha256": "f6533f8b10ddd3035b4fe5bc3aa93f0a2965992162b46b92e0eaf0f83f0dae82"
+    },
+    {
+      "id": "pair-04-aspect-conditions-v1",
+      "case_id": "fresh-ru-undocumented-journal-retention",
+      "arm": "aspect-conditions-v1",
+      "input": "generator-inputs/pair-04-aspect-conditions-v1.txt",
+      "sha256": "7ada74112ec42274494def94d251af91aa943ba918e36c08b7c8b174c8e03941",
+      "historical_baseline_id": "trial-024",
+      "evidence_sha256": "4d52f8259eec8d7a2cd08af201886391ba9269ae0a5c6996129b698add036325"
+    },
+    {
+      "id": "pair-04-current",
+      "case_id": "fresh-ru-undocumented-journal-retention",
+      "arm": "current",
+      "input": "generator-inputs/pair-04-current.txt",
+      "sha256": "4720d65bf1ccc49e2b518a1c3ec1a56f88e3882c64682707ea72bf6e8e9cabe0",
+      "historical_baseline_id": "trial-024",
+      "evidence_sha256": "4d52f8259eec8d7a2cd08af201886391ba9269ae0a5c6996129b698add036325"
+    }
+  ],
+  "sha256": {
+    "historical/cases.json": "ea0817420624a729d24057869bf6ceba1fea9eb9dcdf3c81d57635ee371a9f4c",
+    "historical/inputs.json": "4ead071c6ac6bff79725bcedf93b1109b52c5a81e8c8a0f20a109ee5ece1bff4",
+    "historical/answers.json": "13cadc52efb93947fd4eaa9ab1020611add11c272d7a805141b5f5ba829e5cbb",
+    "historical/gold.json": "8ddd452522ea3a37247b575c93a6eb34e89846d070eef42d7bdbc3fe9132e82a",
+    "historical/manifest.json": "5641e62c9f1cdaf56ed3b40bf110d7b8b0e50a64e552e698329ed444b0d50403",
+    "historical/RESULTS_RU.md": "6dab5a7f1c4e93b2737f78200508129c2b80f98134c213f1136fdfb7c13654bd",
+    "historical/RUN_RECEIPT_RU.md": "91aeeb273dc611d7b650e7577b957a555cecccfe4c749885f7b30ece986b8857",
+    "generator-inputs/pair-01-current.txt": "0baacaae348e1771ac6842c824d5d1d4ffe5e1bb030d3e002f8a2455172f59c4",
+    "generator-inputs/pair-01-aspect-conditions-v1.txt": "41279d6841397cc3f8ebcee59b029e3bddba5ee7916650fe8f6cbd1b4cfe6b2f",
+    "generator-inputs/pair-02-aspect-conditions-v1.txt": "fcb1597ea1a57e2afed4a8bfc0ba9dfaca5031917257c098ef470de6bb11e7b2",
+    "generator-inputs/pair-02-current.txt": "b63e4bc8db9f0acbfee4e32fcbe4930838d65b7803b4f4efa89f403b75353b25",
+    "generator-inputs/pair-03-current.txt": "5b036aba2d2a72a6b9438c5e01d373cb905b2c7d645e7c15ab0071542861a3d3",
+    "generator-inputs/pair-03-aspect-conditions-v1.txt": "341c11e5565be4b9d3c274cd3f4a0afcaf9506d2e01b074c5fea7ed1f336471c",
+    "generator-inputs/pair-04-aspect-conditions-v1.txt": "7ada74112ec42274494def94d251af91aa943ba918e36c08b7c8b174c8e03941",
+    "generator-inputs/pair-04-current.txt": "4720d65bf1ccc49e2b518a1c3ec1a56f88e3882c64682707ea72bf6e8e9cabe0",
+    "candidate.txt": "fd90481a51ccd9bc8d428d2798106357208e60ca468bf5ef43ab1d50e6da2a75",
+    "rubric-v2.json": "6020f36b6a804ff1834017abe9467452797d6fbd141e2f7e8138abea03ee1ce5",
+    "prepare.py": "49be795ca70525d51de50c2079dea5e4872bba3b0654e44c028194d560fda173",
+    "live/answers/pair-01-aspect-conditions-v1.md": "5ea791a032a6000500ee1c21cf42c9c509c5a512565598d9c360752f80bd051d",
+    "live/answers/pair-01-current.md": "62ac2cd3877cf4266b4c970772a7ba8af9de641de5545e956b5bf7d47a1c4068",
+    "live/answers/pair-02-aspect-conditions-v1.md": "67bc48396773d0f2f428a5028533ae7a657362cdd96a54a8126802ddfd47e741",
+    "live/answers/pair-02-current.md": "050a25395915a039a0b1de9755849c90b266b45fa7eb686d039f9055721eea55",
+    "live/answers/pair-03-aspect-conditions-v1.md": "59ff7c415b0a613bfff2c303575062caa96b0f77fd8f2fd415984fee9faf5fe8",
+    "live/answers/pair-03-current.md": "4ef89c769709c6430ca3ceca587ba757c14fd5ddf4a7e2c4dabf30e7abdd0f2e",
+    "live/answers/pair-04-aspect-conditions-v1.md": "a8b72106ceb20e5bd9b8abcf0aa1069a59151cb5c671f8ec6e279f5436791196",
+    "live/answers/pair-04-current.md": "5728f83a43188bbcc2bde1dee943471a8b9a2b27746cc3e7becbb28e4fec7967",
+    "live/delivery-checks.json": "b553ef47a23c072e2c24813d5b2212de37f97bce06bb01c1e9f0a5f1c1f7dfda",
+    "live/exports/pair-01-aspect-conditions-v1.json": "794bb60d8a50e407c1400586573a0a06c70a3b1a77303e21c9e893127b9164f2",
+    "live/exports/pair-01-current.json": "fc818d1ec6d1fe02589b380d72e9b3fa1d5dd0b912249a202006b7dcad26daa2",
+    "live/exports/pair-02-aspect-conditions-v1.json": "80c25f37329b445537d36abcabba0bdbf6e7834ca5435f6ceca435e8aa90b5a5",
+    "live/exports/pair-02-current.json": "96d63e1b51dd1ff22b8b825890a9472bc539651cb096af949564609b4cb0978c",
+    "live/exports/pair-03-aspect-conditions-v1.json": "f6bb0bb833814ab034257708b8891a4b9d50d0f4214700ded0c24e308e15ce72",
+    "live/exports/pair-03-current.json": "309c1c7c866f4662c48063325bbd1a9cd6be404c33354fa88c35843349246b37",
+    "live/exports/pair-04-aspect-conditions-v1.json": "f486099cbf74688a4a4c072bc830886ea99c23da1b4030b2832e91923d1272af",
+    "live/exports/pair-04-current.json": "e6f9ed9e66df7f07545e002c8f5302cf8f4564155a13f7543dcd213f7583249b",
+    "live/results.json": "4683614c5db0eab67df664cc397235caf0ef69f96ad416f2034dc533cb61d84a",
+    "live/review.json": "bfd27c717d7d4b41718a68ddbb0022582fb262d2db9adb79613d6d08403d0a02",
+    "live/summary.json": "fc2b94b2ba7a2676df77d20b37a08679e2d0890d5098a0b57886d477f5e3aaf9",
+    "sessions.json": "739086e5a538332eee9735b6c3fbd31047c04b3c3e5c010d5315f91859f93b2e",
+    "launch-handoff.json": "53c34b0d4651a80928605a91d53d2bced60a032c7cada60930e645248809894f",
+    "collect_live.py": "f7d6a72f5412b758bd55a8e865d208a62d352e529f6f735c5b7a9db24e1a9a7d",
+    "summarize_live.py": "202c27a7f368c3b5de0b084e9b69bda35eef125eafe26d8d02ab7f10a3117531",
+    "REVIEW_RU.md": "fe13f3eb7d1921d9fd7acfbe7bba575d668a97357b401d91635acc4cfc129bea"
+  },
+  "generated_answers": 8,
+  "launcher_calls_parent_reported": 8,
+  "harness_assistant_messages": 16,
+  "usage_provenance": "opencode session export; assistant.tokens and info.tokens reconciled; not raw HTTP capture",
+  "harness_reported_model_metadata": {
+    "id": "gpt-6.1-terra",
+    "providerID": "openai",
+    "variant": "default"
+  },
+  "requiredness": "draft; preliminary independent review incorporated; M7 sensitivity, M3/M5 grouped",
+  "historical_receipts": [
+    "pre-review/manifest.json",
+    "pre-live/manifest.json"
+  ],
+  "final_review": "REVIEW_RU.md",
+  "review_scope": "Parent review, separate from preparation but nonblind; requiredness remains draft."
+}

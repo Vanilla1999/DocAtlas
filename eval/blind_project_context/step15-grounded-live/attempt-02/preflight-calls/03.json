@@ -1,0 +1,20 @@
+{
+  "name": "fetch_url",
+  "arguments": {
+    "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/clock.md",
+    "followRedirects": false
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "# Time coordination\n\nThe gateway compares instrument time with the observatory reference before executing a schedule.\n\n## Clock offset\n\nIf the absolute clock offset exceeds two seconds, pause schedule execution and notify the duty operator. Keep queued reservations unchanged. Resume only after two consecutive reference checks report an offset within two seconds.\n\n## Missing reference\n\nIf the reference clock is unavailable, keep execution paused; a local clock reading alone cannot satisfy either recovery check.\n\n## Simulation clock\n\nThe simulator advances time manually and never waits for reference checks. Its accelerated clock is isolated from the real instrument gateway.\n",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

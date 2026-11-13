@@ -1,0 +1,20 @@
+{
+  "opencode": "/home/viadmin/.opencode/bin/opencode",
+  "model": "openai/gpt-6.1-terra#low",
+  "inputs": {
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/attempt02.py": "d79aec20abe38671f5430c50ab7359c1c1a69f840b092523a630b8e914a6cd99",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/profile/index.js": "713b6597c864d2ebf8fc0973b46db0e12990e37c84852189bb87844ad2bd721b",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/profile/package.json": "a1de02be4a5db96f024029d38e8d1d7e510a3abed97c1dd56da002d8ede90203",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/observer/index.js": "acdfbc423b247a0ae7d0ed177f7c257594da4508d995014cbf8ee87a08f9584a",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/observe_stdio.py": "40d185f421cc05b493a3415ed132679e8a17ef5661612b5bff55f4675795e865",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/session_runtime.py": "d8296287f8f9230b857b8da4fdf6e50292cef23a4520df00451a255607235ff0",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step13-runtime-token-review/session_runtime.py": "0b94f14953bd9078a52d285d88344dd5e46d5d2ce36b36b3c1d78c0c90e5944d",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/tasks.json": "d091e3e94bb56a9d67a1514d23fc9417bb0dc8ee1718b69c4dad63ab8f0505eb",
+    "/home/viadmin/.local/share/docatlas-eval/step15/work/attempt-02/locations/D/V-M2/opencode.json": "6986f7871d04db8ea8a388c4ae35b4dbe402fdea83e9e6cfaae36cf5993741ba",
+    "/home/viadmin/.local/share/docatlas-eval/step15/work/attempt-02/locations/D/V-M1/opencode.json": "977937067fbd148a66f014de44f7d553f3223ba4b91c986f5e18e8185a101411",
+    "/home/viadmin/.local/share/docatlas-eval/step15/work/attempt-02/locations/D/V-M3/opencode.json": "0db4ff3a36463c37aabe07103b45ee3e672bd4d6f7927e1e2be7f0414616c66b",
+    "/home/viadmin/.local/share/docatlas-eval/step15/work/attempt-02/locations/D/V-M4/opencode.json": "7188114b5dbe2894a659587c5d55672cde17f1653b8596a948936780a4091e66"
+  },
+  "common_prompt_sha256": "9533321f7cf4cfeff4a26ff66fa03058694a07455e87e54e188c8f3fa0b78aea",
+  "provider_calls": 0
+}

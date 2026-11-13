@@ -1,0 +1,7 @@
+{
+  "reason": "Grounded startup takes 23.9s in real observer transport; prior 10s readiness guard fired before any provider request",
+  "prior_provider_requests": 0,
+  "prior_model_tool_calls": 0,
+  "change": "readiness 10s to 60s; MCP startup timeout 60s; four new locations; all model criteria and prompts unchanged",
+  "transport_probe": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/attempt-02/transport-probe/complete.json"
+}

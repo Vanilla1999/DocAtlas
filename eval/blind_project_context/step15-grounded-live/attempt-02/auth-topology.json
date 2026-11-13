@@ -1,0 +1,21 @@
+{
+  "auth": "existing-user",
+  "checked_by": "opencode debug paths (no server/provider start)",
+  "paths": {
+    "home": "/home/viadmin",
+    "data": "/home/viadmin/.local/share/opencode",
+    "cache": "/home/viadmin/.local/share/docatlas-eval/step15/work/attempt-02/client-cache/opencode",
+    "config": "/home/viadmin/.local/share/docatlas-eval/step15/work/attempt-02/client-config/opencode",
+    "state": "/home/viadmin/.local/share/docatlas-eval/step15/work/attempt-02/client-state/opencode",
+    "tmp": "/home/viadmin/.local/share/docatlas-eval/step15/work/attempt-02/tmp/opencode",
+    "bin": "/home/viadmin/.local/share/docatlas-eval/step15/work/attempt-02/client-cache/opencode/bin",
+    "log": "/home/viadmin/.local/share/opencode/log",
+    "repos": "/home/viadmin/.local/share/opencode/repos",
+    "db": "/home/viadmin/.local/share/opencode/opencode.db"
+  },
+  "credential_values_accessed": false,
+  "credentials_copied": false,
+  "api_key_environment_forwarded": false,
+  "login_started": false,
+  "boundary": "Private process/server, shared user data/credentials/session DB/native log; isolated config/state/cache. Normal OpenCode credential refresh may update shared data."
+}

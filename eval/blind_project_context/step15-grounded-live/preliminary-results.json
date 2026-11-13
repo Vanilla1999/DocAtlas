@@ -1,0 +1,212 @@
+{
+  "status": "4_COMPLETED_SEMANTIC_REVIEW_PENDING",
+  "sessions": [
+    {
+      "arm": "D",
+      "task": "V-M1",
+      "usage": {
+        "input": 5171,
+        "output": 643,
+        "cached": 1408,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 3763
+      },
+      "provider_requests": 3,
+      "seconds": 17.878993322001406,
+      "model_tool_calls": {
+        "grounded_search_docs": 2
+      },
+      "actual_mcp_calls": {
+        "search_docs": 2
+      },
+      "answer": "Для подтверждённого ночного наблюдения на общем инструменте порядок такой:\n\n1. Получите согласие принимающего наблюдателя и одобрение передачи от дежурного оператора.\n2. **Оставьте передачу ожидающей**, пока действует блокировка обслуживания, даже если согласие и одобрение уже получены. Сначала блокировку должна снять команда инструмента.\n3. При передаче сохраните исходный идентификатор бронирования и укажите обоих наблюдателей в журнале аудита. [Источник: Confirmed reservations — Transfer, Locked instrument](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/reservations.md)\n\n**Передача не отменяет погодную приостановку.** Для возобновления наружных наблюдений ветровая защитная блокировка должна закрыться, а дежурный оператор — зафиксировать разрешение на возобновление. При приостановке также сохраняется идентификатор бронирования. Инструмент, явно классифицированный как внутренний, может продолжать работу во время ветровой приостановки, если его собственные защитные блокировки остаются закрытыми; изображение закрытой крыши в календаре само по себе не подтверждает такую классификацию. [Источник: Weather decisions — Suspension, Indoor instrument](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/weather.md)\n\nКалендарь служит только для отображения состояния: обновление страницы не снимает блокировку обслуживания и не разрешает выполнение наблюдения. [Источники: Calendar display — Colours](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/calendar.md); [Meridian scheduler — Services](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/overview.md)",
+      "answer_source": "attempt-02/live-02/D/V-M1/answer.md",
+      "quality": null,
+      "source_facts_found": null,
+      "source_facts_delivered": null,
+      "measurement_gap": null
+    },
+    {
+      "arm": "D",
+      "task": "V-M2",
+      "usage": {
+        "input": 3493,
+        "output": 227,
+        "cached": 1152,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 2341
+      },
+      "provider_requests": 2,
+      "seconds": 8.579971383998782,
+      "model_tool_calls": {
+        "grounded_search_docs": 1
+      },
+      "actual_mcp_calls": {
+        "search_docs": 1
+      },
+      "answer": "- **Stop outdoor observations when the wind interlock opens.** Preserve reservation identifiers during the suspension.\n- **Restart only after both** the interlock closes and the duty operator records restart approval. A favourable forecast is not an interlock signal and cannot authorize a restart.\n- **An indoor instrument may continue** during the wind suspension if it is explicitly classified as indoor and its own safety interlocks remain closed. A roof shown as closed on the calendar does not establish that classification.\n\nSource: [Weather decisions — Suspension, Indoor instrument, and Forecast display](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/weather.md).",
+      "answer_source": "attempt-02/live-02/D/V-M2/answer.md",
+      "quality": null,
+      "source_facts_found": null,
+      "source_facts_delivered": null,
+      "measurement_gap": null
+    },
+    {
+      "arm": "D",
+      "task": "V-M3",
+      "usage": {
+        "input": 3487,
+        "output": 322,
+        "cached": 1152,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 2335
+      },
+      "provider_requests": 2,
+      "seconds": 10.245033314000466,
+      "model_tool_calls": {
+        "grounded_search_docs": 1
+      },
+      "actual_mcp_calls": {
+        "search_docs": 1
+      },
+      "answer": "If the absolute clock offset **exceeds two seconds**, the gateway must:\n\n- Pause schedule execution and notify the duty operator.\n- Keep queued reservations unchanged.\n- Resume only after **two consecutive checks against the observatory reference clock** each report an offset within two seconds.\n\nIf the reference clock is unavailable, execution must remain paused. A local clock reading alone cannot satisfy either recovery check. [Time coordination: Clock offset and Missing reference](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/clock.md)\n\nThe retired prototype’s recovery behavior—clearing pending reservations and restarting on the first local clock sample—must not be used for the current gateway. The planner may compute a plan while execution is suspended, but that plan does not bypass the clock check or a weather interlock. [Scheduler architecture: Planner and Prototype recovery](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/architecture.md)",
+      "answer_source": "attempt-02/live-02/D/V-M3/answer.md",
+      "quality": null,
+      "source_facts_found": null,
+      "source_facts_delivered": null,
+      "measurement_gap": null
+    },
+    {
+      "arm": "D",
+      "task": "V-M4",
+      "usage": {
+        "input": 5143,
+        "output": 242,
+        "cached": 2432,
+        "cache_write": 0,
+        "reasoning": 9,
+        "uncached": 2711
+      },
+      "provider_requests": 3,
+      "seconds": 10.934372580000854,
+      "model_tool_calls": {
+        "grounded_search_docs": 2
+      },
+      "actual_mcp_calls": {
+        "search_docs": 2
+      },
+      "answer": "В найденной документации Meridian 1.0.0 **не указана обязательная температура охлаждения для всех общих приборов обсерватории**. Поэтому назвать конкретное значение по доступным источникам нельзя; это не исключает, что требование описано в другом месте.\n\nИсточник: [Meridian scheduler — Services](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/overview.md).",
+      "answer_source": "attempt-02/live-02/D/V-M4/answer.md",
+      "quality": null,
+      "source_facts_found": null,
+      "source_facts_delivered": null,
+      "measurement_gap": null
+    }
+  ],
+  "totals": {
+    "A": {
+      "sessions": 4,
+      "provider_requests": 13,
+      "seconds": 66.15084200000001,
+      "usage": {
+        "input": 26342,
+        "output": 1245,
+        "cached": 12544,
+        "uncached": 13798,
+        "cache_write": 0,
+        "reasoning": 11
+      },
+      "actual_mcp_calls": {
+        "docs_status": 4,
+        "get_docs_context": 5
+      },
+      "model_tool_calls": {
+        "docatlas_docs_status": 4,
+        "docatlas_get_docs_context": 5
+      },
+      "boundary": "historical step14; preserve its measurement gaps"
+    },
+    "B": {
+      "sessions": 4,
+      "provider_requests": 9,
+      "seconds": null,
+      "usage": {
+        "input": 18604,
+        "output": 1150,
+        "cached": 7424,
+        "uncached": 11180,
+        "cache_write": 0,
+        "reasoning": 11
+      },
+      "actual_mcp_calls": {
+        "docs_status": 4,
+        "get_docs_context": 5
+      },
+      "model_tool_calls": {
+        "docatlas_get_docs_context": 5
+      },
+      "boundary": "historical step14; preserve its measurement gaps"
+    },
+    "C": {
+      "sessions": 4,
+      "provider_requests": 14,
+      "seconds": 49.826121208001496,
+      "usage": {
+        "input": 22896,
+        "output": 1727,
+        "cached": 9856,
+        "uncached": 13040,
+        "cache_write": 0,
+        "reasoning": 0
+      },
+      "actual_mcp_calls": {},
+      "model_tool_calls": {
+        "grep": 5,
+        "glob": 2,
+        "read": 14
+      },
+      "boundary": "historical step14; preserve its measurement gaps"
+    },
+    "D": {
+      "sessions": 4,
+      "provider_requests": 10,
+      "seconds": 47.63837060000151,
+      "usage": {
+        "input": 17294,
+        "output": 1434,
+        "cached": 6144,
+        "uncached": 11150,
+        "cache_write": 0,
+        "reasoning": 9
+      },
+      "actual_mcp_calls": {
+        "search_docs": 6
+      },
+      "model_tool_calls": {
+        "grounded_search_docs": 6
+      },
+      "boundary": "new sequential D"
+    }
+  },
+  "historical_results_sha256": "264c4ee5b496e6e8c6f80a56dad0e77152149c169aed595d115fef3dddb11cc7",
+  "historical_measurement_gaps": [
+    {
+      "arm": "B",
+      "task": "V-M1",
+      "gap": "Bun/Python clock epochs differ; first-request hint is verified, chronological timestamp ordering unknown"
+    },
+    {
+      "arm": "B",
+      "task": "V-M4",
+      "gap": "Coordinator killed by outer 120-second tool timeout; provider results complete, CLI incomplete, end-to-end seconds unknown"
+    }
+  ],
+  "no_simultaneous_randomization": true,
+  "model_retries": 0,
+  "lexical_mode": true,
+  "preparation_calls_excluded": true,
+  "orchestration_agent_usage_included": false
+}

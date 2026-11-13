@@ -1,0 +1,90 @@
+{
+  "session_status": "finished",
+  "retrieval_status": "not_observed",
+  "answer_status": "produced",
+  "answer": "Для подтверждённого ночного наблюдения на общем инструменте порядок такой:\n\n1. Получите согласие принимающего наблюдателя и одобрение передачи от дежурного оператора.\n2. **Оставьте передачу ожидающей**, пока действует блокировка обслуживания, даже если согласие и одобрение уже получены. Сначала блокировку должна снять команда инструмента.\n3. При передаче сохраните исходный идентификатор бронирования и укажите обоих наблюдателей в журнале аудита. [Источник: Confirmed reservations — Transfer, Locked instrument](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/reservations.md)\n\n**Передача не отменяет погодную приостановку.** Для возобновления наружных наблюдений ветровая защитная блокировка должна закрыться, а дежурный оператор — зафиксировать разрешение на возобновление. При приостановке также сохраняется идентификатор бронирования. Инструмент, явно классифицированный как внутренний, может продолжать работу во время ветровой приостановки, если его собственные защитные блокировки остаются закрытыми; изображение закрытой крыши в календаре само по себе не подтверждает такую классификацию. [Источник: Weather decisions — Suspension, Indoor instrument](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/weather.md)\n\nКалендарь служит только для отображения состояния: обновление страницы не снимает блокировку обслуживания и не разрешает выполнение наблюдения. [Источники: Calendar display — Colours](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/calendar.md); [Meridian scheduler — Services](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/overview.md)",
+  "failures": [],
+  "capture_errors": [],
+  "tool_calls": 2,
+  "retrieval_calls": 0,
+  "expected_host_rejections": [],
+  "transport_pass": false,
+  "answer_quality": "not_graded",
+  "termination": null,
+  "returncode": 0,
+  "seconds": 17.878993322001406,
+  "cleanup": {
+    "strategy": "held private group plus explicitly registered MCP pidfds; no foreign-group signals",
+    "group": 289210,
+    "observed_processes": [
+      {
+        "pid": 289210,
+        "state": "Z",
+        "pgid": 289210,
+        "sid": 289210,
+        "start_ticks": 847249,
+        "name": "opencode"
+      },
+      {
+        "pid": 289245,
+        "state": "S",
+        "pgid": 289245,
+        "sid": 289245,
+        "start_ticks": 847307,
+        "name": "python",
+        "role": "transport",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/attempt-02/live-02/D/V-M1/mcp-process.json"
+      },
+      {
+        "pid": 289246,
+        "state": "R",
+        "pgid": 289245,
+        "sid": 289245,
+        "start_ticks": 847309,
+        "name": "node",
+        "role": "server",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/attempt-02/live-02/D/V-M1/mcp-process.json"
+      }
+    ],
+    "before_cleanup": [
+      {
+        "pid": 289210,
+        "state": "Z",
+        "pgid": 289210,
+        "sid": 289210,
+        "start_ticks": 847249,
+        "name": "opencode"
+      }
+    ],
+    "signals": [],
+    "remaining_live": [],
+    "escaped_live_observed": [],
+    "registered_processes": [
+      {
+        "role": "transport",
+        "pid": 289245,
+        "pgid": 289245,
+        "sid": 289245,
+        "start_ticks": 847307,
+        "pid_namespace": "pid:[4026531836]",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/attempt-02/live-02/D/V-M1/mcp-process.json",
+        "exit_verified": true
+      },
+      {
+        "role": "server",
+        "pid": 289246,
+        "pgid": 289245,
+        "sid": 289245,
+        "start_ticks": 847309,
+        "pid_namespace": "pid:[4026531836]",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/attempt-02/live-02/D/V-M1/mcp-process.json",
+        "exit_verified": true
+      }
+    ],
+    "registration_errors": {},
+    "no_live_owned_processes": true,
+    "leader_reaped": true,
+    "boundary": "Private group plus explicit MCP launch registrations/observed identities; unseen detached descendants and GPU VRAM are not measured."
+  },
+  "provider_capture_completed_before_cleanup": true
+}

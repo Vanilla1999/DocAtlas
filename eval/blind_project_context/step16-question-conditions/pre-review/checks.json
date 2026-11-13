@@ -1,0 +1,13 @@
+{
+  "status": "PASS_ARTIFACT_INTEGRITY_ONLY",
+  "manifest_hashes": 18,
+  "source_spans_and_hashes": 11,
+  "historical_quotes_in_prepared_evidence": 16,
+  "review_rows": 21,
+  "exact_answer_quotes": 20,
+  "git_diff_check": "PASS",
+  "semantic_review_independent": false,
+  "provider_delivery_verified": false,
+  "new_model_calls": 0,
+  "product_tests_run": 0
+}

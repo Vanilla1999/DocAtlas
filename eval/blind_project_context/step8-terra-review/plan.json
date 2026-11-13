@@ -1,0 +1,25 @@
+{
+  "commit": "76766008789d963ccad33a220c3bd76217ce9f81",
+  "model": "openai/gpt-6.1-terra#low",
+  "case_ids": [
+    "T01-ru",
+    "T01-en",
+    "T02-ru",
+    "T05-ru",
+    "T10-ru",
+    "T12-ru",
+    "T15-en",
+    "T19-ru"
+  ],
+  "corpora": [
+    "L0",
+    "L2"
+  ],
+  "arms": [
+    "docatlas",
+    "search"
+  ],
+  "steps": 12,
+  "skill_sha256": "9c3e501120bcd98e6d23faeeeb1b917e70a29c9d0305727470defd92582511c8",
+  "note": "Dev diagnostic; no gold or retrieval answers supplied to model; language translation is agent generated. One fresh OpenCode session per case and arm. Installed wheel, no observer."
+}

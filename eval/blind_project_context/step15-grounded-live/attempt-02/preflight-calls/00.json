@@ -1,0 +1,17 @@
+{
+  "name": "list_libraries",
+  "arguments": {},
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Indexed libraries:\n\n- meridian-step15-e62fa9e3",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

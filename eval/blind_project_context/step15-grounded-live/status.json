@@ -1,0 +1,16 @@
+{
+  "status": "BLOCKED_PREPARATION_CONFIG_MISMATCH_STOPPED",
+  "model_sessions_started": 0,
+  "provider_requests": 0,
+  "retrieval_experiment_started": false,
+  "library": "meridian-step15-e62fa9e3",
+  "version": "1.0.0",
+  "expected_store": "/home/viadmin/.local/share/docatlas-eval/step15/work/attempt-01/grounded-store",
+  "actual_store": "/home/viadmin/.local/share/docs-mcp-server",
+  "indexed_pages": 6,
+  "indexed_chunks": 9,
+  "prior_libraries_not_removed_or_reindexed": true,
+  "semantic_grade": null,
+  "reason": "Grounded --config did not apply requested storePath; stop-on-error rule; no started case repeated.",
+  "existing_library_note": "Existing grounded-ab5-frozen-e13fdef2-20261027 remains in default store; new library was appended, not deleted or overwritten."
+}

@@ -1,0 +1,21 @@
+{
+  "opencode": "/home/viadmin/.opencode/bin/opencode",
+  "model": "openai/gpt-6.1-terra#low",
+  "inputs": {
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/continue02.py": "1b07ca44b4fe0fd0da3bd48598aa99ded7f8cc433d9206e798be8cfc756d2a0d",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/attempt02.py": "d79aec20abe38671f5430c50ab7359c1c1a69f840b092523a630b8e914a6cd99",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/profile-ready60/index.js": "c5f22ea45e49a618064faa92fda0ef1b8335cc4cb8d4e493641f0b23ad954033",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/profile-ready60/package.json": "a1cf271a88438a05c057753c2bd8a9b3949c9bc2b709044c4a130b32a5b46d91",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/observer/index.js": "acdfbc423b247a0ae7d0ed177f7c257594da4508d995014cbf8ee87a08f9584a",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/observe_stdio.py": "40d185f421cc05b493a3415ed132679e8a17ef5661612b5bff55f4675795e865",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/session_runtime.py": "d8296287f8f9230b857b8da4fdf6e50292cef23a4520df00451a255607235ff0",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step13-runtime-token-review/session_runtime.py": "0b94f14953bd9078a52d285d88344dd5e46d5d2ce36b36b3c1d78c0c90e5944d",
+    "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step14-host-language-live/tasks.json": "d091e3e94bb56a9d67a1514d23fc9417bb0dc8ee1718b69c4dad63ab8f0505eb",
+    "/home/viadmin/.local/share/docatlas-eval/step15/work/attempt-02/locations/live-02/D/V-M2/opencode.json": "912366c61dcbeea15732af589c5cd8320efc4a09422dd9a1af9d0c6baac0c1e3",
+    "/home/viadmin/.local/share/docatlas-eval/step15/work/attempt-02/locations/live-02/D/V-M1/opencode.json": "82cbe784751eeccd3525654b8a9ce2e6bd04dd31efd27ce452c043666318977e",
+    "/home/viadmin/.local/share/docatlas-eval/step15/work/attempt-02/locations/live-02/D/V-M3/opencode.json": "c47edad205c5676a5baaf67260a6d4eb79e851adabd4e3e00fc95a01d7f32fd2",
+    "/home/viadmin/.local/share/docatlas-eval/step15/work/attempt-02/locations/live-02/D/V-M4/opencode.json": "c4bde9e70b3ab61c946bb820bfe6561beeeec8b1074ea3d15daa6efab5adf600"
+  },
+  "timeout": 900,
+  "max_steps": 12
+}

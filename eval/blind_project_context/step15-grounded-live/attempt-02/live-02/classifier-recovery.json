@@ -1,0 +1,12 @@
+{
+  "reason": "V-M1 finished successfully with 3 provider responses and 2 real Grounded calls; historical classifier only recognizes DocAtlas/files tool names",
+  "model_errors": 0,
+  "provider_errors": 0,
+  "repeated_cases": [],
+  "remaining": [
+    "V-M2",
+    "V-M3",
+    "V-M4"
+  ],
+  "script_sha256": "1d52689e946e1af98caece8a681446c6f9d92d30d3a721d786f876151e34253e"
+}

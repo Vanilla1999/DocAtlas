@@ -1,0 +1,69 @@
+{
+  "status":"DRAFT_NONBLIND_EXECUTOR_REVIEW_AFTER_PRELIMINARY_INDEPENDENT_REQUIREDNESS_REVIEW",
+  "rubric":"question-relative-conditions-v2-draft.1",
+  "owner_approved":false,
+  "scoring_groups_without_M7":[["M1"],["M2"],["M3","M5"],["M4"],["M9"],["P1"],["P2"],["P3"],["P4"],["P5"],["P7"],["A1"]],
+  "group_rule":"M3/M5 jointly express one execution/ownership distinction; allow one phrase to support both. Full if all semantic components supported, no separate wording required.",
+  "sensitivity_additional_group":["M7"],
+  "separate_positions":["M6","M8","M10","P6","A2","J1","J2"],
+  "reviews":[
+    {"trial":"pair-01-current","items":[
+      {"id":"M1","grade":"full","quote":"Получите согласие принимающего наблюдателя и одобрение дежурного оператора.","reason":"Both transfer approvals required."},
+      {"id":"M2","grade":"full","quote":"Сохраните исходный идентификатор бронирования и внесите обоих наблюдателей в журнал аудита.","reason":"Transfer identity and both audit participants retained."},
+      {"id":"M3","grade":"full","quote":"Передача не отменяет погодную приостановку.","reason":"Transfer does not remove existing suspension."},
+      {"id":"M4","grade":"full","quote":"**При активной блокировке обслуживания передача должна оставаться в ожидании**, даже если принимающий наблюдатель согласился, а дежурный оператор её одобрил. Сначала блокировку должна снять команда инструмента.","reason":"Lock, pending status despite both approvals, responsible team and precedence preserved."},
+      {"id":"M5","grade":"full","quote":"Погодные решения управляют выполнением наблюдений, а не принадлежностью бронирования.","reason":"Execution/ownership explicit; grouped with M3 for scoring."},
+      {"id":"M6","grade":"missing","quote":null,"reason":"No stop-duty on interlock opening; unnecessary for already active suspension."},
+      {"id":"M7","grade":"full","quote":"идентификатор бронирования при приостановке сохраняется.","reason":"Preservation during suspension explicit, separate from transfer."},
+      {"id":"M8","grade":"full","quote":"Возобновить наблюдения можно только после закрытия ветровой блокировки и записи дежурным оператором разрешения на перезапуск","reason":"Both restart conditions attached to observations, not ownership transfer; follow-up only."},
+      {"id":"M9","grade":"partial","quote":"Для передачи подтверждённого ночного бронирования:","reason":"Confirmed/night preserved; shared-instrument scope omitted despite delivery. No contradiction asserted."},
+      {"id":"M10","grade":"full","quote":"Календарь доступен только для просмотра: обновление его отображения не снимает блокировку обслуживания. Упрощённая передача дневных учебных слотов к подтверждённым наблюдениям не применяется.","reason":"Supported peripheral rules, no extra transfer operation required."}
+    ],"erroneous_added_restrictions":[],"secondary_observations":[]},
+    {"trial":"pair-01-aspect-conditions-v1","items":[
+      {"id":"M1","grade":"full","quote":"Получите согласие принимающего наблюдателя и одобрение дежурного оператора.","reason":"Both transfer approvals required."},
+      {"id":"M2","grade":"full","quote":"Сохраните исходный идентификатор бронирования и укажите обоих наблюдателей в журнале аудита.","reason":"Transfer preservation and audit retained."},
+      {"id":"M3","grade":"full","quote":"Погодная приостановка касается выполнения наблюдений, а не владения бронированием; передача её не изменяет.","reason":"Same phrase supports M3/M5; counted once."},
+      {"id":"M4","grade":"full","quote":"**Оставьте передачу в ожидании**, даже если согласие и одобрение уже получены: сначала команда инструмента должна снять активную блокировку обслуживания.","reason":"Complete lock-dependent pending obligation retained."},
+      {"id":"M5","grade":"full","quote":"Погодная приостановка касается выполнения наблюдений, а не владения бронированием; передача её не изменяет.","reason":"Same phrase supports M3/M5; counted once."},
+      {"id":"M6","grade":"partial","quote":"Для возобновления наружных наблюдений после срабатывания ветровой блокировки","reason":"Mentions trigger context, no explicit duty to start suspension. Not required here."},
+      {"id":"M7","grade":"partial","quote":"Сохраните исходный идентификатор бронирования","reason":"Transfer scope only. Does not explicitly preserve identifier throughout suspension. Requiredness disputed."},
+      {"id":"M8","grade":"full","quote":"Для возобновления наружных наблюдений после срабатывания ветровой блокировки она должна закрыться, а дежурный оператор — записать разрешение на возобновление. Это условия **возобновления наблюдений**, а не дополнительные условия передачи.","reason":"Both restart conditions preserved and action binding explicit."},
+      {"id":"M9","grade":"full","quote":"Для подтверждённого ночного наблюдения на общем инструменте:","reason":"Full applicability scope retained."},
+      {"id":"M10","grade":"missing","quote":null,"reason":"Calendar/training background omitted appropriately."}
+    ],"erroneous_added_restrictions":[],"secondary_observations":[]},
+    {"trial":"pair-02-current","items":[
+      {"id":"P1","grade":"full","quote":"The documented procedure applies only to **RillPrint 4 queues already in maintenance mode**:","reason":"Maintenance mode is a prerequisite, not inferred from stalled."},
+      {"id":"P2","grade":"full","quote":"Before any purge, export the job manifest.","reason":"Mandatory export before purge."},
+      {"id":"P3","grade":"full","quote":"Purge only when **both** the upstream feeder is stopped and the device buffer is empty.","reason":"Conjunction and governed action preserved."},
+      {"id":"P4","grade":"full","quote":"If any job is marked `held`, stop recovery and leave the queue paused. Do not purge or resume it.","reason":"Held-job blocker preserves pause and forbids both actions."},
+      {"id":"P5","grade":"full","quote":"After the purge, run `spool-verify` successfully before resuming the queue.","reason":"Successful verification and temporal order preserved."},
+      {"id":"P6","grade":"full","quote":"Uploading a diagnostic bundle is optional.","reason":"Mentioned correctly as optional; omission would not be defect."},
+      {"id":"P7","grade":"full","quote":"Archived job receipts must remain unchanged throughout recovery.","reason":"Whole-recovery preservation retained."}
+    ],"erroneous_added_restrictions":[],"secondary_observations":[]},
+    {"trial":"pair-02-aspect-conditions-v1","items":[
+      {"id":"P1","grade":"full","quote":"the documented procedure applies **only if the queue is already in maintenance mode**.","reason":"Sentence explicitly scopes stalled RillPrint 4 recovery to maintenance mode."},
+      {"id":"P2","grade":"full","quote":"Export the job manifest before purging.","reason":"Mandatory export precedes purge."},
+      {"id":"P3","grade":"full","quote":"Purge only when **both** the upstream feeder is stopped and the device buffer is empty.","reason":"Both prerequisites retained."},
+      {"id":"P4","grade":"full","quote":"First check for jobs marked `held`: if any are present, stop recovery, leave the queue paused, and do not purge or resume it.","reason":"Held exception governs entire recovery; checking status operationalizes the stated condition without introducing a new approval."},
+      {"id":"P5","grade":"full","quote":"3. Run `spool-verify` successfully before resuming the queue.","reason":"Numbered step 3 follows purge in step 2; successful verification precedes resume. Full assertion supported across adjacent steps."},
+      {"id":"P6","grade":"full","quote":"Uploading a diagnostic bundle is optional.","reason":"Optionality preserved when mentioned."},
+      {"id":"P7","grade":"full","quote":"Archived job receipts must remain unchanged throughout recovery.","reason":"Temporal invariant retained."}
+    ],"erroneous_added_restrictions":[],"secondary_observations":[{"type":"imprecise_evidence_gap","quote":"The supplied evidence does not say how to enter maintenance mode or give the purge and verification commands.","reason":"Verification operation spool-verify is named in source and answer. Concrete command syntax/arguments are not supplied. Broad statement about missing verification commands is imprecise. Post-answer secondary observation, not a new win metric or lost conditional assertion."}]},
+    {"trial":"pair-03-current","items":[
+      {"id":"A1","grade":"full","quote":"In a standard RelayPost mailbox, one attachment can be at most **18 MiB**.","reason":"Mailbox class, scope, maximum and unit retained."},
+      {"id":"A2","grade":"missing","quote":null,"reason":"Unasked upload workflow appropriately absent."}
+    ],"erroneous_added_restrictions":[],"secondary_observations":[]},
+    {"trial":"pair-03-aspect-conditions-v1","items":[
+      {"id":"A1","grade":"full","quote":"In a standard RelayPost mailbox, one attachment can be at most **18 MiB**.","reason":"Direct fact with required qualifications."},
+      {"id":"A2","grade":"missing","quote":null,"reason":"Unasked upload workflow appropriately absent."}
+    ],"erroneous_added_restrictions":[],"secondary_observations":[]},
+    {"trial":"pair-04-current","items":[
+      {"id":"J1","grade":"full","quote":"В предоставленной документации **не указан срок автоматического удаления**","reason":"Bounded abstention; explicitly leaves other documentation open."},
+      {"id":"J2","grade":"full","quote":"Указанная периодичность в 24 часа относится к сверке устройств, а не к удалению записей","reason":"Does not confuse reconciliation with retention."}
+    ],"erroneous_added_restrictions":[],"secondary_observations":[]},
+    {"trial":"pair-04-aspect-conditions-v1","items":[
+      {"id":"J1","grade":"full","quote":"В предоставленном фрагменте документации срок автоматического удаления записей журнала не указан.","reason":"Bounded gap, not universal absence claim."},
+      {"id":"J2","grade":"full","quote":"Упомянутые 24 часа — это периодичность сверки устройств, а не срок хранения журнала","reason":"No false inference of deletion period."}
+    ],"erroneous_added_restrictions":[],"secondary_observations":[]}
+  ]
+}

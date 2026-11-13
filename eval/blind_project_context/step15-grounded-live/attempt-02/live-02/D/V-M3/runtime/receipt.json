@@ -1,0 +1,90 @@
+{
+  "session_status": "finished",
+  "retrieval_status": "not_observed",
+  "answer_status": "produced",
+  "answer": "If the absolute clock offset **exceeds two seconds**, the gateway must:\n\n- Pause schedule execution and notify the duty operator.\n- Keep queued reservations unchanged.\n- Resume only after **two consecutive checks against the observatory reference clock** each report an offset within two seconds.\n\nIf the reference clock is unavailable, execution must remain paused. A local clock reading alone cannot satisfy either recovery check. [Time coordination: Clock offset and Missing reference](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/clock.md)\n\nThe retired prototype’s recovery behavior—clearing pending reservations and restarting on the first local clock sample—must not be used for the current gateway. The planner may compute a plan while execution is suspended, but that plan does not bypass the clock check or a weather interlock. [Scheduler architecture: Planner and Prototype recovery](https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/architecture.md)",
+  "failures": [],
+  "capture_errors": [],
+  "tool_calls": 1,
+  "retrieval_calls": 0,
+  "expected_host_rejections": [],
+  "transport_pass": false,
+  "answer_quality": "not_graded",
+  "termination": null,
+  "returncode": 0,
+  "seconds": 10.245033314000466,
+  "cleanup": {
+    "strategy": "held private group plus explicitly registered MCP pidfds; no foreign-group signals",
+    "group": 291776,
+    "observed_processes": [
+      {
+        "pid": 291776,
+        "state": "Z",
+        "pgid": 291776,
+        "sid": 291776,
+        "start_ticks": 854530,
+        "name": "opencode"
+      },
+      {
+        "pid": 291812,
+        "state": "S",
+        "pgid": 291812,
+        "sid": 291812,
+        "start_ticks": 854588,
+        "name": "python",
+        "role": "transport",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/attempt-02/live-02/D/V-M3/mcp-process.json"
+      },
+      {
+        "pid": 291813,
+        "state": "R",
+        "pgid": 291812,
+        "sid": 291812,
+        "start_ticks": 854590,
+        "name": "node",
+        "role": "server",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/attempt-02/live-02/D/V-M3/mcp-process.json"
+      }
+    ],
+    "before_cleanup": [
+      {
+        "pid": 291776,
+        "state": "Z",
+        "pgid": 291776,
+        "sid": 291776,
+        "start_ticks": 854530,
+        "name": "opencode"
+      }
+    ],
+    "signals": [],
+    "remaining_live": [],
+    "escaped_live_observed": [],
+    "registered_processes": [
+      {
+        "role": "transport",
+        "pid": 291812,
+        "pgid": 291812,
+        "sid": 291812,
+        "start_ticks": 854588,
+        "pid_namespace": "pid:[4026531836]",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/attempt-02/live-02/D/V-M3/mcp-process.json",
+        "exit_verified": true
+      },
+      {
+        "role": "server",
+        "pid": 291813,
+        "pgid": 291812,
+        "sid": 291812,
+        "start_ticks": 854590,
+        "pid_namespace": "pid:[4026531836]",
+        "registry": "/tmp/opencode/step14-host-language-live-20261108/eval/blind_project_context/step15-grounded-live/attempt-02/live-02/D/V-M3/mcp-process.json",
+        "exit_verified": true
+      }
+    ],
+    "registration_errors": {},
+    "no_live_owned_processes": true,
+    "leader_reaped": true,
+    "boundary": "Private group plus explicit MCP launch registrations/observed identities; unseen detached descendants and GPU VRAM are not measured."
+  },
+  "provider_capture_completed_before_cleanup": true
+}

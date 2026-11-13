@@ -1,0 +1,20 @@
+{
+  "name": "fetch_url",
+  "arguments": {
+    "url": "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/weather.md",
+    "followRedirects": false
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "# Weather decisions\n\nWeather decisions govern execution, not ownership of reservations.\n\n## Suspension\n\nSuspend outdoor observations when the wind interlock opens. Preserve reservation identifiers during suspension. Resume only after the interlock closes and the duty operator records a restart approval.\n\n## Indoor instrument\n\nAn instrument explicitly classified as indoor may continue during a wind suspension, provided its own safety interlocks remain closed. A roof visible as closed on the calendar does not establish indoor classification.\n\n## Forecast display\n\nThe forecast panel predicts wind for planning. A favourable forecast is not an interlock signal and cannot authorize a restart.\n",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "command": [
+    "/home/viadmin/.npm/_npx/cb869cd955fb8070/node_modules/.bin/docs-mcp-server",
+    "--store-path",
+    "/home/viadmin/.local/share/docatlas-eval/step15/work/attempt-02/grounded-store",
+    "--telemetry=false",
+    "scrape",
+    "meridian-step15-e62fa9e3",
+    "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/overview.md",
+    "--version",
+    "1.0.0",
+    "--max-pages",
+    "1",
+    "--max-depth",
+    "0",
+    "--clean=false",
+    "--follow-redirects=false",
+    "--include-pattern",
+    "https://raw.githubusercontent.com/Vanilla1999/DocAtlas/e62fa9e357bd22731cddabe930532a4a2faecc18/eval/blind_project_context/step14-host-language-live/frozen-corpus/overview.md",
+    "--output",
+    "json"
+  ],
+  "returncode": 0,
+  "stdout": "Successfully scraped 1 pages\n",
+  "stderr": ""
+}

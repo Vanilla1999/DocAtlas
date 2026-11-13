@@ -1,0 +1,1 @@
+{"direction": "request", "message": {"method": "initialize", "params": {"protocolVersion": "2025-11-25", "capabilities": {"elicitation": {"form": {}, "url": {}}, "roots": {}}, "clientInfo": {"name": "opencode", "version": "2.2.5"}}, "jsonrpc": "2.0", "id": 0}, "monotonic_ns": 8314089735494, "wall_time_ns": 1794128222569700854, "capture_version": "wall-v2"}

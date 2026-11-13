@@ -1,0 +1,117 @@
+{
+  "schema": "question-relative-fixed-evidence-v1",
+  "status": "AWAITING_DIRECT_LAUNCHER_HANDOFF",
+  "historical_revision": "420e21924e486a7ebca8f4aa891cc176e07280f6",
+  "historical_path": "eval/blind_project_context/step15-answer-conditions/terra-small",
+  "requested_model": "openai/gpt-6.1-terra",
+  "effort_override": null,
+  "historical_effective_settings": null,
+  "provider_requests": 0,
+  "provider_usage": null,
+  "actual_provider_input_delivery": "unknown",
+  "candidate_results": null,
+  "blockers": [],
+  "checks": {
+    "cases": 4,
+    "prepared_trials": 8,
+    "source_texts_in_prepared_inputs": true,
+    "baseline_prompt_hashes_match": true,
+    "only_instruction_replaced": true
+  },
+  "roster": [
+    {
+      "id": "pair-01-current",
+      "case_id": "V-M1",
+      "arm": "current",
+      "input": "generator-inputs/pair-01-current.txt",
+      "sha256": "0baacaae348e1771ac6842c824d5d1d4ffe5e1bb030d3e002f8a2455172f59c4",
+      "historical_baseline_id": "trial-001",
+      "evidence_sha256": "46939efcea743a4ca2e381778f5faf7e4a385d3a446016b12dff649bd38aae0a"
+    },
+    {
+      "id": "pair-01-aspect-conditions-v1",
+      "case_id": "V-M1",
+      "arm": "aspect-conditions-v1",
+      "input": "generator-inputs/pair-01-aspect-conditions-v1.txt",
+      "sha256": "41279d6841397cc3f8ebcee59b029e3bddba5ee7916650fe8f6cbd1b4cfe6b2f",
+      "historical_baseline_id": "trial-001",
+      "evidence_sha256": "46939efcea743a4ca2e381778f5faf7e4a385d3a446016b12dff649bd38aae0a"
+    },
+    {
+      "id": "pair-02-aspect-conditions-v1",
+      "case_id": "fresh-en-print-queue-recovery",
+      "arm": "aspect-conditions-v1",
+      "input": "generator-inputs/pair-02-aspect-conditions-v1.txt",
+      "sha256": "fcb1597ea1a57e2afed4a8bfc0ba9dfaca5031917257c098ef470de6bb11e7b2",
+      "historical_baseline_id": "trial-015",
+      "evidence_sha256": "736cee85a59a88fc987fb5a7788ecb53b3f4841c2f4ca29ba42625c8760cc178"
+    },
+    {
+      "id": "pair-02-current",
+      "case_id": "fresh-en-print-queue-recovery",
+      "arm": "current",
+      "input": "generator-inputs/pair-02-current.txt",
+      "sha256": "b63e4bc8db9f0acbfee4e32fcbe4930838d65b7803b4f4efa89f403b75353b25",
+      "historical_baseline_id": "trial-015",
+      "evidence_sha256": "736cee85a59a88fc987fb5a7788ecb53b3f4841c2f4ca29ba42625c8760cc178"
+    },
+    {
+      "id": "pair-03-current",
+      "case_id": "fresh-en-single-attachment-limit",
+      "arm": "current",
+      "input": "generator-inputs/pair-03-current.txt",
+      "sha256": "5b036aba2d2a72a6b9438c5e01d373cb905b2c7d645e7c15ab0071542861a3d3",
+      "historical_baseline_id": "trial-019",
+      "evidence_sha256": "f6533f8b10ddd3035b4fe5bc3aa93f0a2965992162b46b92e0eaf0f83f0dae82"
+    },
+    {
+      "id": "pair-03-aspect-conditions-v1",
+      "case_id": "fresh-en-single-attachment-limit",
+      "arm": "aspect-conditions-v1",
+      "input": "generator-inputs/pair-03-aspect-conditions-v1.txt",
+      "sha256": "341c11e5565be4b9d3c274cd3f4a0afcaf9506d2e01b074c5fea7ed1f336471c",
+      "historical_baseline_id": "trial-019",
+      "evidence_sha256": "f6533f8b10ddd3035b4fe5bc3aa93f0a2965992162b46b92e0eaf0f83f0dae82"
+    },
+    {
+      "id": "pair-04-aspect-conditions-v1",
+      "case_id": "fresh-ru-undocumented-journal-retention",
+      "arm": "aspect-conditions-v1",
+      "input": "generator-inputs/pair-04-aspect-conditions-v1.txt",
+      "sha256": "7ada74112ec42274494def94d251af91aa943ba918e36c08b7c8b174c8e03941",
+      "historical_baseline_id": "trial-024",
+      "evidence_sha256": "4d52f8259eec8d7a2cd08af201886391ba9269ae0a5c6996129b698add036325"
+    },
+    {
+      "id": "pair-04-current",
+      "case_id": "fresh-ru-undocumented-journal-retention",
+      "arm": "current",
+      "input": "generator-inputs/pair-04-current.txt",
+      "sha256": "4720d65bf1ccc49e2b518a1c3ec1a56f88e3882c64682707ea72bf6e8e9cabe0",
+      "historical_baseline_id": "trial-024",
+      "evidence_sha256": "4d52f8259eec8d7a2cd08af201886391ba9269ae0a5c6996129b698add036325"
+    }
+  ],
+  "sha256": {
+    "historical/cases.json": "ea0817420624a729d24057869bf6ceba1fea9eb9dcdf3c81d57635ee371a9f4c",
+    "historical/inputs.json": "4ead071c6ac6bff79725bcedf93b1109b52c5a81e8c8a0f20a109ee5ece1bff4",
+    "historical/answers.json": "13cadc52efb93947fd4eaa9ab1020611add11c272d7a805141b5f5ba829e5cbb",
+    "historical/gold.json": "8ddd452522ea3a37247b575c93a6eb34e89846d070eef42d7bdbc3fe9132e82a",
+    "historical/manifest.json": "5641e62c9f1cdaf56ed3b40bf110d7b8b0e50a64e552e698329ed444b0d50403",
+    "historical/RESULTS_RU.md": "6dab5a7f1c4e93b2737f78200508129c2b80f98134c213f1136fdfb7c13654bd",
+    "historical/RUN_RECEIPT_RU.md": "91aeeb273dc611d7b650e7577b957a555cecccfe4c749885f7b30ece986b8857",
+    "generator-inputs/pair-01-current.txt": "0baacaae348e1771ac6842c824d5d1d4ffe5e1bb030d3e002f8a2455172f59c4",
+    "generator-inputs/pair-01-aspect-conditions-v1.txt": "41279d6841397cc3f8ebcee59b029e3bddba5ee7916650fe8f6cbd1b4cfe6b2f",
+    "generator-inputs/pair-02-aspect-conditions-v1.txt": "fcb1597ea1a57e2afed4a8bfc0ba9dfaca5031917257c098ef470de6bb11e7b2",
+    "generator-inputs/pair-02-current.txt": "b63e4bc8db9f0acbfee4e32fcbe4930838d65b7803b4f4efa89f403b75353b25",
+    "generator-inputs/pair-03-current.txt": "5b036aba2d2a72a6b9438c5e01d373cb905b2c7d645e7c15ab0071542861a3d3",
+    "generator-inputs/pair-03-aspect-conditions-v1.txt": "341c11e5565be4b9d3c274cd3f4a0afcaf9506d2e01b074c5fea7ed1f336471c",
+    "generator-inputs/pair-04-aspect-conditions-v1.txt": "7ada74112ec42274494def94d251af91aa943ba918e36c08b7c8b174c8e03941",
+    "generator-inputs/pair-04-current.txt": "4720d65bf1ccc49e2b518a1c3ec1a56f88e3882c64682707ea72bf6e8e9cabe0",
+    "candidate.txt": "fd90481a51ccd9bc8d428d2798106357208e60ca468bf5ef43ab1d50e6da2a75",
+    "rubric-v2.json": "6020f36b6a804ff1834017abe9467452797d6fbd141e2f7e8138abea03ee1ce5",
+    "prepare.py": "9dc5e76c1998af5de2cdab31b5c3f78f054917a21eb8d751437fd0e23da47737"
+  },
+  "historical_reproduction_limit": "Historical effective defaults are unknown; this does not block a new paired experiment in the current harness.",
+  "launch_status": "Parent confirms direct functions.subagent availability. Code Mode search cannot enumerate direct tools. This executor's exposed direct tool list lacks subagent; handoff requests prepared for parent."
+}
