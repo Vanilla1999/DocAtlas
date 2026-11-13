@@ -10,7 +10,7 @@ Local-first · version-aware · source-attributed · MCP
 [![License: MIT](https://img.shields.io/github/license/Vanilla1999/DocAtlas?style=for-the-badge)](https://github.com/Vanilla1999/DocAtlas/blob/main/LICENSE)
 [![Python 3.11 | 3.12 | 3.13](https://img.shields.io/badge/python-3.11%20|%203.12%20|%203.13-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://pypi.org/project/doc-atlas/)
 
-[Install](#one-line-install) · [How it works](#what-docatlas-is-and-what-problem-it-solves) · [Docs MCP](#project-docs-mcp-server) · [CLI reference](./docs/capabilities.md#end-to-end-examples-of-current-behavior)
+[Install](#one-line-install) · [How it works](#what-docatlas-is-and-what-problem-it-solves) · [Measured comparison](#measured-comparison) · [Docs MCP](#project-docs-mcp-server) · [CLI reference](./docs/capabilities.md#end-to-end-examples-of-current-behavior) · [Release checklist](./docs/release-readiness.md)
 
 </div>
 
@@ -94,7 +94,28 @@ Accepted values: `claude-code`, `opencode`, `codex`, `all`, `none`. An unknown v
 
 For OpenCode, the installer honors `OPENCODE_CONFIG` (full path), falling back to `$XDG_CONFIG_HOME/opencode/opencode.json`. Existing JSONC configs (comments / trailing commas) are parsed; a `.bak` backup is kept on rewrite.
 
-The default installation needs no extra setup: lexical documentation retrieval works immediately after the MCP server is registered. The optional pinned Qwen evidence scorer is experimental, GPU-specific (Blackwell only) and configured separately — see [wiki/Reranker](https://github.com/Vanilla1999/DocAtlas/wiki/Reranker) or run `doc-atlas reranker check` for a readiness report.
+The default lexical documentation path does not require Qwen, CUDA, or model downloads. After MCP registration, follow any `prepare_docs` action returned for an unprepared source. The optional Qwen evidence scorer is a separately enabled **experimental pinned profile**, not a generally supported GPU mode: it requires CUDA capability **12.0** and the exact dependency versions in [Reranker](wiki/Reranker.md). CPU, macOS, and other CUDA capabilities are not supported by that profile. Scoring failures do not silently fall back to lexical selection. Run `doc-atlas reranker check` for an assets/runtime/configuration preflight; this does not run model inference.
+
+For maintainers, the dated [release-readiness checklist](docs/release-readiness.md) separates successful package/onboarding checks from unresolved MCP checks, clean installer verification, and the experimental GPU qualification. A successful preflight is not a model-inference test or a release approval.
+
+## Measured comparison
+
+A small historical diagnostic compared four client paths on the **same four Meridian questions and six English documents**, with the same **magnitcopilot** answering model:
+
+- **A — DocAtlas / Qwen:** model-driven language preflight.
+- **B — DocAtlas / Qwen:** host-driven language preflight (`host-v1`).
+- **C — Direct files:** `glob`, `grep`, and `read`, without a documentation MCP server.
+- **D — Grounded:** `@arabold/docs-mcp-server` **3.2.1**, lexical search, **no embeddings**.
+
+**Scope:** A/B used the historical experimental Qwen **minimal-context** profile, not today's lexical default or the later `no_redundancy` profile. This is an end-to-end client-path comparison, not an isolated reranker test.
+
+![Provider input summed over four sessions. A: 13,798 uncached plus 12,544 cached; B: 11,180 plus 7,424; C: 13,040 plus 9,856; D: 11,150 plus 6,144. Input includes cache reads; these are not monetary costs.](readme-assets/benchmarks/grounded-input-tokens.svg)
+
+![Final-answer coverage under the historical 19-position rubric. A, B, and C each have 15 full, 2 partial, and 2 missing positions; D has 16 full, 0 partial, and 3 missing. All four paths delivered all 19 scored positions to the answering model.](readme-assets/benchmarks/grounded-answer-facts.svg)
+
+All four paths delivered **19/19 scored positions**, but none expressed every position fully under the original answer rubric. Host-preflight DocAtlas and Grounded used nearly identical uncached input: **11,180 vs 11,150 tokens**. This does **not** establish a general answer-quality or monetary-cost winner.
+
+**Limits:** one run per question and path; some facts repeat across questions; Grounded ran later; provider caching was not controlled. A later study questioned whether some conditions in the shared V-M1 scenario were required; it did not regrade these four arms. Tokens measure provider requests, not MCP payload size; output tokens are reported separately. See the [full table, protocol, source hashes, reproduction command, and measurement gaps](docs/benchmarks/grounded-meridian.md).
 
 ## Python import namespace
 
@@ -137,7 +158,7 @@ get_docs_context(question=..., project_path=...)
 
 `get_docs_context` is the single high-level entry point. Project questions return source-attributed, retrieval-only `docs_context`; missing safe evidence uses `status="insufficient_evidence"`. Original questions and explicit host lookups retain separate coverage. The compatibility `docs_answer` schema does not promise lexical answer certification. Explicitly enabled advanced `patch_context` carries evidence and grants no edit permission. The host explains supported facts and identifies gaps.
 
-The complete model-visible response and tool catalog are measured and minimized without fixed 800-token or 6144-byte acceptance ceilings. Preserve admitted text, source identity, hashes, coordinates, and safety guards. Source-read, candidate-work, input, and host-session bounds remain separate. MCP response shape and diagnostics are server-owned. OpenCode registration sets `DOCATLAS_MCP_TEXT_FALLBACK=1` and `DOCATLAS_MCP_COMPACT_TEXT=1`, delivering original sources and resolvable citation references in a shorter self-contained text response without relying on MCP `_meta`. Context Assembly defaults to `adaptive`; ordinary lexical selection uses `body` pruning when needed. Registration defaults `DOCATLAS_CONTEXT_COMPRESSION=off` so a model directory alone does not activate MiniLM, while preserving explicit registered selection and layout overrides. Existing OpenCode entries must be re-registered (`doc-atlas install opencode`) to receive these settings; other clients retain their previous behavior. Compact presentation preserves the selected source rows and permits text fallback on incompatible payloads. See [OpenCode compact text](./docs/opencode-compact-text.md). This retains the working default, not a guarantee of complete answers; actual paid-provider quality and token savings still require a live agent A/B.
+The complete model-visible response and tool catalog are measured and minimized without fixed 800-token or 6144-byte acceptance ceilings. Preserve admitted text, source identity, hashes, coordinates, and safety guards. Source-read, candidate-work, input, and host-session bounds remain separate. MCP response shape and diagnostics are server-owned. OpenCode registration sets `DOCATLAS_MCP_TEXT_FALLBACK=1` and `DOCATLAS_MCP_COMPACT_TEXT=1`, delivering original sources and resolvable citation references in a shorter self-contained text response without relying on MCP `_meta`. Context Assembly defaults to `adaptive`; ordinary lexical selection uses `body` pruning when needed. Registration defaults `DOCATLAS_CONTEXT_COMPRESSION=off` so a model directory alone does not activate MiniLM, while preserving explicit registered selection and layout overrides. Existing OpenCode entries must be re-registered (`doc-atlas install opencode`) to receive these settings; other clients retain their previous behavior. Compact presentation preserves the selected source rows and permits text fallback on incompatible payloads. See [OpenCode compact text](./docs/opencode-compact-text.md). This retains the working default, not a guarantee of complete answers. Quality and token savings for this default still require a live agent A/B; the [historical Qwen comparison](#measured-comparison) does not qualify a different configuration.
 
 An optional provider-neutral [one-call host-loop contract](./docs/one-call-agent-loop.md) locally enforces cumulative request, retained-history, repair, test, and output budgets after a model initiates DocAtlas retrieval. Existing generic clients remain supported but are not labelled verified unless their host proves every required control.
 

@@ -58,6 +58,14 @@ def enabled():
     return os.environ.get("DOCATLAS_EXPERIMENT_PAIRED_QWEN") == "1"
 
 
+def cache_directory(path: str) -> Path:
+    """Validate the configured cache path without creating it during preflight."""
+    cache = Path(path)
+    if not cache.is_absolute():
+        raise ValueError("paired_cache_requires_absolute_directory")
+    return cache
+
+
 def normalized(value):
     """Remove ONLY the two explicitly volatile fields, retaining all other data."""
     if isinstance(value, dict):
@@ -175,9 +183,7 @@ def score_rows(retrieval, rows, snapshot, trace):
     try:
         root = scorer.verify_assets(model_path)  # Also mandatory when every row is cached.
         if cache_path:
-            cache = Path(cache_path)
-            if not cache.is_absolute():
-                raise ValueError("paired_cache_requires_absolute_directory")
+            cache = cache_directory(cache_path)
             cache.mkdir(parents=True, exist_ok=True)
         for identity in documents.documents:
             key = digest({"query": original, "document": documents.document(identity), "contract": contract})

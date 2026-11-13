@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="560" viewBox="0 0 1120 560" role="img" aria-labelledby="title description">
+<title id="title">Provider input across four sessions</title>
+<desc id="description">A: Uncached input 13,798, Cached input 12,544; B: Uncached input 11,180, Cached input 7,424; C: Uncached input 13,040, Cached input 9,856; D: Uncached input 11,150, Cached input 6,144. Input already includes cache reads. Output tokens and model calls are reported separately. Provider usage, not money or MCP payload size. One run per question; cache was not controlled.</desc>
+<rect width="1120" height="560" rx="16" fill="#f8fafc"/>
+<g font-family="DejaVu Sans, Arial, sans-serif">
+<text x="32.0" y="46.0" font-size="26" fill="#0f172a" text-anchor="start" font-weight="700">Provider input across four sessions</text>
+<text x="32.0" y="76.0" font-size="15" fill="#334155" text-anchor="start" font-weight="400">Historical Qwen minimal-context / direct files / Grounded lexical · Not a current-default benchmark</text>
+<rect x="345" y="102" width="14" height="14" rx="3" fill="#1d4ed8"/>
+<text x="368.0" y="114.0" font-size="14" fill="#334155" text-anchor="start" font-weight="400">Uncached input</text>
+<rect x="550" y="102" width="14" height="14" rx="3" fill="#bfdbfe"/>
+<text x="573.0" y="114.0" font-size="14" fill="#334155" text-anchor="start" font-weight="400">Cached input</text>
+<line x1="345.0" y1="138" x2="345.0" y2="432" stroke="#cbd5e1"/>
+<text x="345.0" y="456.0" font-size="13" fill="#334155" text-anchor="middle" font-weight="400">0</text>
+<line x1="448.3" y1="138" x2="448.3" y2="432" stroke="#cbd5e1"/>
+<text x="448.3" y="456.0" font-size="13" fill="#334155" text-anchor="middle" font-weight="400">5,000</text>
+<line x1="551.7" y1="138" x2="551.7" y2="432" stroke="#cbd5e1"/>
+<text x="551.7" y="456.0" font-size="13" fill="#334155" text-anchor="middle" font-weight="400">10,000</text>
+<line x1="655.0" y1="138" x2="655.0" y2="432" stroke="#cbd5e1"/>
+<text x="655.0" y="456.0" font-size="13" fill="#334155" text-anchor="middle" font-weight="400">15,000</text>
+<line x1="758.3" y1="138" x2="758.3" y2="432" stroke="#cbd5e1"/>
+<text x="758.3" y="456.0" font-size="13" fill="#334155" text-anchor="middle" font-weight="400">20,000</text>
+<line x1="861.7" y1="138" x2="861.7" y2="432" stroke="#cbd5e1"/>
+<text x="861.7" y="456.0" font-size="13" fill="#334155" text-anchor="middle" font-weight="400">25,000</text>
+<line x1="965.0" y1="138" x2="965.0" y2="432" stroke="#cbd5e1"/>
+<text x="965.0" y="456.0" font-size="13" fill="#334155" text-anchor="middle" font-weight="400">30,000</text>
+<text x="32.0" y="171.0" font-size="17" fill="#0f172a" text-anchor="start" font-weight="700">A · DocAtlas / Qwen</text>
+<text x="32.0" y="193.0" font-size="14" fill="#334155" text-anchor="start" font-weight="400">Model preflight</text>
+<rect x="345.0" y="150" width="285.2" height="40" fill="#1d4ed8"/>
+<text x="487.6" y="176.0" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="700">13,798</text>
+<rect x="630.2" y="150" width="259.2" height="40" fill="#bfdbfe"/>
+<text x="759.8" y="176.0" font-size="16" fill="#172554" text-anchor="middle" font-weight="700">12,544</text>
+<text x="901.4" y="176.0" font-size="16" fill="#0f172a" text-anchor="start" font-weight="700">26,342</text>
+<text x="32.0" y="246.0" font-size="17" fill="#0f172a" text-anchor="start" font-weight="700">B · DocAtlas / Qwen</text>
+<text x="32.0" y="268.0" font-size="14" fill="#334155" text-anchor="start" font-weight="400">Host preflight</text>
+<rect x="345.0" y="225" width="231.1" height="40" fill="#1d4ed8"/>
+<text x="460.5" y="251.0" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="700">11,180</text>
+<rect x="576.1" y="225" width="153.4" height="40" fill="#bfdbfe"/>
+<text x="652.8" y="251.0" font-size="16" fill="#172554" text-anchor="middle" font-weight="700">7,424</text>
+<text x="741.5" y="251.0" font-size="16" fill="#0f172a" text-anchor="start" font-weight="700">18,604</text>
+<text x="32.0" y="321.0" font-size="17" fill="#0f172a" text-anchor="start" font-weight="700">C · Direct files</text>
+<text x="32.0" y="343.0" font-size="14" fill="#334155" text-anchor="start" font-weight="400">glob / grep / read</text>
+<rect x="345.0" y="300" width="269.5" height="40" fill="#1d4ed8"/>
+<text x="479.7" y="326.0" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="700">13,040</text>
+<rect x="614.5" y="300" width="203.7" height="40" fill="#bfdbfe"/>
+<text x="716.3" y="326.0" font-size="16" fill="#172554" text-anchor="middle" font-weight="700">9,856</text>
+<text x="830.2" y="326.0" font-size="16" fill="#0f172a" text-anchor="start" font-weight="700">22,896</text>
+<text x="32.0" y="396.0" font-size="17" fill="#0f172a" text-anchor="start" font-weight="700">D · Grounded 3.2.1</text>
+<text x="32.0" y="418.0" font-size="14" fill="#334155" text-anchor="start" font-weight="400">Lexical; no embeddings</text>
+<rect x="345.0" y="375" width="230.4" height="40" fill="#1d4ed8"/>
+<text x="460.2" y="401.0" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="700">11,150</text>
+<rect x="575.4" y="375" width="127.0" height="40" fill="#bfdbfe"/>
+<text x="638.9" y="401.0" font-size="16" fill="#172554" text-anchor="middle" font-weight="700">6,144</text>
+<text x="714.4" y="401.0" font-size="16" fill="#0f172a" text-anchor="start" font-weight="700">17,294</text>
+<text x="32.0" y="505.0" font-size="14" fill="#334155" text-anchor="start" font-weight="400">Input already includes cache reads. Output tokens and model calls are reported separately.</text>
+<text x="32.0" y="532.0" font-size="14" fill="#334155" text-anchor="start" font-weight="400">Provider usage, not money or MCP payload size. One run per question; cache was not controlled.</text>
+</g>
+</svg>

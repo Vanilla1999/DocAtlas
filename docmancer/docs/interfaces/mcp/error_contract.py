@@ -42,6 +42,14 @@ _HINTS_BY_REASON: dict[str, list[str]] = {
     "joint_semantic_relevance_failed": [
         "Check the opt-in joint relevance model path, pinned local assets and optional dependencies; retry only after fixing them.",
     ],
+    "paired_qwen_requires_compression_off": [
+        "Set DOCATLAS_CONTEXT_COMPRESSION=off in the MCP server environment, or disable the entire Qwen profile; do not enable both selectors.",
+        "Run doc-atlas reranker check in that environment and restart the MCP server after correcting its configuration.",
+    ],
+    "paired_qwen_requires_default_native_acquisition_not_minimal_complete_scope": [
+        "Remove DOCATLAS_EXPERIMENT_MINIMAL_CONTEXT=1 from the paired-Qwen MCP environment, or disable the entire Qwen profile.",
+        "Run doc-atlas reranker check in that environment and restart the MCP server after correcting its configuration.",
+    ],
     "docs_context_target_mismatch": [
         "Use the configured project root, or omit project_path to use the explicit host binding. Never replace the root with a documentation subdirectory.",
         "Preserve explicit scope/module_path. To query another project, connect its own project integration; do not widen the query or prepare new documentation.",

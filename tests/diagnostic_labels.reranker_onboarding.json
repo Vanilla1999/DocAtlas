@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_reranker_onboarding.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_reranker_onboarding.py": "a800ae1c66bc588f46a85ca0535299e75203bb28e36056543412019f6127125d"
+  }
+}

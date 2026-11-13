@@ -39,10 +39,14 @@ from .context_query_probes import authoritative_queries, literal_query_probe
 from .experimental_context_finalization import _rebuild
 from .experimental_pool_pruning import otsu_upper, pool_prune_mode, prune_checked_pool
 from .experimental_qwen_checked_pool import PoolTrace, enabled as paired_qwen_enabled, score_rows as paired_score_rows
-from .experimental_qwen_ablation import load_settings as qwen_study_settings
 from .experimental_qwen_pool_units import (
-    study_settings as qwen_pool_settings, prune_study_pool, initial_study_units,
-    discard_overlapping_units, PRUNING_ENV, UNITS_ENV, GUARD_ENV,
+    prune_study_pool, initial_study_units, discard_overlapping_units,
+)
+from .experimental_qwen_profile import (
+    JOINT_POOL_PRUNE_DEFAULT, JOINT_EXPERIMENT_CHOICES as _EXPERIMENT_CHOICES,
+    joint_experiment as _experiment,
+    study_options as _study_options, validated_minimal_context_enabled,
+    validate_paired_context_budget, validate_paired_native_settings,
 )
 from .model_visible_projection import _refresh_estimate
 from .projection_tokenizer import projection_token_count
@@ -58,8 +62,6 @@ def _delivery_limit(retrieval: dict, cap: int) -> int:
     return min(cap, delivery_token_ceiling(),
                FOCUSED_MAX_TOKENS if retrieval.get("_focused_source_path") else cap)
 
-# Whole-section pool pruning used when DOCATLAS_EXPERIMENT_POOL_PRUNE is unset.
-JOINT_POOL_PRUNE_DEFAULT = "body"
 # Research flags, read per call and off by default (pool pruning: see its
 # entry); results in
 # eval/blind_project_context/STEP3_DICTIONARY_FREE_RU.md.
@@ -83,22 +85,6 @@ JOINT_POOL_PRUNE_DEFAULT = "body"
 #       loop keep only the upper Otsu class of whole sections by relevance:
 #       the mean relative relevance over queries, or per query and then the
 #       union over queries (STEP7_CONTEXT7_PATH_RU.md). No number is added.
-_EXPERIMENT_CHOICES = {
-    "DOCATLAS_EXPERIMENT_JOINT_TERMS": ("word", "char4"),
-    "DOCATLAS_EXPERIMENT_JOINT_PRIORITY": ("cost_sqrt", "gain"),
-    "DOCATLAS_EXPERIMENT_JOINT_FUSION": ("mean", "max_shared_scale"),
-    "DOCATLAS_EXPERIMENT_JOINT_CUT": ("off", "otsu_mean", "otsu_union"),
-}
-
-
-def _experiment(name: str) -> str:
-    choices = _EXPERIMENT_CHOICES[name]
-    value = os.environ.get(name, choices[0]).strip().lower()
-    if value not in choices:
-        raise ValueError(f"{name} must be one of: {', '.join(choices)}")
-    return value
-
-
 def _cost_scale(cost: int, priority_mode: str) -> float:
     return 1.0 if priority_mode == "gain" else math.sqrt(cost)
 
@@ -345,20 +331,6 @@ def _whole_pool_fits(payload: dict, snapshot: dict, retrieval: dict, rows: list[
     return _delivery_fits(whole, limit)
 
 
-def _study_options():
-    """Explicit independent study; never silently alter the original paired arm."""
-    selection, pool = qwen_study_settings(), qwen_pool_settings()
-    if any(name in os.environ for name in (PRUNING_ENV, UNITS_ENV, GUARD_ENV)) and selection.mode is None:
-        raise ValueError("qwen_pool_options_require_explicit_study")
-    if pool.enabled and selection.mode != "control":
-        raise ValueError("qwen_study_change_one_mechanism_at_a_time")
-    if pool.pruning != "control" and pool.units != "control":
-        raise ValueError("qwen_study_pruning_and_units_are_separate_arms")
-    if pool.units == "competing_rows" and pool.unit_guard != "conservative":
-        raise ValueError("qwen_study_competing_rows_requires_conservative_guard")
-    return selection, pool
-
-
 def _continuation_settings() -> dict:
     """Bind stable host choices that affect selection or its wire pricing."""
     from docmancer.docs.domain.context_presentation import presentation_settings
@@ -408,10 +380,8 @@ def select_joint_context(
     study, pool_study = _study_options()
     if type(portion) is not int or portion < 1:
         raise ValueError("invalid_context_portion")
-    from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
-    if paired_qwen_enabled() and minimal_context_enabled():
-        raise ValueError("paired_qwen_requires_default_native_acquisition_not_minimal_complete_scope")
-    if minimal_context_enabled():
+    minimal = validated_minimal_context_enabled()
+    if minimal:
         from .minimal_context_selection import select_minimal_context
         return select_minimal_context(
             payload, snapshot, retrieval, portion=portion,
@@ -419,8 +389,7 @@ def select_joint_context(
             finalize_packet=finalize_packet,
         )
     cap = experimental_context_max_tokens()
-    if paired_qwen_enabled() and cap is None:
-        raise ValueError("paired_qwen_requires_native_context_token_budget")
+    validate_paired_context_budget(cap)
     if cap is None:
         if portion != 1 or continuation_token is not None:
             raise ValueError("portion_unavailable")
@@ -540,12 +509,7 @@ def _select_portion(payload: dict, snapshot: dict, retrieval: dict, *,
     if not queries:
         raise ValueError("joint_context_selection_requires_authoritative_queries")
     paired = paired_qwen_enabled()
-    if paired and (
-        (terms_mode, priority_mode, fusion_mode, cut_mode) != ("word", "cost_sqrt", "mean", "off")
-        or pool_prune_mode(JOINT_POOL_PRUNE_DEFAULT) != JOINT_POOL_PRUNE_DEFAULT
-        or os.environ.get("DOCATLAS_EXPERIMENT_JOINT_RELEVANCE", "off") != "off"
-    ):
-        raise ValueError("paired_qwen_requires_default_pruning_eligibility_mmr_and_cost_settings")
+    validate_paired_native_settings((terms_mode, priority_mode, fusion_mode, cut_mode))
     paired_trace = PoolTrace(retrieval, cap, limit, max_source_references,
                              (payload.get("more_context") or {}).get("portion", 1))
     if study.mode is not None:

@@ -1,0 +1,437 @@
+{
+  "study": "STEP14/STEP15 Meridian historical diagnostic",
+  "source_commit": "39d893b4d8886b8bbaa446ba1414271a93604b3b",
+  "docatlas_experimental_code": "220d2dab",
+  "docatlas_profile": "Qwen minimal-context; one-hop-v1; concise-v1",
+  "answering_model_display_name": "magnitcopilot",
+  "questions_per_arm": 4,
+  "runs_per_question_and_arm": 1,
+  "english_documents": 6,
+  "historical_scoring_positions": 19,
+  "current_default_benchmark": false,
+  "notes": [
+    "The 19 positions contain repeated facts; V-M4 abstention is outside that denominator.",
+    "A later draft study questioned shared V-M1 requirements; these four arms were not regraded.",
+    "Input includes cache reads; output includes reasoning. No monetary cost is established.",
+    "D ran after A/B/C without controlled caching or randomized order.",
+    "B/V-M4 full end-to-end timing is missing; no latency comparison is generated."
+  ],
+  "sources": [
+    {
+      "path": "eval/blind_project_context/step14-host-language-live/results.json",
+      "sha256": "264c4ee5b496e6e8c6f80a56dad0e77152149c169aed595d115fef3dddb11cc7"
+    },
+    {
+      "path": "eval/blind_project_context/step14-host-language-live/tasks.json",
+      "sha256": "d091e3e94bb56a9d67a1514d23fc9417bb0dc8ee1718b69c4dad63ab8f0505eb"
+    },
+    {
+      "path": "eval/blind_project_context/step14-host-language-live/review-criteria.json",
+      "sha256": "bcc423940023b89b8692a9020438132a8c6ef38478d84cd52bb6dafdc7fcab5c"
+    },
+    {
+      "path": "eval/blind_project_context/step15-grounded-live/attempt-02/live-02/results.json",
+      "sha256": "4e93db69e548918de52f42c82a14c021ffdbf81df74707e8528e643259c081e8"
+    },
+    {
+      "path": "eval/blind_project_context/step15-grounded-live/semantic-review.json",
+      "sha256": "b3e1dc9232e18e033ab72a88faef7d69a4cab4e8d61815b012b9bfed2f79c67f"
+    },
+    {
+      "path": "eval/blind_project_context/step15-grounded-live/runtime-evidence.json",
+      "sha256": "d7ecef97c03a13f12ef924dfbd0bf327e1d2d5a482e744b3ab1545a42e3246fa"
+    },
+    {
+      "path": "eval/blind_project_context/step15-grounded-live/preliminary-results.json",
+      "sha256": "1c62fe38912ff78ad0c03fd1a44f9c76522b1cb1970b7b11d9dca84e736d5a5c"
+    }
+  ],
+  "arms": [
+    {
+      "arm": "A",
+      "label": "DocAtlas / Qwen",
+      "detail": "Model preflight",
+      "usage": {
+        "input": 26342,
+        "cached": 12544,
+        "uncached": 13798,
+        "output": 1245,
+        "reasoning": 11,
+        "cache_write": 0
+      },
+      "model_calls": 13,
+      "delivered_positions": 19,
+      "answer_grades": {
+        "full": 15,
+        "partial": 2,
+        "missing": 2,
+        "contradicted": 0
+      }
+    },
+    {
+      "arm": "B",
+      "label": "DocAtlas / Qwen",
+      "detail": "Host preflight",
+      "usage": {
+        "input": 18604,
+        "cached": 7424,
+        "uncached": 11180,
+        "output": 1150,
+        "reasoning": 11,
+        "cache_write": 0
+      },
+      "model_calls": 9,
+      "delivered_positions": 19,
+      "answer_grades": {
+        "full": 15,
+        "partial": 2,
+        "missing": 2,
+        "contradicted": 0
+      }
+    },
+    {
+      "arm": "C",
+      "label": "Direct files",
+      "detail": "glob / grep / read",
+      "usage": {
+        "input": 22896,
+        "cached": 9856,
+        "uncached": 13040,
+        "output": 1727,
+        "reasoning": 0,
+        "cache_write": 0
+      },
+      "model_calls": 14,
+      "delivered_positions": 19,
+      "answer_grades": {
+        "full": 15,
+        "partial": 2,
+        "missing": 2,
+        "contradicted": 0
+      }
+    },
+    {
+      "arm": "D",
+      "label": "Grounded 3.2.1",
+      "detail": "Lexical; no embeddings",
+      "usage": {
+        "input": 17294,
+        "cached": 6144,
+        "uncached": 11150,
+        "output": 1434,
+        "reasoning": 9,
+        "cache_write": 0
+      },
+      "model_calls": 10,
+      "delivered_positions": 19,
+      "answer_grades": {
+        "full": 16,
+        "partial": 0,
+        "missing": 3,
+        "contradicted": 0
+      }
+    }
+  ],
+  "sessions": [
+    {
+      "arm": "A",
+      "task": "V-M1",
+      "usage": {
+        "input": 6350,
+        "output": 490,
+        "cached": 2944,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 3406
+      },
+      "model_calls": 3,
+      "delivered_positions": 8,
+      "answer_grades": {
+        "full": 6,
+        "partial": 2,
+        "missing": 0,
+        "contradicted": 0
+      }
+    },
+    {
+      "arm": "A",
+      "task": "V-M2",
+      "usage": {
+        "input": 5843,
+        "output": 264,
+        "cached": 2944,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 2899
+      },
+      "model_calls": 3,
+      "delivered_positions": 6,
+      "answer_grades": {
+        "full": 5,
+        "partial": 0,
+        "missing": 1,
+        "contradicted": 0
+      }
+    },
+    {
+      "arm": "A",
+      "task": "V-M3",
+      "usage": {
+        "input": 6041,
+        "output": 255,
+        "cached": 1664,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 4377
+      },
+      "model_calls": 3,
+      "delivered_positions": 5,
+      "answer_grades": {
+        "full": 4,
+        "partial": 0,
+        "missing": 1,
+        "contradicted": 0
+      }
+    },
+    {
+      "arm": "A",
+      "task": "V-M4",
+      "usage": {
+        "input": 8108,
+        "output": 236,
+        "cached": 4992,
+        "cache_write": 0,
+        "reasoning": 11,
+        "uncached": 3116
+      },
+      "model_calls": 4,
+      "delivered_positions": null,
+      "answer_grades": null
+    },
+    {
+      "arm": "B",
+      "task": "V-M1",
+      "usage": {
+        "input": 4454,
+        "output": 489,
+        "cached": 1408,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 3046
+      },
+      "model_calls": 2,
+      "delivered_positions": 8,
+      "answer_grades": {
+        "full": 6,
+        "partial": 2,
+        "missing": 0,
+        "contradicted": 0
+      }
+    },
+    {
+      "arm": "B",
+      "task": "V-M2",
+      "usage": {
+        "input": 3960,
+        "output": 233,
+        "cached": 1408,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 2552
+      },
+      "model_calls": 2,
+      "delivered_positions": 6,
+      "answer_grades": {
+        "full": 5,
+        "partial": 0,
+        "missing": 1,
+        "contradicted": 0
+      }
+    },
+    {
+      "arm": "B",
+      "task": "V-M3",
+      "usage": {
+        "input": 4162,
+        "output": 216,
+        "cached": 1408,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 2754
+      },
+      "model_calls": 2,
+      "delivered_positions": 5,
+      "answer_grades": {
+        "full": 4,
+        "partial": 0,
+        "missing": 1,
+        "contradicted": 0
+      }
+    },
+    {
+      "arm": "B",
+      "task": "V-M4",
+      "usage": {
+        "input": 6028,
+        "output": 212,
+        "cached": 3200,
+        "cache_write": 0,
+        "reasoning": 11,
+        "uncached": 2828
+      },
+      "model_calls": 3,
+      "delivered_positions": null,
+      "answer_grades": null
+    },
+    {
+      "arm": "C",
+      "task": "V-M1",
+      "usage": {
+        "input": 5818,
+        "output": 769,
+        "cached": 1152,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 4666
+      },
+      "model_calls": 3,
+      "delivered_positions": 8,
+      "answer_grades": {
+        "full": 6,
+        "partial": 2,
+        "missing": 0,
+        "contradicted": 0
+      }
+    },
+    {
+      "arm": "C",
+      "task": "V-M2",
+      "usage": {
+        "input": 4364,
+        "output": 217,
+        "cached": 1280,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 3084
+      },
+      "model_calls": 3,
+      "delivered_positions": 6,
+      "answer_grades": {
+        "full": 5,
+        "partial": 0,
+        "missing": 1,
+        "contradicted": 0
+      }
+    },
+    {
+      "arm": "C",
+      "task": "V-M3",
+      "usage": {
+        "input": 6076,
+        "output": 404,
+        "cached": 3712,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 2364
+      },
+      "model_calls": 4,
+      "delivered_positions": 5,
+      "answer_grades": {
+        "full": 4,
+        "partial": 0,
+        "missing": 1,
+        "contradicted": 0
+      }
+    },
+    {
+      "arm": "C",
+      "task": "V-M4",
+      "usage": {
+        "input": 6638,
+        "output": 337,
+        "cached": 3712,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 2926
+      },
+      "model_calls": 4,
+      "delivered_positions": null,
+      "answer_grades": null
+    },
+    {
+      "arm": "D",
+      "task": "V-M1",
+      "usage": {
+        "input": 5171,
+        "output": 643,
+        "cached": 1408,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 3763
+      },
+      "model_calls": 3,
+      "delivered_positions": 8,
+      "answer_grades": {
+        "full": 7,
+        "partial": 0,
+        "missing": 1,
+        "contradicted": 0
+      }
+    },
+    {
+      "arm": "D",
+      "task": "V-M2",
+      "usage": {
+        "input": 3493,
+        "output": 227,
+        "cached": 1152,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 2341
+      },
+      "model_calls": 2,
+      "delivered_positions": 6,
+      "answer_grades": {
+        "full": 5,
+        "partial": 0,
+        "missing": 1,
+        "contradicted": 0
+      }
+    },
+    {
+      "arm": "D",
+      "task": "V-M3",
+      "usage": {
+        "input": 3487,
+        "output": 322,
+        "cached": 1152,
+        "cache_write": 0,
+        "reasoning": 0,
+        "uncached": 2335
+      },
+      "model_calls": 2,
+      "delivered_positions": 5,
+      "answer_grades": {
+        "full": 4,
+        "partial": 0,
+        "missing": 1,
+        "contradicted": 0
+      }
+    },
+    {
+      "arm": "D",
+      "task": "V-M4",
+      "usage": {
+        "input": 5143,
+        "output": 242,
+        "cached": 2432,
+        "cache_write": 0,
+        "reasoning": 9,
+        "uncached": 2711
+      },
+      "model_calls": 3,
+      "delivered_positions": null,
+      "answer_grades": null
+    }
+  ]
+}

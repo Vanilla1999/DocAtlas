@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="560" viewBox="0 0 1120 560" role="img" aria-labelledby="title description">
+<title id="title">Final-answer coverage under the historical rubric</title>
+<desc id="description">A: Full 15, Partial 2, Missing 2; B: Full 15, Partial 2, Missing 2; C: Full 15, Partial 2, Missing 2; D: Full 16, Partial 0, Missing 3. All arms delivered 19/19 scored positions. These counts do not establish an overall winner. A later study questioned shared-scenario requirements; it did not regrade these four arms.</desc>
+<rect width="1120" height="560" rx="16" fill="#f8fafc"/>
+<g font-family="DejaVu Sans, Arial, sans-serif">
+<text x="32.0" y="46.0" font-size="26" fill="#0f172a" text-anchor="start" font-weight="700">Final-answer coverage under the historical rubric</text>
+<text x="32.0" y="76.0" font-size="15" fill="#334155" text-anchor="start" font-weight="400">19 scored positions, not 19 independent facts · Same magnitcopilot answering model</text>
+<rect x="345" y="102" width="14" height="14" rx="3" fill="#0f766e"/>
+<text x="368.0" y="114.0" font-size="14" fill="#334155" text-anchor="start" font-weight="400">Full</text>
+<rect x="550" y="102" width="14" height="14" rx="3" fill="#fbbf24"/>
+<text x="573.0" y="114.0" font-size="14" fill="#334155" text-anchor="start" font-weight="400">Partial</text>
+<rect x="755" y="102" width="14" height="14" rx="3" fill="#be123c"/>
+<text x="778.0" y="114.0" font-size="14" fill="#334155" text-anchor="start" font-weight="400">Missing</text>
+<line x1="345.0" y1="138" x2="345.0" y2="432" stroke="#cbd5e1"/>
+<text x="345.0" y="456.0" font-size="13" fill="#334155" text-anchor="middle" font-weight="400">0</text>
+<line x1="508.2" y1="138" x2="508.2" y2="432" stroke="#cbd5e1"/>
+<text x="508.2" y="456.0" font-size="13" fill="#334155" text-anchor="middle" font-weight="400">5</text>
+<line x1="671.3" y1="138" x2="671.3" y2="432" stroke="#cbd5e1"/>
+<text x="671.3" y="456.0" font-size="13" fill="#334155" text-anchor="middle" font-weight="400">10</text>
+<line x1="834.5" y1="138" x2="834.5" y2="432" stroke="#cbd5e1"/>
+<text x="834.5" y="456.0" font-size="13" fill="#334155" text-anchor="middle" font-weight="400">15</text>
+<line x1="965.0" y1="138" x2="965.0" y2="432" stroke="#cbd5e1"/>
+<text x="965.0" y="456.0" font-size="13" fill="#334155" text-anchor="middle" font-weight="400">19</text>
+<text x="32.0" y="171.0" font-size="17" fill="#0f172a" text-anchor="start" font-weight="700">A · DocAtlas / Qwen</text>
+<text x="32.0" y="193.0" font-size="14" fill="#334155" text-anchor="start" font-weight="400">Model preflight</text>
+<rect x="345.0" y="150" width="489.5" height="40" fill="#0f766e"/>
+<text x="589.7" y="176.0" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="700">15</text>
+<rect x="834.5" y="150" width="65.3" height="40" fill="#fbbf24"/>
+<text x="867.1" y="176.0" font-size="16" fill="#422006" text-anchor="middle" font-weight="700">2</text>
+<rect x="899.7" y="150" width="65.3" height="40" fill="#be123c"/>
+<text x="932.4" y="176.0" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="700">2</text>
+<text x="977.0" y="176.0" font-size="16" fill="#0f172a" text-anchor="start" font-weight="700">19</text>
+<text x="32.0" y="246.0" font-size="17" fill="#0f172a" text-anchor="start" font-weight="700">B · DocAtlas / Qwen</text>
+<text x="32.0" y="268.0" font-size="14" fill="#334155" text-anchor="start" font-weight="400">Host preflight</text>
+<rect x="345.0" y="225" width="489.5" height="40" fill="#0f766e"/>
+<text x="589.7" y="251.0" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="700">15</text>
+<rect x="834.5" y="225" width="65.3" height="40" fill="#fbbf24"/>
+<text x="867.1" y="251.0" font-size="16" fill="#422006" text-anchor="middle" font-weight="700">2</text>
+<rect x="899.7" y="225" width="65.3" height="40" fill="#be123c"/>
+<text x="932.4" y="251.0" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="700">2</text>
+<text x="977.0" y="251.0" font-size="16" fill="#0f172a" text-anchor="start" font-weight="700">19</text>
+<text x="32.0" y="321.0" font-size="17" fill="#0f172a" text-anchor="start" font-weight="700">C · Direct files</text>
+<text x="32.0" y="343.0" font-size="14" fill="#334155" text-anchor="start" font-weight="400">glob / grep / read</text>
+<rect x="345.0" y="300" width="489.5" height="40" fill="#0f766e"/>
+<text x="589.7" y="326.0" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="700">15</text>
+<rect x="834.5" y="300" width="65.3" height="40" fill="#fbbf24"/>
+<text x="867.1" y="326.0" font-size="16" fill="#422006" text-anchor="middle" font-weight="700">2</text>
+<rect x="899.7" y="300" width="65.3" height="40" fill="#be123c"/>
+<text x="932.4" y="326.0" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="700">2</text>
+<text x="977.0" y="326.0" font-size="16" fill="#0f172a" text-anchor="start" font-weight="700">19</text>
+<text x="32.0" y="396.0" font-size="17" fill="#0f172a" text-anchor="start" font-weight="700">D · Grounded 3.2.1</text>
+<text x="32.0" y="418.0" font-size="14" fill="#334155" text-anchor="start" font-weight="400">Lexical; no embeddings</text>
+<rect x="345.0" y="375" width="522.1" height="40" fill="#0f766e"/>
+<text x="606.1" y="401.0" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="700">16</text>
+<rect x="867.1" y="375" width="97.9" height="40" fill="#be123c"/>
+<text x="916.1" y="401.0" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="700">3</text>
+<text x="977.0" y="401.0" font-size="16" fill="#0f172a" text-anchor="start" font-weight="700">19</text>
+<text x="32.0" y="505.0" font-size="14" fill="#334155" text-anchor="start" font-weight="400">All arms delivered 19/19 scored positions. These counts do not establish an overall winner.</text>
+<text x="32.0" y="532.0" font-size="14" fill="#334155" text-anchor="start" font-weight="400">A later study questioned shared-scenario requirements; it did not regrade these four arms.</text>
+</g>
+</svg>
