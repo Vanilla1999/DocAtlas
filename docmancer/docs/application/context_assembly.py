@@ -16,12 +16,16 @@ from docmancer.docs.domain.delivery_limits import delivery_token_ceiling
 from docmancer.docs.domain.context_presentation import LITERAL_FORMAT, literal_presentation_enabled
 
 BASE = "docatlas.standalone-text.v1"
-POLICIES = ("literal", "grouped", "table", "grouped-table", "adaptive")
-_FORMATS = {p: f"docatlas.assembled-{p}.v1" for p in POLICIES[1:4]}
+POLICIES = ("literal", "grouped", "table", "grouped-table", "compact", "adaptive")
+_FORMATS = {p: f"docatlas.assembled-{p}.v1" for p in POLICIES[1:5]}
 _LEGENDS = {
     "grouped": " Source objects inherit path/section from source_groups[group] (zero-based). Shared source_context applies to every source.",
     "table": " Each source array follows source_columns in order. Shared source_context applies to every source.",
     "grouped-table": " Each source array follows source_columns; group indexes source_groups (zero-based) for path/section. Shared source_context applies to every source.",
+    # Delivery-only layout: the internal storage handle source_uri is not part of
+    # the documented citation contract (cite ref, path and lines), so compact
+    # omits it. Decode restores every other field exactly.
+    "compact": " Each source array follows source_columns; group indexes source_groups (zero-based) for path/section. source_uri is omitted: cite ref, path and lines; refetch gaps with source_path. Shared source_context applies to every source.",
 }
 _RESERVED = {"source_groups", "source_columns"}
 
@@ -64,6 +68,34 @@ def _table(view: dict) -> dict | None:
     return result
 
 
+def _compact(view: dict) -> dict | None:
+    """Delivery-only: grouped-table minus the per-row storage handle source_uri.
+
+    Reversible for every field except source_uri, which is intentionally not
+    delivered (internal handle; citations use ref, path and lines). Gap
+    follow-ups stay available without a per-row URI: the documented
+    source_path input and any envelope-issued bounded reads (read_next /
+    more_context) are preserved verbatim. Decode restores every other field.
+    """
+    rows = view["sources"]
+    if not rows or any("source_uri" not in row for row in rows):
+        return None
+    grouped = _group(view)
+    if grouped is None:
+        return None
+    stripped = deepcopy(grouped)
+    stripped["sources"] = [
+        {k: v for k, v in row.items() if k != "source_uri"}
+        for row in stripped["sources"]
+    ]
+    packed = _table(stripped)
+    if packed is None:
+        return None
+    packed["context_format"] = _FORMATS["compact"]
+    packed["notice"] = packed.get("notice", "") + _LEGENDS["compact"]
+    return packed
+
+
 def decode_context(view: dict) -> dict:
     """Restore the exact standalone *view*, not a full internal machine packet.
 
@@ -85,7 +117,7 @@ def decode_context(view: dict) -> dict:
     rows = result.get("sources")
     if not isinstance(rows, list) or not rows:
         raise ValueError("context_assembly_invalid_rows")
-    if policy in {"table", "grouped-table"}:
+    if policy in {"table", "grouped-table", "compact"}:
         cols = result.pop("source_columns", None)
         if (not isinstance(cols, list) or not cols or
                 any(not isinstance(c, str) for c in cols) or len(set(cols)) != len(cols)):
@@ -95,7 +127,7 @@ def decode_context(view: dict) -> dict:
         rows = [dict(zip(cols, row, strict=True)) for row in rows]
     elif "source_columns" in result:
         raise ValueError("context_assembly_unexpected_columns")
-    if policy in {"grouped", "grouped-table"}:
+    if policy in {"grouped", "grouped-table", "compact"}:
         groups = result.pop("source_groups", None)
         if (not isinstance(groups, list) or not groups or
                 any(not isinstance(g, dict) or set(g) - {"path", "section"} for g in groups)):
@@ -173,6 +205,22 @@ def assemble_context(text: str, *, policy: str | None = None) -> str:
         return text
     try:
         candidates = render_layouts(text)
+        view = json.loads(text)
+        compact = _compact(view)
+        if compact is not None:
+            # Delivery-boundary verification: compact must restore everything
+            # except the deliberately omitted source_uri storage handle.
+            stripped = deepcopy(view)
+            for row in stripped.get("sources", []):
+                row.pop("source_uri", None)
+            if _json(decode_context(compact)) == _json(stripped):
+                from docmancer.docs.domain.minimal_context_config import (
+                    minimal_context_enabled as _minimal_enabled,
+                )
+                serialized = _json(compact)
+                if _minimal_enabled() or max(_cost(serialized),
+                                             math.ceil(len(serialized.encode("utf-8")) / 4)) <= delivery_token_ceiling():
+                    candidates["compact"] = serialized
         if policy == "adaptive":
             return min(candidates.values(), key=_cost)
         return candidates.get(policy, text)

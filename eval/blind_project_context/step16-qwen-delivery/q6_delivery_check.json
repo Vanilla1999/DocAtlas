@@ -1,0 +1,203 @@
+{
+ "scope": "Supplemental newly formulated Russian question, not sealed T06 and not counted in 260 facts",
+ "question": "Какой лимит размера действует для успешного docs_context в compact-text профиле и распространяется ли он на canonical fallback?",
+ "pool_comparison": {
+  "same_checked_pools_verified": true,
+  "comparisons": [
+   {
+    "question_sha256": "2054afbcf6217c528d6e357f4aed6e6deb59b01f705d9ff37d3cae5e7cf4eb9c",
+    "budget": {
+     "effective_limit": 12000,
+     "max_source_references": 128,
+     "requested_cap": 12000
+    },
+    "portion": 1,
+    "stage": "eligible",
+    "a_manifests": 2,
+    "b_manifests": 2,
+    "equal": true,
+    "pairs": [
+     {
+      "checks": {
+       "normalized_rows_sha256": true,
+       "normalized_snapshots_sha256": true,
+       "row_count": true
+      },
+      "a_rows": 57,
+      "b_rows": 57
+     },
+     {
+      "checks": {
+       "normalized_rows_sha256": true,
+       "normalized_snapshots_sha256": true,
+       "row_count": true
+      },
+      "a_rows": 30,
+      "b_rows": 30
+     }
+    ]
+   },
+   {
+    "question_sha256": "2054afbcf6217c528d6e357f4aed6e6deb59b01f705d9ff37d3cae5e7cf4eb9c",
+    "budget": {
+     "effective_limit": 12000,
+     "max_source_references": 128,
+     "requested_cap": 12000
+    },
+    "portion": 1,
+    "stage": "post_prune",
+    "a_manifests": 2,
+    "b_manifests": 2,
+    "equal": true,
+    "pairs": [
+     {
+      "checks": {
+       "normalized_rows_sha256": true,
+       "normalized_snapshots_sha256": true,
+       "row_count": true
+      },
+      "a_rows": 57,
+      "b_rows": 57
+     },
+     {
+      "checks": {
+       "normalized_rows_sha256": true,
+       "normalized_snapshots_sha256": true,
+       "row_count": true
+      },
+      "a_rows": 30,
+      "b_rows": 30
+     }
+    ]
+   },
+   {
+    "question_sha256": "2054afbcf6217c528d6e357f4aed6e6deb59b01f705d9ff37d3cae5e7cf4eb9c",
+    "budget": {
+     "effective_limit": 12000,
+     "max_source_references": 128,
+     "requested_cap": 12000
+    },
+    "portion": 1,
+    "stage": "raw_checked",
+    "a_manifests": 2,
+    "b_manifests": 2,
+    "equal": true,
+    "pairs": [
+     {
+      "checks": {
+       "normalized_rows_sha256": true,
+       "normalized_snapshots_sha256": true,
+       "row_count": true
+      },
+      "a_rows": 146,
+      "b_rows": 146
+     },
+     {
+      "checks": {
+       "normalized_rows_sha256": true,
+       "normalized_snapshots_sha256": true,
+       "row_count": true
+      },
+      "a_rows": 256,
+      "b_rows": 256
+     }
+    ]
+   }
+  ],
+  "limitations": "Pool equality only; not delivery, model accuracy, source authorization or final budget validation."
+ },
+ "results": [
+  {
+   "arm": "A",
+   "corpus": "L0",
+   "payload": "/home/viadmin/.local/share/docatlas-eval/step16/q6-supplemental/A/payloads/L0/Q6-supplemental-ru.json",
+   "payload_sha256": "43f7d514abc8e65d83f086101cd54411882f02b91314e9bf0291d244f3c9efc8",
+   "cost": 8298,
+   "available": true,
+   "source_text_rows": 52,
+   "rule_present": true,
+   "condition_compact_present": true,
+   "condition_canonical_present": true,
+   "complete_rule_in_one_source_row": true,
+   "note": "Positive literal source-row diagnostic only, separate from budget compliance and sealed facts.",
+   "source_span_witnesses": [
+    {
+     "path": "docs/opencode-compact-text.md",
+     "line_start": 60,
+     "line_end": 71,
+     "text": "The compact JSON is a model-facing **view**, not a replacement for a full\nDocAtlas `docs_context` machine packet or a sufficiency certificate. It does not\nedit the selected source bytes, widen scope or confer answer/edit authority.\nClients requiring the full schema must keep the old JSON text interface.\nFor ordinary successful `docs_context` in this explicitly enabled profile,\nboth compact output and a canonical fallback must fit the existing compact-text\nbudget: `max(o200k_tokens, ceil(UTF-8 bytes / 4)) <= 12000`. The fallback path now\nuses that check too; previously a failed compact rendering could emit a canonical\npacket without this check. This does not change source selection, the\nunderlying tokenizer, Context Assembly or private model view. It does not add a\nlimit to advanced v4 patch packets or to consumers with compact text disabled.\n\n",
+     "source_sha256": "9c6942bd6a267bc306085d7a9568859a512135e5d95e739a1f36893daf097fea"
+    }
+   ]
+  },
+  {
+   "arm": "A",
+   "corpus": "L2",
+   "payload": "/home/viadmin/.local/share/docatlas-eval/step16/q6-supplemental/A/payloads/L2/Q6-supplemental-ru.json",
+   "payload_sha256": "b2a61651f1049576f27b9aabf9420f091b0bb188336fb4bc9217fc7435e8478e",
+   "cost": 6442,
+   "available": true,
+   "source_text_rows": 30,
+   "rule_present": true,
+   "condition_compact_present": true,
+   "condition_canonical_present": true,
+   "complete_rule_in_one_source_row": true,
+   "note": "Positive literal source-row diagnostic only, separate from budget compliance and sealed facts.",
+   "source_span_witnesses": [
+    {
+     "path": "docs/opencode-compact-text.md",
+     "line_start": 60,
+     "line_end": 71,
+     "text": "The compact JSON is a model-facing **view**, not a replacement for a full\nDocAtlas `docs_context` machine packet or a sufficiency certificate. It does not\nedit the selected source bytes, widen scope or confer answer/edit authority.\nClients requiring the full schema must keep the old JSON text interface.\nFor ordinary successful `docs_context` in this explicitly enabled profile,\nboth compact output and a canonical fallback must fit the existing compact-text\nbudget: `max(o200k_tokens, ceil(UTF-8 bytes / 4)) <= 12000`. The fallback path now\nuses that check too; previously a failed compact rendering could emit a canonical\npacket without this check. This does not change source selection, the\nunderlying tokenizer, Context Assembly or private model view. It does not add a\nlimit to advanced v4 patch packets or to consumers with compact text disabled.\n\n",
+     "source_sha256": "9c6942bd6a267bc306085d7a9568859a512135e5d95e739a1f36893daf097fea"
+    }
+   ]
+  },
+  {
+   "arm": "B",
+   "corpus": "L0",
+   "payload": "/home/viadmin/.local/share/docatlas-eval/step16/q6-supplemental/B/payloads/L0/Q6-supplemental-ru.json",
+   "payload_sha256": "45343f33ae3af8d9feb3257872759ff54196496c8aab86216b780f15d808c5b2",
+   "cost": 1193,
+   "available": true,
+   "source_text_rows": 5,
+   "rule_present": true,
+   "condition_compact_present": true,
+   "condition_canonical_present": true,
+   "complete_rule_in_one_source_row": true,
+   "note": "Positive literal source-row diagnostic only, separate from budget compliance and sealed facts.",
+   "source_span_witnesses": [
+    {
+     "path": "docs/opencode-compact-text.md",
+     "line_start": 60,
+     "line_end": 71,
+     "text": "The compact JSON is a model-facing **view**, not a replacement for a full\nDocAtlas `docs_context` machine packet or a sufficiency certificate. It does not\nedit the selected source bytes, widen scope or confer answer/edit authority.\nClients requiring the full schema must keep the old JSON text interface.\nFor ordinary successful `docs_context` in this explicitly enabled profile,\nboth compact output and a canonical fallback must fit the existing compact-text\nbudget: `max(o200k_tokens, ceil(UTF-8 bytes / 4)) <= 12000`. The fallback path now\nuses that check too; previously a failed compact rendering could emit a canonical\npacket without this check. This does not change source selection, the\nunderlying tokenizer, Context Assembly or private model view. It does not add a\nlimit to advanced v4 patch packets or to consumers with compact text disabled.\n\n",
+     "source_sha256": "9c6942bd6a267bc306085d7a9568859a512135e5d95e739a1f36893daf097fea"
+    }
+   ]
+  },
+  {
+   "arm": "B",
+   "corpus": "L2",
+   "payload": "/home/viadmin/.local/share/docatlas-eval/step16/q6-supplemental/B/payloads/L2/Q6-supplemental-ru.json",
+   "payload_sha256": "8177a94334c536c60983d455b4c0523b4631353a780bdfab1799109df54d6feb",
+   "cost": 980,
+   "available": true,
+   "source_text_rows": 3,
+   "rule_present": true,
+   "condition_compact_present": true,
+   "condition_canonical_present": true,
+   "complete_rule_in_one_source_row": true,
+   "note": "Positive literal source-row diagnostic only, separate from budget compliance and sealed facts.",
+   "source_span_witnesses": [
+    {
+     "path": "docs/opencode-compact-text.md",
+     "line_start": 60,
+     "line_end": 71,
+     "text": "The compact JSON is a model-facing **view**, not a replacement for a full\nDocAtlas `docs_context` machine packet or a sufficiency certificate. It does not\nedit the selected source bytes, widen scope or confer answer/edit authority.\nClients requiring the full schema must keep the old JSON text interface.\nFor ordinary successful `docs_context` in this explicitly enabled profile,\nboth compact output and a canonical fallback must fit the existing compact-text\nbudget: `max(o200k_tokens, ceil(UTF-8 bytes / 4)) <= 12000`. The fallback path now\nuses that check too; previously a failed compact rendering could emit a canonical\npacket without this check. This does not change source selection, the\nunderlying tokenizer, Context Assembly or private model view. It does not add a\nlimit to advanced v4 patch packets or to consumers with compact text disabled.\n\n",
+     "source_sha256": "9c6942bd6a267bc306085d7a9568859a512135e5d95e739a1f36893daf097fea"
+    }
+   ]
+  }
+ ]
+}

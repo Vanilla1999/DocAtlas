@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "code_files": [],
+  "documentation_languages": {
+    "docs/RELEASE_CHECKLIST.md": [
+      "en"
+    ],
+    "docs/capabilities.md": [
+      "en"
+    ],
+    "docs/change-aware-docs.md": [
+      "en"
+    ],
+    "docs/development/python-module-size-policy.md": [
+      "en"
+    ],
+    "docs/release-identity.md": [
+      "en"
+    ],
+    "docs/sdk-delivery-budgets.md": [
+      "en"
+    ],
+    "docs/support-surface-policy.md": [
+      "en"
+    ]
+  },
+  "documents": [
+    {
+      "path": "docs/RELEASE_CHECKLIST.md",
+      "role": "other",
+      "scope": "project",
+      "description": "Frozen repository documentation: docs/RELEASE_CHECKLIST.md",
+      "authority": "source_of_truth",
+      "status": "active",
+      "impact": "track"
+    },
+    {
+      "path": "docs/capabilities.md",
+      "role": "other",
+      "scope": "project",
+      "description": "Frozen repository documentation: docs/capabilities.md",
+      "authority": "source_of_truth",
+      "status": "active",
+      "impact": "track"
+    },
+    {
+      "path": "docs/change-aware-docs.md",
+      "role": "other",
+      "scope": "project",
+      "description": "Frozen repository documentation: docs/change-aware-docs.md",
+      "authority": "source_of_truth",
+      "status": "active",
+      "impact": "track"
+    },
+    {
+      "path": "docs/development/python-module-size-policy.md",
+      "role": "other",
+      "scope": "project",
+      "description": "Frozen repository documentation: docs/development/python-module-size-policy.md",
+      "authority": "source_of_truth",
+      "status": "active",
+      "impact": "track"
+    },
+    {
+      "path": "docs/release-identity.md",
+      "role": "other",
+      "scope": "project",
+      "description": "Frozen repository documentation: docs/release-identity.md",
+      "authority": "source_of_truth",
+      "status": "active",
+      "impact": "track"
+    },
+    {
+      "path": "docs/sdk-delivery-budgets.md",
+      "role": "other",
+      "scope": "project",
+      "description": "Frozen repository documentation: docs/sdk-delivery-budgets.md",
+      "authority": "source_of_truth",
+      "status": "active",
+      "impact": "track"
+    },
+    {
+      "path": "docs/support-surface-policy.md",
+      "role": "other",
+      "scope": "project",
+      "description": "Frozen repository documentation: docs/support-surface-policy.md",
+      "authority": "source_of_truth",
+      "status": "active",
+      "impact": "track"
+    }
+  ]
+}

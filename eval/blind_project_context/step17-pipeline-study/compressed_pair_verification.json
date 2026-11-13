@@ -1,0 +1,4758 @@
+{
+  "same_checked_pools_verified": true,
+  "comparisons": [
+    {
+      "question_sha256": "efd67e761cf1caa0dd9799decc1a0a055fb6d8f90222e066e8249d27ace0362f",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 57,
+          "b_rows": 57
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 38,
+          "b_rows": 38
+        }
+      ]
+    },
+    {
+      "question_sha256": "efd67e761cf1caa0dd9799decc1a0a055fb6d8f90222e066e8249d27ace0362f",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 57,
+          "b_rows": 57
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 38,
+          "b_rows": 38
+        }
+      ]
+    },
+    {
+      "question_sha256": "efd67e761cf1caa0dd9799decc1a0a055fb6d8f90222e066e8249d27ace0362f",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 256,
+          "b_rows": 256
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 246,
+          "b_rows": 246
+        }
+      ]
+    },
+    {
+      "question_sha256": "6e9231bdb73f598cb4217c2d9e66a36d5d5e3d11e032efc68ca3882f944e2e85",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 35,
+          "b_rows": 35
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 18,
+          "b_rows": 18
+        }
+      ]
+    },
+    {
+      "question_sha256": "6e9231bdb73f598cb4217c2d9e66a36d5d5e3d11e032efc68ca3882f944e2e85",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 35,
+          "b_rows": 35
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 18,
+          "b_rows": 18
+        }
+      ]
+    },
+    {
+      "question_sha256": "6e9231bdb73f598cb4217c2d9e66a36d5d5e3d11e032efc68ca3882f944e2e85",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 256,
+          "b_rows": 256
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 237,
+          "b_rows": 237
+        }
+      ]
+    },
+    {
+      "question_sha256": "d3f154a068c239c80edd08801899da0642c61410ca6958676e56e3ae6579db79",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 66,
+          "b_rows": 66
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 54,
+          "b_rows": 54
+        }
+      ]
+    },
+    {
+      "question_sha256": "d3f154a068c239c80edd08801899da0642c61410ca6958676e56e3ae6579db79",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 66,
+          "b_rows": 66
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 54,
+          "b_rows": 54
+        }
+      ]
+    },
+    {
+      "question_sha256": "d3f154a068c239c80edd08801899da0642c61410ca6958676e56e3ae6579db79",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 209,
+          "b_rows": 209
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 246,
+          "b_rows": 246
+        }
+      ]
+    },
+    {
+      "question_sha256": "bc6e0c7c62360c830f7f6e9ec76f183053fd06cc35258b26c0a60d1afa258410",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 128,
+          "b_rows": 128
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 51,
+          "b_rows": 51
+        }
+      ]
+    },
+    {
+      "question_sha256": "bc6e0c7c62360c830f7f6e9ec76f183053fd06cc35258b26c0a60d1afa258410",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 128,
+          "b_rows": 128
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 51,
+          "b_rows": 51
+        }
+      ]
+    },
+    {
+      "question_sha256": "bc6e0c7c62360c830f7f6e9ec76f183053fd06cc35258b26c0a60d1afa258410",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 256,
+          "b_rows": 256
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 243,
+          "b_rows": 243
+        }
+      ]
+    },
+    {
+      "question_sha256": "6ddb265151be2f1fcd4b9a871d6937526c73427fbe974cbf7854589d7daaf534",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 69,
+          "b_rows": 69
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 37,
+          "b_rows": 37
+        }
+      ]
+    },
+    {
+      "question_sha256": "6ddb265151be2f1fcd4b9a871d6937526c73427fbe974cbf7854589d7daaf534",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 69,
+          "b_rows": 69
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 37,
+          "b_rows": 37
+        }
+      ]
+    },
+    {
+      "question_sha256": "6ddb265151be2f1fcd4b9a871d6937526c73427fbe974cbf7854589d7daaf534",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 256,
+          "b_rows": 256
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 250,
+          "b_rows": 250
+        }
+      ]
+    },
+    {
+      "question_sha256": "cf8c3a9c4d037248a1ddd81034759ea5fab7753e919175f84a68cb8565d1f222",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 60,
+          "b_rows": 60
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 54,
+          "b_rows": 54
+        }
+      ]
+    },
+    {
+      "question_sha256": "cf8c3a9c4d037248a1ddd81034759ea5fab7753e919175f84a68cb8565d1f222",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 60,
+          "b_rows": 60
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 54,
+          "b_rows": 54
+        }
+      ]
+    },
+    {
+      "question_sha256": "cf8c3a9c4d037248a1ddd81034759ea5fab7753e919175f84a68cb8565d1f222",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 239,
+          "b_rows": 239
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 245,
+          "b_rows": 245
+        }
+      ]
+    },
+    {
+      "question_sha256": "0cfbdc95c7f16b8eebc6e00d5f96010fc060bfdb02d5facca948e4c5a6806072",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 110,
+          "b_rows": 110
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 61,
+          "b_rows": 61
+        }
+      ]
+    },
+    {
+      "question_sha256": "0cfbdc95c7f16b8eebc6e00d5f96010fc060bfdb02d5facca948e4c5a6806072",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 110,
+          "b_rows": 110
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 61,
+          "b_rows": 61
+        }
+      ]
+    },
+    {
+      "question_sha256": "0cfbdc95c7f16b8eebc6e00d5f96010fc060bfdb02d5facca948e4c5a6806072",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 256,
+          "b_rows": 256
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 255,
+          "b_rows": 255
+        }
+      ]
+    },
+    {
+      "question_sha256": "5203e9784bc3fd8c6a3c2dce77a8687c107af80d26efad99e869f7e3d3c9db02",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 55,
+          "b_rows": 55
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 48,
+          "b_rows": 48
+        }
+      ]
+    },
+    {
+      "question_sha256": "5203e9784bc3fd8c6a3c2dce77a8687c107af80d26efad99e869f7e3d3c9db02",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 55,
+          "b_rows": 55
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 48,
+          "b_rows": 48
+        }
+      ]
+    },
+    {
+      "question_sha256": "5203e9784bc3fd8c6a3c2dce77a8687c107af80d26efad99e869f7e3d3c9db02",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 256,
+          "b_rows": 256
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 246,
+          "b_rows": 246
+        }
+      ]
+    },
+    {
+      "question_sha256": "e92ec8dffc7999c807cd88f0ff4bb6b95be433d318616673913683ec5848204e",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 71,
+          "b_rows": 71
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 46,
+          "b_rows": 46
+        }
+      ]
+    },
+    {
+      "question_sha256": "e92ec8dffc7999c807cd88f0ff4bb6b95be433d318616673913683ec5848204e",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 71,
+          "b_rows": 71
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 46,
+          "b_rows": 46
+        }
+      ]
+    },
+    {
+      "question_sha256": "e92ec8dffc7999c807cd88f0ff4bb6b95be433d318616673913683ec5848204e",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 251,
+          "b_rows": 251
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 242,
+          "b_rows": 242
+        }
+      ]
+    },
+    {
+      "question_sha256": "bf0f6f16f820a21dff967ee8d6def1bc7ea52296e8c58fdb7d27f864e41596ce",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 73,
+          "b_rows": 73
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 33,
+          "b_rows": 33
+        }
+      ]
+    },
+    {
+      "question_sha256": "bf0f6f16f820a21dff967ee8d6def1bc7ea52296e8c58fdb7d27f864e41596ce",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 73,
+          "b_rows": 73
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 33,
+          "b_rows": 33
+        }
+      ]
+    },
+    {
+      "question_sha256": "bf0f6f16f820a21dff967ee8d6def1bc7ea52296e8c58fdb7d27f864e41596ce",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 256,
+          "b_rows": 256
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 237,
+          "b_rows": 237
+        }
+      ]
+    },
+    {
+      "question_sha256": "2745906f94fa25f8bc5bf70507703ff7f2275376941ba7f5535a94f1c2f083ee",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 76,
+          "b_rows": 76
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 44,
+          "b_rows": 44
+        }
+      ]
+    },
+    {
+      "question_sha256": "2745906f94fa25f8bc5bf70507703ff7f2275376941ba7f5535a94f1c2f083ee",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 76,
+          "b_rows": 76
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 44,
+          "b_rows": 44
+        }
+      ]
+    },
+    {
+      "question_sha256": "2745906f94fa25f8bc5bf70507703ff7f2275376941ba7f5535a94f1c2f083ee",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 256,
+          "b_rows": 256
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 241,
+          "b_rows": 241
+        }
+      ]
+    },
+    {
+      "question_sha256": "c6d441cdd7ab1d009e70f2e690859a06b0f94a17b9dbd9ea39fb1d95dbb17595",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 82,
+          "b_rows": 82
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 43,
+          "b_rows": 43
+        }
+      ]
+    },
+    {
+      "question_sha256": "c6d441cdd7ab1d009e70f2e690859a06b0f94a17b9dbd9ea39fb1d95dbb17595",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 82,
+          "b_rows": 82
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 43,
+          "b_rows": 43
+        }
+      ]
+    },
+    {
+      "question_sha256": "c6d441cdd7ab1d009e70f2e690859a06b0f94a17b9dbd9ea39fb1d95dbb17595",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 256,
+          "b_rows": 256
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 243,
+          "b_rows": 243
+        }
+      ]
+    },
+    {
+      "question_sha256": "98c71ad67897a87b3369de0213f637b7558063593afe5c18cec062ebf66e2b9d",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 89,
+          "b_rows": 89
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 13,
+          "b_rows": 13
+        }
+      ]
+    },
+    {
+      "question_sha256": "98c71ad67897a87b3369de0213f637b7558063593afe5c18cec062ebf66e2b9d",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 89,
+          "b_rows": 89
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 13,
+          "b_rows": 13
+        }
+      ]
+    },
+    {
+      "question_sha256": "98c71ad67897a87b3369de0213f637b7558063593afe5c18cec062ebf66e2b9d",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 256,
+          "b_rows": 256
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 243,
+          "b_rows": 243
+        }
+      ]
+    },
+    {
+      "question_sha256": "b2312743700a34207a58e6ead628f378aeb414218ae83e463c60a11e97579700",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 60,
+          "b_rows": 60
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 36,
+          "b_rows": 36
+        }
+      ]
+    },
+    {
+      "question_sha256": "b2312743700a34207a58e6ead628f378aeb414218ae83e463c60a11e97579700",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 60,
+          "b_rows": 60
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 36,
+          "b_rows": 36
+        }
+      ]
+    },
+    {
+      "question_sha256": "b2312743700a34207a58e6ead628f378aeb414218ae83e463c60a11e97579700",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 256,
+          "b_rows": 256
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 243,
+          "b_rows": 243
+        }
+      ]
+    },
+    {
+      "question_sha256": "50d3c140e39443fd2fa0522c8879b60a0663400c3e7f04c661c93ebf95fe5363",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 85,
+          "b_rows": 85
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 13,
+          "b_rows": 13
+        }
+      ]
+    },
+    {
+      "question_sha256": "50d3c140e39443fd2fa0522c8879b60a0663400c3e7f04c661c93ebf95fe5363",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 85,
+          "b_rows": 85
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 13,
+          "b_rows": 13
+        }
+      ]
+    },
+    {
+      "question_sha256": "50d3c140e39443fd2fa0522c8879b60a0663400c3e7f04c661c93ebf95fe5363",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 256,
+          "b_rows": 256
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 247,
+          "b_rows": 247
+        }
+      ]
+    },
+    {
+      "question_sha256": "18e5f1fab80bd778643403c81b0c15236d30bf87ab4ab6e6c4cd70b0f0b246a5",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 62,
+          "b_rows": 62
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 20,
+          "b_rows": 20
+        }
+      ]
+    },
+    {
+      "question_sha256": "18e5f1fab80bd778643403c81b0c15236d30bf87ab4ab6e6c4cd70b0f0b246a5",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 62,
+          "b_rows": 62
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 20,
+          "b_rows": 20
+        }
+      ]
+    },
+    {
+      "question_sha256": "18e5f1fab80bd778643403c81b0c15236d30bf87ab4ab6e6c4cd70b0f0b246a5",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 256,
+          "b_rows": 256
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 233,
+          "b_rows": 233
+        }
+      ]
+    },
+    {
+      "question_sha256": "2ac55c674d3b1ce13f8b58943727251111f6328b3b03bf3c0ab26b3160038b24",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 40,
+          "b_rows": 40
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 24,
+          "b_rows": 24
+        }
+      ]
+    },
+    {
+      "question_sha256": "2ac55c674d3b1ce13f8b58943727251111f6328b3b03bf3c0ab26b3160038b24",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 40,
+          "b_rows": 40
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 24,
+          "b_rows": 24
+        }
+      ]
+    },
+    {
+      "question_sha256": "2ac55c674d3b1ce13f8b58943727251111f6328b3b03bf3c0ab26b3160038b24",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 256,
+          "b_rows": 256
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 231,
+          "b_rows": 231
+        }
+      ]
+    },
+    {
+      "question_sha256": "7b98b1e8e1e00e9e3b72dba1a266cbbf0ae5dc988e6144e3b1fd6b2365198782",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 67,
+          "b_rows": 67
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 40,
+          "b_rows": 40
+        }
+      ]
+    },
+    {
+      "question_sha256": "7b98b1e8e1e00e9e3b72dba1a266cbbf0ae5dc988e6144e3b1fd6b2365198782",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 67,
+          "b_rows": 67
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 40,
+          "b_rows": 40
+        }
+      ]
+    },
+    {
+      "question_sha256": "7b98b1e8e1e00e9e3b72dba1a266cbbf0ae5dc988e6144e3b1fd6b2365198782",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 234,
+          "b_rows": 234
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 246,
+          "b_rows": 246
+        }
+      ]
+    },
+    {
+      "question_sha256": "a2226caf2c46fc125ae4b562f0ebb385d066aa6e940cebb5e321f7880a59525a",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 113,
+          "b_rows": 113
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 51,
+          "b_rows": 51
+        }
+      ]
+    },
+    {
+      "question_sha256": "a2226caf2c46fc125ae4b562f0ebb385d066aa6e940cebb5e321f7880a59525a",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 113,
+          "b_rows": 113
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 51,
+          "b_rows": 51
+        }
+      ]
+    },
+    {
+      "question_sha256": "a2226caf2c46fc125ae4b562f0ebb385d066aa6e940cebb5e321f7880a59525a",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 256,
+          "b_rows": 256
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 253,
+          "b_rows": 253
+        }
+      ]
+    },
+    {
+      "question_sha256": "7f7d9a4a514bd55cb1bdf3ce5889a72d0da0261f4154a29ca5ebfb6d64e37fdb",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 56,
+          "b_rows": 56
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 36,
+          "b_rows": 36
+        }
+      ]
+    },
+    {
+      "question_sha256": "7f7d9a4a514bd55cb1bdf3ce5889a72d0da0261f4154a29ca5ebfb6d64e37fdb",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 56,
+          "b_rows": 56
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 36,
+          "b_rows": 36
+        }
+      ]
+    },
+    {
+      "question_sha256": "7f7d9a4a514bd55cb1bdf3ce5889a72d0da0261f4154a29ca5ebfb6d64e37fdb",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 256,
+          "b_rows": 256
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 251,
+          "b_rows": 251
+        }
+      ]
+    },
+    {
+      "question_sha256": "5cde5ed6633f4d7dc7f32d6932ed2ca261548a849231c9f496a44d8e25987166",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 66,
+          "b_rows": 66
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 29,
+          "b_rows": 29
+        }
+      ]
+    },
+    {
+      "question_sha256": "5cde5ed6633f4d7dc7f32d6932ed2ca261548a849231c9f496a44d8e25987166",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 66,
+          "b_rows": 66
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 29,
+          "b_rows": 29
+        }
+      ]
+    },
+    {
+      "question_sha256": "5cde5ed6633f4d7dc7f32d6932ed2ca261548a849231c9f496a44d8e25987166",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 256,
+          "b_rows": 256
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 250,
+          "b_rows": 250
+        }
+      ]
+    },
+    {
+      "question_sha256": "fb488c6f069ce8b1933d4280a188bd98c9a444edcb866ec8e043fe8f46941924",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 72,
+          "b_rows": 72
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 39,
+          "b_rows": 39
+        }
+      ]
+    },
+    {
+      "question_sha256": "fb488c6f069ce8b1933d4280a188bd98c9a444edcb866ec8e043fe8f46941924",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 72,
+          "b_rows": 72
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 39,
+          "b_rows": 39
+        }
+      ]
+    },
+    {
+      "question_sha256": "fb488c6f069ce8b1933d4280a188bd98c9a444edcb866ec8e043fe8f46941924",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 256,
+          "b_rows": 256
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 249,
+          "b_rows": 249
+        }
+      ]
+    },
+    {
+      "question_sha256": "1d07ef7a71ecfa6fdbcee065281da9126f4d94b4eadf1d3ced1ad7e0e7461289",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 99,
+          "b_rows": 99
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 37,
+          "b_rows": 37
+        }
+      ]
+    },
+    {
+      "question_sha256": "1d07ef7a71ecfa6fdbcee065281da9126f4d94b4eadf1d3ced1ad7e0e7461289",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 99,
+          "b_rows": 99
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 37,
+          "b_rows": 37
+        }
+      ]
+    },
+    {
+      "question_sha256": "1d07ef7a71ecfa6fdbcee065281da9126f4d94b4eadf1d3ced1ad7e0e7461289",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 256,
+          "b_rows": 256
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 242,
+          "b_rows": 242
+        }
+      ]
+    },
+    {
+      "question_sha256": "536e4bda3c00e7d952b275a42f5629cc17dba3da60084697e4e6bf4d49d6b15a",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 13,
+          "b_rows": 13
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 17,
+          "b_rows": 17
+        }
+      ]
+    },
+    {
+      "question_sha256": "536e4bda3c00e7d952b275a42f5629cc17dba3da60084697e4e6bf4d49d6b15a",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 13,
+          "b_rows": 13
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 17,
+          "b_rows": 17
+        }
+      ]
+    },
+    {
+      "question_sha256": "536e4bda3c00e7d952b275a42f5629cc17dba3da60084697e4e6bf4d49d6b15a",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 71,
+          "b_rows": 71
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 247,
+          "b_rows": 247
+        }
+      ]
+    },
+    {
+      "question_sha256": "3e327d06597ad754be8bf9a5e2c570b10584ad64e5854665156c986522e5b796",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 60,
+          "b_rows": 60
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 101,
+          "b_rows": 101
+        }
+      ]
+    },
+    {
+      "question_sha256": "3e327d06597ad754be8bf9a5e2c570b10584ad64e5854665156c986522e5b796",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 60,
+          "b_rows": 60
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 101,
+          "b_rows": 101
+        }
+      ]
+    },
+    {
+      "question_sha256": "3e327d06597ad754be8bf9a5e2c570b10584ad64e5854665156c986522e5b796",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 289,
+          "b_rows": 289
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 487,
+          "b_rows": 487
+        }
+      ]
+    },
+    {
+      "question_sha256": "64a44057ec32a83e17fea980a88cebc52bb6e6f048aeabc05c7cfa6e283be63b",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 69,
+          "b_rows": 69
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 72,
+          "b_rows": 72
+        }
+      ]
+    },
+    {
+      "question_sha256": "64a44057ec32a83e17fea980a88cebc52bb6e6f048aeabc05c7cfa6e283be63b",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 69,
+          "b_rows": 69
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 72,
+          "b_rows": 72
+        }
+      ]
+    },
+    {
+      "question_sha256": "64a44057ec32a83e17fea980a88cebc52bb6e6f048aeabc05c7cfa6e283be63b",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 293,
+          "b_rows": 293
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 502,
+          "b_rows": 502
+        }
+      ]
+    },
+    {
+      "question_sha256": "a18c591060b479c478d4617d717f231968d28153fa01bdab476dc5fa1183eeb0",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 76,
+          "b_rows": 76
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 120,
+          "b_rows": 120
+        }
+      ]
+    },
+    {
+      "question_sha256": "a18c591060b479c478d4617d717f231968d28153fa01bdab476dc5fa1183eeb0",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 76,
+          "b_rows": 76
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 120,
+          "b_rows": 120
+        }
+      ]
+    },
+    {
+      "question_sha256": "a18c591060b479c478d4617d717f231968d28153fa01bdab476dc5fa1183eeb0",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 265,
+          "b_rows": 265
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 504,
+          "b_rows": 504
+        }
+      ]
+    },
+    {
+      "question_sha256": "532de3decdde36fe365b7eac4879d31d711dc7c582757071b2cefe898200d12d",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 137,
+          "b_rows": 137
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 150,
+          "b_rows": 150
+        }
+      ]
+    },
+    {
+      "question_sha256": "532de3decdde36fe365b7eac4879d31d711dc7c582757071b2cefe898200d12d",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 137,
+          "b_rows": 137
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 150,
+          "b_rows": 150
+        }
+      ]
+    },
+    {
+      "question_sha256": "532de3decdde36fe365b7eac4879d31d711dc7c582757071b2cefe898200d12d",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 262,
+          "b_rows": 262
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 495,
+          "b_rows": 495
+        }
+      ]
+    },
+    {
+      "question_sha256": "2d1fa14295ba95eedc3e46b47ff01e47521e1516ef82ffda6b9d4235fdaafcf0",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 141,
+          "b_rows": 141
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 114,
+          "b_rows": 114
+        }
+      ]
+    },
+    {
+      "question_sha256": "2d1fa14295ba95eedc3e46b47ff01e47521e1516ef82ffda6b9d4235fdaafcf0",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 141,
+          "b_rows": 141
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 114,
+          "b_rows": 114
+        }
+      ]
+    },
+    {
+      "question_sha256": "2d1fa14295ba95eedc3e46b47ff01e47521e1516ef82ffda6b9d4235fdaafcf0",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 283,
+          "b_rows": 283
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 508,
+          "b_rows": 508
+        }
+      ]
+    },
+    {
+      "question_sha256": "fa285ddf5120b9a366f63ebb2d4a9ccdf9247232ed88409932a589ec6ad1fa99",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 52,
+          "b_rows": 52
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 87,
+          "b_rows": 87
+        }
+      ]
+    },
+    {
+      "question_sha256": "fa285ddf5120b9a366f63ebb2d4a9ccdf9247232ed88409932a589ec6ad1fa99",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 52,
+          "b_rows": 52
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 87,
+          "b_rows": 87
+        }
+      ]
+    },
+    {
+      "question_sha256": "fa285ddf5120b9a366f63ebb2d4a9ccdf9247232ed88409932a589ec6ad1fa99",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 283,
+          "b_rows": 283
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 490,
+          "b_rows": 490
+        }
+      ]
+    },
+    {
+      "question_sha256": "2128a5fec3ec5cf9112a76964b268a180cf7d7e81efa418729d398abbbe4b16d",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 70,
+          "b_rows": 70
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 134,
+          "b_rows": 134
+        }
+      ]
+    },
+    {
+      "question_sha256": "2128a5fec3ec5cf9112a76964b268a180cf7d7e81efa418729d398abbbe4b16d",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 70,
+          "b_rows": 70
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 134,
+          "b_rows": 134
+        }
+      ]
+    },
+    {
+      "question_sha256": "2128a5fec3ec5cf9112a76964b268a180cf7d7e81efa418729d398abbbe4b16d",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 253,
+          "b_rows": 253
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 495,
+          "b_rows": 495
+        }
+      ]
+    },
+    {
+      "question_sha256": "ff632176557ac39b0fb2e292cc6e2eebde31051a5292f8bfeb6ae12bfd3b849e",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 75,
+          "b_rows": 75
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 145,
+          "b_rows": 145
+        }
+      ]
+    },
+    {
+      "question_sha256": "ff632176557ac39b0fb2e292cc6e2eebde31051a5292f8bfeb6ae12bfd3b849e",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 75,
+          "b_rows": 75
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 145,
+          "b_rows": 145
+        }
+      ]
+    },
+    {
+      "question_sha256": "ff632176557ac39b0fb2e292cc6e2eebde31051a5292f8bfeb6ae12bfd3b849e",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 233,
+          "b_rows": 233
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 500,
+          "b_rows": 500
+        }
+      ]
+    },
+    {
+      "question_sha256": "c1a7994961312ae1154ef068fe72991d038c687f46dd6175c53a216e841b2ad4",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 96,
+          "b_rows": 96
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 82,
+          "b_rows": 82
+        }
+      ]
+    },
+    {
+      "question_sha256": "c1a7994961312ae1154ef068fe72991d038c687f46dd6175c53a216e841b2ad4",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 96,
+          "b_rows": 96
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 82,
+          "b_rows": 82
+        }
+      ]
+    },
+    {
+      "question_sha256": "c1a7994961312ae1154ef068fe72991d038c687f46dd6175c53a216e841b2ad4",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 295,
+          "b_rows": 295
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 485,
+          "b_rows": 485
+        }
+      ]
+    },
+    {
+      "question_sha256": "6f7b6295b25accb93882ebe230694881c18603f9e8b5a71aeaaa9db8ccc99efa",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 115,
+          "b_rows": 115
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 112,
+          "b_rows": 112
+        }
+      ]
+    },
+    {
+      "question_sha256": "6f7b6295b25accb93882ebe230694881c18603f9e8b5a71aeaaa9db8ccc99efa",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 115,
+          "b_rows": 115
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 112,
+          "b_rows": 112
+        }
+      ]
+    },
+    {
+      "question_sha256": "6f7b6295b25accb93882ebe230694881c18603f9e8b5a71aeaaa9db8ccc99efa",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 293,
+          "b_rows": 293
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 496,
+          "b_rows": 496
+        }
+      ]
+    },
+    {
+      "question_sha256": "8e852ed81c8a0a9fea323b2a8f7e6330e31f1d7bf443a27e00a993e77833af52",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 72,
+          "b_rows": 72
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 50,
+          "b_rows": 50
+        }
+      ]
+    },
+    {
+      "question_sha256": "8e852ed81c8a0a9fea323b2a8f7e6330e31f1d7bf443a27e00a993e77833af52",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 72,
+          "b_rows": 72
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 50,
+          "b_rows": 50
+        }
+      ]
+    },
+    {
+      "question_sha256": "8e852ed81c8a0a9fea323b2a8f7e6330e31f1d7bf443a27e00a993e77833af52",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 288,
+          "b_rows": 288
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 482,
+          "b_rows": 482
+        }
+      ]
+    },
+    {
+      "question_sha256": "985f573d9c2b818d819e6e636ac26b0923a28fd525c14148acb380c5453e9f4e",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 130,
+          "b_rows": 130
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 129,
+          "b_rows": 129
+        }
+      ]
+    },
+    {
+      "question_sha256": "985f573d9c2b818d819e6e636ac26b0923a28fd525c14148acb380c5453e9f4e",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 130,
+          "b_rows": 130
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 129,
+          "b_rows": 129
+        }
+      ]
+    },
+    {
+      "question_sha256": "985f573d9c2b818d819e6e636ac26b0923a28fd525c14148acb380c5453e9f4e",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 295,
+          "b_rows": 295
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 485,
+          "b_rows": 485
+        }
+      ]
+    },
+    {
+      "question_sha256": "01c5a5018ca66e048f2bb6eaa3707b5a2123c445dbb9e242832868655e1832bb",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 85,
+          "b_rows": 85
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 137,
+          "b_rows": 137
+        }
+      ]
+    },
+    {
+      "question_sha256": "01c5a5018ca66e048f2bb6eaa3707b5a2123c445dbb9e242832868655e1832bb",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 85,
+          "b_rows": 85
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 137,
+          "b_rows": 137
+        }
+      ]
+    },
+    {
+      "question_sha256": "01c5a5018ca66e048f2bb6eaa3707b5a2123c445dbb9e242832868655e1832bb",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 241,
+          "b_rows": 241
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 429,
+          "b_rows": 429
+        }
+      ]
+    },
+    {
+      "question_sha256": "07d34e01f9bbc12ca068f471869e24787a2cbef9957f38c9fe615f190a0bdf2e",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 77,
+          "b_rows": 77
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 115,
+          "b_rows": 115
+        }
+      ]
+    },
+    {
+      "question_sha256": "07d34e01f9bbc12ca068f471869e24787a2cbef9957f38c9fe615f190a0bdf2e",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 77,
+          "b_rows": 77
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 115,
+          "b_rows": 115
+        }
+      ]
+    },
+    {
+      "question_sha256": "07d34e01f9bbc12ca068f471869e24787a2cbef9957f38c9fe615f190a0bdf2e",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 275,
+          "b_rows": 275
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 491,
+          "b_rows": 491
+        }
+      ]
+    },
+    {
+      "question_sha256": "a2f14dc1c663ce49094165ee38d85853a93ba8ecae49d596cf174feff4c41eff",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 56,
+          "b_rows": 56
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 95,
+          "b_rows": 95
+        }
+      ]
+    },
+    {
+      "question_sha256": "a2f14dc1c663ce49094165ee38d85853a93ba8ecae49d596cf174feff4c41eff",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 56,
+          "b_rows": 56
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 95,
+          "b_rows": 95
+        }
+      ]
+    },
+    {
+      "question_sha256": "a2f14dc1c663ce49094165ee38d85853a93ba8ecae49d596cf174feff4c41eff",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 260,
+          "b_rows": 260
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 506,
+          "b_rows": 506
+        }
+      ]
+    },
+    {
+      "question_sha256": "f8d7e4865bccb6a0f90163f044335bdd4a32e681bf121efcc19d4772019fcad9",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 152,
+          "b_rows": 152
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 142,
+          "b_rows": 142
+        }
+      ]
+    },
+    {
+      "question_sha256": "f8d7e4865bccb6a0f90163f044335bdd4a32e681bf121efcc19d4772019fcad9",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 152,
+          "b_rows": 152
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 142,
+          "b_rows": 142
+        }
+      ]
+    },
+    {
+      "question_sha256": "f8d7e4865bccb6a0f90163f044335bdd4a32e681bf121efcc19d4772019fcad9",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 286,
+          "b_rows": 286
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 485,
+          "b_rows": 485
+        }
+      ]
+    },
+    {
+      "question_sha256": "3b3f4376020021d79a3f5f7ef5fabad6e6d9f9a0263824ccf1e2c92178ab4b6c",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 88,
+          "b_rows": 88
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 140,
+          "b_rows": 140
+        }
+      ]
+    },
+    {
+      "question_sha256": "3b3f4376020021d79a3f5f7ef5fabad6e6d9f9a0263824ccf1e2c92178ab4b6c",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 88,
+          "b_rows": 88
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 140,
+          "b_rows": 140
+        }
+      ]
+    },
+    {
+      "question_sha256": "3b3f4376020021d79a3f5f7ef5fabad6e6d9f9a0263824ccf1e2c92178ab4b6c",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 254,
+          "b_rows": 254
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 453,
+          "b_rows": 453
+        }
+      ]
+    },
+    {
+      "question_sha256": "44e89a76322a5147c010b7aed4d6dd025bf370263e263ecb282d4cb0329f222c",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 81,
+          "b_rows": 81
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 76,
+          "b_rows": 76
+        }
+      ]
+    },
+    {
+      "question_sha256": "44e89a76322a5147c010b7aed4d6dd025bf370263e263ecb282d4cb0329f222c",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 81,
+          "b_rows": 81
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 76,
+          "b_rows": 76
+        }
+      ]
+    },
+    {
+      "question_sha256": "44e89a76322a5147c010b7aed4d6dd025bf370263e263ecb282d4cb0329f222c",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 294,
+          "b_rows": 294
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 501,
+          "b_rows": 501
+        }
+      ]
+    },
+    {
+      "question_sha256": "fda5489a4276c1ad2984b40375379c3882fb9e5a79be1490650aa169cbc28d3c",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 110,
+          "b_rows": 110
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 50,
+          "b_rows": 50
+        }
+      ]
+    },
+    {
+      "question_sha256": "fda5489a4276c1ad2984b40375379c3882fb9e5a79be1490650aa169cbc28d3c",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 110,
+          "b_rows": 110
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 50,
+          "b_rows": 50
+        }
+      ]
+    },
+    {
+      "question_sha256": "fda5489a4276c1ad2984b40375379c3882fb9e5a79be1490650aa169cbc28d3c",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 260,
+          "b_rows": 260
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 470,
+          "b_rows": 470
+        }
+      ]
+    },
+    {
+      "question_sha256": "4873ccb266f837c8d08791d728a2f0d949290e86fdf4c5e5d7f415ab76b098f6",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 92,
+          "b_rows": 92
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 97,
+          "b_rows": 97
+        }
+      ]
+    },
+    {
+      "question_sha256": "4873ccb266f837c8d08791d728a2f0d949290e86fdf4c5e5d7f415ab76b098f6",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 92,
+          "b_rows": 92
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 97,
+          "b_rows": 97
+        }
+      ]
+    },
+    {
+      "question_sha256": "4873ccb266f837c8d08791d728a2f0d949290e86fdf4c5e5d7f415ab76b098f6",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 279,
+          "b_rows": 279
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 487,
+          "b_rows": 487
+        }
+      ]
+    },
+    {
+      "question_sha256": "3140f2d4f6c430d01274864fe084d5fe067f61742f1df41e6bd73c6ebe015b27",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 70,
+          "b_rows": 70
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 91,
+          "b_rows": 91
+        }
+      ]
+    },
+    {
+      "question_sha256": "3140f2d4f6c430d01274864fe084d5fe067f61742f1df41e6bd73c6ebe015b27",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 70,
+          "b_rows": 70
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 91,
+          "b_rows": 91
+        }
+      ]
+    },
+    {
+      "question_sha256": "3140f2d4f6c430d01274864fe084d5fe067f61742f1df41e6bd73c6ebe015b27",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 270,
+          "b_rows": 270
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 499,
+          "b_rows": 499
+        }
+      ]
+    },
+    {
+      "question_sha256": "4dbb66adda88d6471e1a34e5946a31213ed38e797afc259d9d0bb362b81fd5c4",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 14,
+          "b_rows": 14
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 33,
+          "b_rows": 33
+        }
+      ]
+    },
+    {
+      "question_sha256": "4dbb66adda88d6471e1a34e5946a31213ed38e797afc259d9d0bb362b81fd5c4",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 14,
+          "b_rows": 14
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 33,
+          "b_rows": 33
+        }
+      ]
+    },
+    {
+      "question_sha256": "4dbb66adda88d6471e1a34e5946a31213ed38e797afc259d9d0bb362b81fd5c4",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 96,
+          "b_rows": 96
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 328,
+          "b_rows": 328
+        }
+      ]
+    },
+    {
+      "question_sha256": "22aa9105536830f76ea8651e6dc3ae7c1780bd792023fa97f41650c6c8bd1e1a",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 81,
+          "b_rows": 81
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 94,
+          "b_rows": 94
+        }
+      ]
+    },
+    {
+      "question_sha256": "22aa9105536830f76ea8651e6dc3ae7c1780bd792023fa97f41650c6c8bd1e1a",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 81,
+          "b_rows": 81
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 94,
+          "b_rows": 94
+        }
+      ]
+    },
+    {
+      "question_sha256": "22aa9105536830f76ea8651e6dc3ae7c1780bd792023fa97f41650c6c8bd1e1a",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 282,
+          "b_rows": 282
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 468,
+          "b_rows": 468
+        }
+      ]
+    },
+    {
+      "question_sha256": "331304a8bf2f2a4e85b78bc5b76f2583800e326bca67e5d443d2695e0cf8491b",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "eligible",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 127,
+          "b_rows": 127
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 106,
+          "b_rows": 106
+        }
+      ]
+    },
+    {
+      "question_sha256": "331304a8bf2f2a4e85b78bc5b76f2583800e326bca67e5d443d2695e0cf8491b",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "post_prune",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 127,
+          "b_rows": 127
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 106,
+          "b_rows": 106
+        }
+      ]
+    },
+    {
+      "question_sha256": "331304a8bf2f2a4e85b78bc5b76f2583800e326bca67e5d443d2695e0cf8491b",
+      "budget": {
+        "effective_limit": 12000,
+        "max_source_references": 128,
+        "requested_cap": 12000
+      },
+      "portion": 1,
+      "stage": "raw_checked",
+      "a_manifests": 2,
+      "b_manifests": 2,
+      "equal": true,
+      "pairs": [
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 299,
+          "b_rows": 299
+        },
+        {
+          "checks": {
+            "normalized_rows_sha256": true,
+            "normalized_snapshots_sha256": true,
+            "row_count": true
+          },
+          "a_rows": 494,
+          "b_rows": 494
+        }
+      ]
+    }
+  ],
+  "limitations": "Pool equality only; not delivery, model accuracy, source authorization or final budget validation."
+}

@@ -1,0 +1,199 @@
+{
+  "schema": "verified-lossless-trace-compaction-v1",
+  "started_utc": "2026-11-12T17:44:40.358262+00:00",
+  "root": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign",
+  "status": "completed",
+  "files": [
+    {
+      "original_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/A-12000.jsonl",
+      "archive_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/A-12000.jsonl.gz",
+      "index_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/A-12000.index.jsonl.gz",
+      "original_bytes": 2557643789,
+      "archive_bytes": 555243171,
+      "index_bytes": 3183821,
+      "uncompressed_sha256": "fdd1a84e352ff2a7782fc80880b7a6b7597bfc77a4d4c9915441b08ff1a027bf",
+      "events": {
+        "pool_manifest": 288,
+        "selection_decision": 5146,
+        "selection_output": 96
+      },
+      "stages": {
+        "raw_checked": 96,
+        "post_prune": 96,
+        "eligible": 96
+      },
+      "verified_utc": "2026-11-12T17:45:24.418417+00:00",
+      "status": "verified_archive_original_removed",
+      "freed_bytes": 1999216797
+    },
+    {
+      "original_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/B-12000.jsonl",
+      "archive_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/B-12000.jsonl.gz",
+      "index_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/B-12000.index.jsonl.gz",
+      "original_bytes": 2551689943,
+      "archive_bytes": 553511817,
+      "index_bytes": 1430514,
+      "uncompressed_sha256": "cf7d26a35602f480adf1d26e0f8ed2b053cdd23114feb3cd8d14dd1a920635af",
+      "events": {
+        "pool_manifest": 288,
+        "qwen_scoring": 96,
+        "selection_decision": 4190,
+        "selection_output": 96
+      },
+      "stages": {
+        "raw_checked": 96,
+        "post_prune": 96,
+        "eligible": 96
+      },
+      "verified_utc": "2026-11-12T17:46:04.918568+00:00",
+      "status": "verified_archive_original_removed",
+      "freed_bytes": 1996747612
+    },
+    {
+      "original_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/A-6000.jsonl",
+      "archive_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/A-6000.jsonl.gz",
+      "index_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/A-6000.index.jsonl.gz",
+      "original_bytes": 2554662412,
+      "archive_bytes": 553443543,
+      "index_bytes": 1390186,
+      "uncompressed_sha256": "0ff4e07378f84f23d9486cb7a7a5a83c02a7820bdb93cf1e19968a749ffea1f5",
+      "events": {
+        "pool_manifest": 288,
+        "selection_decision": 6861,
+        "selection_output": 96
+      },
+      "stages": {
+        "raw_checked": 96,
+        "post_prune": 96,
+        "eligible": 96
+      },
+      "verified_utc": "2026-11-12T17:46:45.293368+00:00",
+      "status": "verified_archive_original_removed",
+      "freed_bytes": 1999828683
+    },
+    {
+      "original_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/B-6000.jsonl",
+      "archive_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/B-6000.jsonl.gz",
+      "index_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/B-6000.index.jsonl.gz",
+      "original_bytes": 2557368000,
+      "archive_bytes": 553559729,
+      "index_bytes": 1472481,
+      "uncompressed_sha256": "41597b2798f0c8a98f20565972457e919ba272c2670861d44f227af0a91c3eb6",
+      "events": {
+        "pool_manifest": 288,
+        "qwen_scoring": 96,
+        "selection_decision": 4465,
+        "selection_output": 96
+      },
+      "stages": {
+        "raw_checked": 96,
+        "post_prune": 96,
+        "eligible": 96
+      },
+      "verified_utc": "2026-11-12T17:47:25.675231+00:00",
+      "status": "verified_archive_original_removed",
+      "freed_bytes": 2002335790
+    },
+    {
+      "original_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/A-3000.jsonl",
+      "archive_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/A-3000.jsonl.gz",
+      "index_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/A-3000.index.jsonl.gz",
+      "original_bytes": 2552673818,
+      "archive_bytes": 552987546,
+      "index_bytes": 902429,
+      "uncompressed_sha256": "ab76c13375ff02b846b3184fa7223a67f834181d1cc57630d9926197c0eb8004",
+      "events": {
+        "pool_manifest": 288,
+        "selection_decision": 7920,
+        "selection_output": 96
+      },
+      "stages": {
+        "raw_checked": 96,
+        "post_prune": 96,
+        "eligible": 96
+      },
+      "verified_utc": "2026-11-12T17:48:05.755593+00:00",
+      "status": "verified_archive_original_removed",
+      "freed_bytes": 1998783843
+    },
+    {
+      "original_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/B-3000.jsonl",
+      "archive_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/B-3000.jsonl.gz",
+      "index_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/B-3000.index.jsonl.gz",
+      "original_bytes": 2556871999,
+      "archive_bytes": 553436067,
+      "index_bytes": 1331257,
+      "uncompressed_sha256": "07355366355f741aaf65bd35241ed8f363208c4bb23daa55ca70feaa97ea792f",
+      "events": {
+        "pool_manifest": 288,
+        "qwen_scoring": 96,
+        "selection_decision": 4951,
+        "selection_output": 96
+      },
+      "stages": {
+        "raw_checked": 96,
+        "post_prune": 96,
+        "eligible": 96
+      },
+      "verified_utc": "2026-11-12T17:48:46.455401+00:00",
+      "status": "verified_archive_original_removed",
+      "freed_bytes": 2002104675
+    },
+    {
+      "original_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/A-1500.jsonl",
+      "archive_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/A-1500.jsonl.gz",
+      "index_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/A-1500.index.jsonl.gz",
+      "original_bytes": 2551563378,
+      "archive_bytes": 552758758,
+      "index_bytes": 649040,
+      "uncompressed_sha256": "4b7b05a3cab842fbd9008df85c385c8d15bc5bffde2e10b7f19c3a1441666463",
+      "events": {
+        "pool_manifest": 288,
+        "selection_decision": 8413,
+        "selection_output": 96
+      },
+      "stages": {
+        "raw_checked": 96,
+        "post_prune": 96,
+        "eligible": 96
+      },
+      "verified_utc": "2026-11-12T17:49:26.569461+00:00",
+      "status": "verified_archive_original_removed",
+      "freed_bytes": 1998155580
+    },
+    {
+      "original_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/B-1500.jsonl",
+      "archive_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/B-1500.jsonl.gz",
+      "index_path": "/home/viadmin/.local/share/docatlas-eval/step16/paired-campaign/B-1500.index.jsonl.gz",
+      "original_bytes": 2556376422,
+      "archive_bytes": 553304887,
+      "index_bytes": 1196020,
+      "uncompressed_sha256": "2edc7afc2b793128612d1c353d2e63792cc626b8d6a967859dea14263617faa1",
+      "events": {
+        "pool_manifest": 288,
+        "qwen_scoring": 96,
+        "selection_decision": 5487,
+        "selection_output": 96
+      },
+      "stages": {
+        "raw_checked": 96,
+        "post_prune": 96,
+        "eligible": 96
+      },
+      "verified_utc": "2026-11-12T17:50:04.855600+00:00",
+      "status": "verified_archive_original_removed",
+      "freed_bytes": 2001875515
+    }
+  ],
+  "free_bytes_before": 2625056768,
+  "preserved": "all decompressed trace bytes; exact MCP payloads, run/score reports, caches and stores untouched",
+  "index_omitted_fields": [
+    "normalized_rows",
+    "normalized_snapshots",
+    "raw_rows",
+    "raw_snapshots"
+  ],
+  "completed_utc": "2026-11-12T17:50:04.889846+00:00",
+  "total_freed_bytes": 15999048495,
+  "free_bytes_after": 17809907712
+}

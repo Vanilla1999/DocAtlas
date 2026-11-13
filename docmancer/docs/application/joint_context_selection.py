@@ -38,6 +38,12 @@ from .context_continuation import continuation_fingerprint, continuation_metadat
 from .context_query_probes import authoritative_queries, literal_query_probe
 from .experimental_context_finalization import _rebuild
 from .experimental_pool_pruning import otsu_upper, pool_prune_mode, prune_checked_pool
+from .experimental_qwen_checked_pool import PoolTrace, enabled as paired_qwen_enabled, score_rows as paired_score_rows
+from .experimental_qwen_ablation import load_settings as qwen_study_settings
+from .experimental_qwen_pool_units import (
+    study_settings as qwen_pool_settings, prune_study_pool, initial_study_units,
+    discard_overlapping_units, PRUNING_ENV, UNITS_ENV, GUARD_ENV,
+)
 from .model_visible_projection import _refresh_estimate
 from .projection_tokenizer import projection_token_count
 from .query_trace import query_trace_enabled
@@ -339,14 +345,35 @@ def _whole_pool_fits(payload: dict, snapshot: dict, retrieval: dict, rows: list[
     return _delivery_fits(whole, limit)
 
 
+def _study_options():
+    """Explicit independent study; never silently alter the original paired arm."""
+    selection, pool = qwen_study_settings(), qwen_pool_settings()
+    if any(name in os.environ for name in (PRUNING_ENV, UNITS_ENV, GUARD_ENV)) and selection.mode is None:
+        raise ValueError("qwen_pool_options_require_explicit_study")
+    if pool.enabled and selection.mode != "control":
+        raise ValueError("qwen_study_change_one_mechanism_at_a_time")
+    if pool.pruning != "control" and pool.units != "control":
+        raise ValueError("qwen_study_pruning_and_units_are_separate_arms")
+    if pool.units == "competing_rows" and pool.unit_guard != "conservative":
+        raise ValueError("qwen_study_competing_rows_requires_conservative_guard")
+    return selection, pool
+
+
 def _continuation_settings() -> dict:
     """Bind stable host choices that affect selection or its wire pricing."""
     from docmancer.docs.domain.context_presentation import presentation_settings
+    study, pool_study = _study_options()
     return {
+        **study.continuation_settings(),
+        **({"qwen_pool_study": pool_study.receipt()} if pool_study.enabled else {}),
         **presentation_settings(),
         **{name: _experiment(name) for name in _EXPERIMENT_CHOICES},
         "DOCATLAS_EXPERIMENT_POOL_PRUNE": pool_prune_mode(JOINT_POOL_PRUNE_DEFAULT),
         "selector": experimental_selector_settings(),
+        # Do not change default continuation identities when the experiment is off.
+        **({"paired_qwen": "checked-snippet-v1",
+            "paired_model_path": os.environ.get("DOCATLAS_EXPERIMENT_EVIDENCE_MODEL_PATH")}
+           if paired_qwen_enabled() else {}),
         **{name: os.environ.get(name) for name in (
             "DOCATLAS_EXPERIMENT_JOINT_RELEVANCE", "DOCATLAS_EXPERIMENT_MINI_PATH",
             "DOCATLAS_EXPERIMENT_DENSE_PATH", "DOCATLAS_MCP_TEXT_FALLBACK",
@@ -378,9 +405,12 @@ def select_joint_context(
     portion number and continuation token, so equal pools cannot hide a change
     of the requested scope, version or target.
     """
+    study, pool_study = _study_options()
     if type(portion) is not int or portion < 1:
         raise ValueError("invalid_context_portion")
     from docmancer.docs.domain.minimal_context_config import minimal_context_enabled
+    if paired_qwen_enabled() and minimal_context_enabled():
+        raise ValueError("paired_qwen_requires_default_native_acquisition_not_minimal_complete_scope")
     if minimal_context_enabled():
         from .minimal_context_selection import select_minimal_context
         return select_minimal_context(
@@ -389,6 +419,8 @@ def select_joint_context(
             finalize_packet=finalize_packet,
         )
     cap = experimental_context_max_tokens()
+    if paired_qwen_enabled() and cap is None:
+        raise ValueError("paired_qwen_requires_native_context_token_budget")
     if cap is None:
         if portion != 1 or continuation_token is not None:
             raise ValueError("portion_unavailable")
@@ -408,6 +440,14 @@ def select_joint_context(
             "budget_limited": False, "reference_limited": False,
         })
     if not rows and portion == 1 and continuation_token is None:
+        if os.environ.get("DOCATLAS_EXPERIMENT_PAIRED_TRACE"):
+            trace = PoolTrace(retrieval, cap, _delivery_limit(retrieval, cap), max_source_references, portion)
+            if study.mode is not None:
+                trace.emit("qwen_study_settings", selection=study.trace_receipt(), pool=pool_study.receipt())
+            for stage in ("raw_checked", "post_prune", "eligible"):
+                trace.manifest(stage, [], snapshot, empty_pool=True)
+            trace.emit("selection_output", final_rows=[], final_indices=[],
+                       stage="empty_checked_pool_refusal_preserved")
         # Keep an existing source/consent/operational refusal intact. It never
         # advertises a next portion or acquires evidence through this helper.
         return finalize_packet(payload, snapshot) if finalize_packet is not None else (payload, snapshot)
@@ -484,6 +524,7 @@ def _select_portion(payload: dict, snapshot: dict, retrieval: dict, *,
     locators are attached, before registering the selected reference batch.
     The explicit section-compression selector retains its own policy.
     """
+    study, pool_study = _study_options()
     rows = payload.get("sources") or []
     cap = experimental_context_max_tokens()
     if not rows or cap is None:
@@ -498,6 +539,21 @@ def _select_portion(payload: dict, snapshot: dict, retrieval: dict, *,
     # to reconstruct a question from retrieved text or generated probes.
     if not queries:
         raise ValueError("joint_context_selection_requires_authoritative_queries")
+    paired = paired_qwen_enabled()
+    if paired and (
+        (terms_mode, priority_mode, fusion_mode, cut_mode) != ("word", "cost_sqrt", "mean", "off")
+        or pool_prune_mode(JOINT_POOL_PRUNE_DEFAULT) != JOINT_POOL_PRUNE_DEFAULT
+        or os.environ.get("DOCATLAS_EXPERIMENT_JOINT_RELEVANCE", "off") != "off"
+    ):
+        raise ValueError("paired_qwen_requires_default_pruning_eligibility_mmr_and_cost_settings")
+    paired_trace = PoolTrace(retrieval, cap, limit, max_source_references,
+                             (payload.get("more_context") or {}).get("portion", 1))
+    if study.mode is not None:
+        paired_trace.emit("qwen_study_settings", selection=study.trace_receipt(), pool=pool_study.receipt())
+    paired_trace.manifest("raw_checked", rows, snapshot,
+                          native_settings={name: _experiment(name) for name in _EXPERIMENT_CHOICES},
+                          prune_mode=pool_prune_mode(JOINT_POOL_PRUNE_DEFAULT),
+                          relevance_mode=os.environ.get("DOCATLAS_EXPERIMENT_JOINT_RELEVANCE", "off"))
     statistic_rows = rows
     candidate_count = len(rows)
     # Whole-section pool pruning (``body`` unless the flag names another mode;
@@ -508,10 +564,19 @@ def _select_portion(payload: dict, snapshot: dict, retrieval: dict, *,
     if _whole_pool_fits(payload, snapshot, retrieval, rows, limit, len(queries), max_source_references):
         prune_receipt = None
     else:
-        payload, prune_receipt = prune_checked_pool(payload, snapshot, queries,
-                                                    default_mode=JOINT_POOL_PRUNE_DEFAULT)
+        if pool_study.pruning != "control":
+            # A separately named study, not a silent relaxation of paired B.
+            # No extra locator rescue: only intersection vs union/off changes.
+            payload, prune_receipt = prune_study_pool(
+                payload, snapshot, queries, settings=pool_study,
+                default_mode=JOINT_POOL_PRUNE_DEFAULT,
+            )
+        else:
+            payload, prune_receipt = prune_checked_pool(payload, snapshot, queries,
+                                                        default_mode=JOINT_POOL_PRUNE_DEFAULT)
     rows = payload.get("sources") or []
     pruned_count = candidate_count - len(rows)
+    paired_trace.manifest("post_prune", rows, snapshot, pruning_receipt=prune_receipt)
     observation = _SelectionObservation(retrieval, rows, lambda cost: _cost_scale(cost, priority_mode))
     if observation.state is not None and prune_receipt is not None:
         observation.state["pool_pruning"] = prune_receipt
@@ -605,8 +670,26 @@ def _select_portion(payload: dict, snapshot: dict, retrieval: dict, *,
         )
 
     whole = [unit(group, indices) for group, indices in enumerate(grouped)]
-    pending = {item.indices: item for item in whole if item.features or item.locator_queries}
+    if pool_study.units != "control":
+        candidates, unit_receipt = initial_study_units(whole, rows, unit, settings=pool_study)
+        paired_trace.emit("qwen_study_units", **unit_receipt)
+        eligible_groups = {item.group for item in whole if item.features or item.locator_queries}
+        # Preserve native group eligibility, including complementary zero-overlap
+        # rows that can become useful after an adjacent sibling is selected.
+        pending = {item.indices: item for item in candidates if item.group in eligible_groups}
+    else:
+        pending = {item.indices: item for item in whole if item.features or item.locator_queries}
     eligible = {index for item in pending.values() for index in item.indices}
+    paired_trace.manifest("eligible", [row for index, row in enumerate(rows) if index in eligible],
+                          snapshot, post_prune_indices=sorted(eligible),
+                          groups=[{"group": item.group, "indices": list(item.indices),
+                                   "eligible": item.indices in pending} for item in whole])
+    # Score new checked-snippet inputs once with the unchanged original question.
+    # Eligibility, grouping, pruning and all query lanes remain the default ones.
+    paired_scores = paired_score_rows(retrieval, rows, snapshot, paired_trace) if paired else None
+    if paired_scores is not None and study.mode is not None:
+        # Raw scorer/cache/receipt values remain intact; transform selection only.
+        paired_scores = study.transform_scores(paired_scores)
     selected: list[int] = []
     selected_set: set[int] = set()
     selected_groups: set[int] = set()
@@ -699,7 +782,13 @@ def _select_portion(payload: dict, snapshot: dict, retrieval: dict, *,
             # An exact source nomination is a separate routing signal, not
             # a match in the body. It keeps locator-only reads possible while
             # normal attribution is independently rebuilt below.
-            if semantic_scores is None and fusion_mode == "max_shared_scale":
+            if paired_scores is not None:
+                # No old section score is transferred to a split window: reduce
+                # exactly this unit's row scores, including for completing units.
+                original_score = max(paired_scores[index] for index in item.indices)
+                relevance = sum(max(original_score, 1.0 if key in item.locator_queries else 0.0)
+                                for key in queries) / len(queries)
+            elif semantic_scores is None and fusion_mode == "max_shared_scale":
                 relevance = max(max(
                     mass[key] / shared_scale if shared_scale else 0.0,
                     1.0 if key in item.locator_queries else 0.0,
@@ -728,11 +817,15 @@ def _select_portion(payload: dict, snapshot: dict, retrieval: dict, *,
             # continuation, so they are compared against other sections only.
             redundancy = max((similarity(item, previous) for previous in selected_units
                               if previous.group != item.group), default=0.0)
-            gain = relevance - redundancy
+            gain = study.marginal_gain(relevance, redundancy)
             return (gain / _cost_scale(item.cost, priority_mode), relevance, -min(item.indices))
 
         candidate = max(pending.values(), key=priority)
-        if priority(candidate)[0] <= 0:
+        if study.should_stop(priority(candidate)[0]):
+            if paired_trace.path:
+                for remaining in pending.values():
+                    paired_trace.decision(remaining, "nonpositive_gain", priority(remaining),
+                                          selected_before=len(selected))
             if observation.state is not None:
                 for remaining in pending.values():
                     observation.decision(remaining, "nonpositive_gain", priority)
@@ -752,6 +845,10 @@ def _select_portion(payload: dict, snapshot: dict, retrieval: dict, *,
             trial, receipts = packet(trial_indices, budget_limited=bool(rejected - set(trial_indices)))
             fits = _delivery_fits(trial, limit)
         if not fits:
+            if paired_trace.path:
+                paired_trace.decision(candidate, "delivery_budget" if references_fit else "reference_limit",
+                                      priority(candidate), selected_before=len(selected),
+                                      split_into_single_rows=(len(candidate.indices) > 1 and pool_study.units == "control"))
             if observation.state is not None:
                 observation.decision(candidate, "delivery_budget" if references_fit else "reference_limit", priority,
                                      selected_before=len(selected), trial_text_bytes=text_bytes,
@@ -761,16 +858,20 @@ def _select_portion(payload: dict, snapshot: dict, retrieval: dict, *,
                 rejected.update(candidate.indices)
             else:
                 reference_rejected.update(candidate.indices)
-            if len(candidate.indices) > 1:
+            if len(candidate.indices) > 1 and pool_study.units == "control":
                 # A section is not silently clipped. Its original checked rows
                 # compete again under the same joint objective and wire budget.
                 for index in candidate.indices:
                     pending[(index,)] = unit(candidate.group, (index,))
             continue
+        if paired_trace.path:
+            paired_trace.decision(candidate, "selected", priority(candidate), selected_before=len(selected))
         selected.extend(candidate.indices)
         if observation.state is not None:
             observation.decision(candidate, "selected", priority, selected_before=len(selected) - len(candidate.indices))
         selected_set.update(candidate.indices)
+        if pool_study.units != "control":
+            pending = discard_overlapping_units(pending, selected_set)
         selected_groups.add(candidate.group)
         selected_units.append(candidate)
         selected_references.update(references)
@@ -781,4 +882,13 @@ def _select_portion(payload: dict, snapshot: dict, retrieval: dict, *,
     result, bound = packet(selected, budget_limited=bool(rejected - selected_set))
     result, bound = finalize_joint_context_delivery(result, bound, retrieval)
     observation.selected(result.get("sources") or [])
+    if paired_trace.path:
+        final_ids = {row["evidence_id"] for row in result.get("sources") or []}
+        paired_trace.emit("selection_output", greedy_indices=selected,
+                          final_indices=[index for index in selected if rows[index]["evidence_id"] in final_ids],
+                          final_rows=result.get("sources") or [],
+                          final_normalized_rows=[
+                              {key: value for key, value in row.items() if key not in {"evidence_id", "source_uri"}}
+                              for row in result.get("sources") or []],
+                          stage="native_portion_after_fitter_before_host_finalization")
     return result, bound

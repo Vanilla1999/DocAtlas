@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "state": "FINAL_FROZEN",
+  "corpus_id": "FRESH17",
+  "source_repository": "local DocAtlas repository",
+  "source_revision": "14d05208ce43589d51f93ed089c533de740d5600",
+  "source_method": "Exact git show REV:path bytes; not dirty working-tree text",
+  "license": "Existing repository terms; modest internal copies, no external material",
+  "counts": {
+    "families": 12,
+    "dev_families": 6,
+    "holdout_families": 6,
+    "cases": 24,
+    "documents": 7,
+    "obligation_groups": 16
+  },
+  "documents": [
+    {
+      "path": "docs/RELEASE_CHECKLIST.md",
+      "frozen_path": "corpus/project/docs/RELEASE_CHECKLIST.md",
+      "sha256": "8a1eaa8a03d2fe838df84219ea1e96359b9fc66dff2b638eac3a772026e3e87f",
+      "bytes": 9201,
+      "source_revision": "14d05208ce43589d51f93ed089c533de740d5600",
+      "git_blob": "9473dd2a23b977937c2c3b500a6c33aaf5c9c79d"
+    },
+    {
+      "path": "docs/capabilities.md",
+      "frozen_path": "corpus/project/docs/capabilities.md",
+      "sha256": "c1d1339157113508ce26c65951315520131458cbe11a79a70434fcc86e01f504",
+      "bytes": 4043,
+      "source_revision": "14d05208ce43589d51f93ed089c533de740d5600",
+      "git_blob": "7a37fc10c09ccf31845de0270fb82b12852654d2"
+    },
+    {
+      "path": "docs/change-aware-docs.md",
+      "frozen_path": "corpus/project/docs/change-aware-docs.md",
+      "sha256": "e4a5c932205823b5dacf2dbce4c93d73e5d362fa0e2b50ebd7f754ee189e1ffe",
+      "bytes": 2886,
+      "source_revision": "14d05208ce43589d51f93ed089c533de740d5600",
+      "git_blob": "9ea29f8c682dbca1adeefeb5b02109f6d4b094ff"
+    },
+    {
+      "path": "docs/development/python-module-size-policy.md",
+      "frozen_path": "corpus/project/docs/development/python-module-size-policy.md",
+      "sha256": "efed3dd085cbd2b787a3800973f9ad5742ebda038f787bec45106ed338c754bd",
+      "bytes": 2346,
+      "source_revision": "14d05208ce43589d51f93ed089c533de740d5600",
+      "git_blob": "b5a2e5c4e57cb78757a8900520c7d93f821f0b4e"
+    },
+    {
+      "path": "docs/release-identity.md",
+      "frozen_path": "corpus/project/docs/release-identity.md",
+      "sha256": "004e26a57e5a54cc7fb2013ee5db74c372d1388b5c695cdab2c0d0d2e3b04b45",
+      "bytes": 6105,
+      "source_revision": "14d05208ce43589d51f93ed089c533de740d5600",
+      "git_blob": "14b524b11c1d547207935c8b1af0669d4634cbbc"
+    },
+    {
+      "path": "docs/sdk-delivery-budgets.md",
+      "frozen_path": "corpus/project/docs/sdk-delivery-budgets.md",
+      "sha256": "89cc4acbbe6479d88976f2a40edcc9233bff8545749c81bb4bcc7663a55036e4",
+      "bytes": 2481,
+      "source_revision": "14d05208ce43589d51f93ed089c533de740d5600",
+      "git_blob": "75d50daf1af5b6fecd2ffa2410ec8e84b1365cf1"
+    },
+    {
+      "path": "docs/support-surface-policy.md",
+      "frozen_path": "corpus/project/docs/support-surface-policy.md",
+      "sha256": "8103ff0c0d7a92db1b62b1cfc76365748c75de0973ce866f609b0c628441b9f5",
+      "bytes": 5149,
+      "source_revision": "14d05208ce43589d51f93ed089c533de740d5600",
+      "git_blob": "e47abae170dabe14bc732b70ee654f6f74a50373"
+    }
+  ],
+  "catalog_sha256": "3bd98b09f04fb61c4f2621c5d70f236e038f97a24339580ce70d83a27fb6f803",
+  "questions_sha256": "5b05d6a4a6519eaf2b7904793f776acaa26283581002a33b65e1bda5b06083b9",
+  "oracle_sha256": "2ba568fbb608130fd71fdebcd8d603927d956e614df3b1fff2be8d28213298e4",
+  "overlap_audit_sha256": "81af3da830fa53a3eadcb5b1a45e9de3ff14d7a40eed1e212fe5cf78c46f7477",
+  "author_record_sha256": "c996d4cc8c8d72c5181f11b16a533b552eb3a91ae48497b93f753f13225e88aa",
+  "old_corpus_builder_sha256": "c6e10fbea41e29c8d1df7e8ad367377b4eabcec02f0abd9d3184d40aa7ef3a63",
+  "construction_activity": {
+    "inference_calls": 0,
+    "api_calls": 0,
+    "tests_run": 0,
+    "outputs_or_scores_read": 0
+  },
+  "seal_rule": "Holdout questions, oracle, author record and overlap audit must not be opened by implementation Lead until variant code/config/policy hashes frozen. Whole questions.json read exposes holdout; use dev-filtered adapter."
+}
