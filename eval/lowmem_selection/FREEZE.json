@@ -1,0 +1,11 @@
+{
+  "eval/lowmem_selection/fresh/gold.json": "c28ad6bab06c0ad506f7f7088c9a6fd93ce237f857246b4b9712dbb3050aff94",
+  "eval/lowmem_selection/fresh/questions.json": "369b91421657632d76b8bcbf32e5f32d022cfe524df2734d2835e9c9a76329a1",
+  "eval/lowmem_selection/fresh/sources.json": "ac4e8e685d8cc7abceca464ed072a6b4848e3a407964b715f9d464a567f0cc6f",
+  "eval/lowmem_selection/pilot/gold.json": "ea318defafab5ce8e562d0440e27b29e71df7039f93c0700eb08f47fe0ece9cd",
+  "eval/lowmem_selection/pilot/questions.json": "b10eb0774e6d881115e54b08c70b450836251b61243b395fbe0393bcfb2e00de",
+  "eval/lowmem_selection/pilot/sources.json": "e82ce4d11ac722487ac97d7a390450bca66bdf4814db87ae6b2db95483be9dcb",
+  "eval/prepared_model_comparison40/questions.json": "67afaaa42ad71d0036d2cde4f5a7da1b4e9c9b836b53b62ef2658ffdb8af80b5",
+  "eval/prepared_model_comparison40/source_plan.json": "8ec8b19323f4bc4f7d0737aced62527b210ee4ba1c50cf77b62ccafc38594e9a",
+  "eval/prepared_model_comparison40/gold_spans.json": "3a78745249900056d98870850add167e9cc0ceaeb284e0db759b78b94303eacc"
+}

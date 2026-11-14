@@ -1,0 +1,42 @@
+[
+  {
+    "id": "L10-01",
+    "question": "What is the default retry.attempts in Aurora, and does that count include the first delivery attempt?"
+  },
+  {
+    "id": "L10-02",
+    "question": "In Aurora, how do I stop recording payloads on an isolated test relay, what remains recorded, and may I use the same setting in production?"
+  },
+  {
+    "id": "L10-03",
+    "question": "Как восстановить production-снимок Aurora: какие проверки нужны до загрузки, какая команда загружает снимок и что выполнить до открытия входящего потока?"
+  },
+  {
+    "id": "L10-04",
+    "question": "What must a Rivet runner configure to use a shared cache, and can it skip artifact signature checks on a private network?"
+  },
+  {
+    "id": "L10-05",
+    "question": "How do Quartz versions 1 and 2 differ for reads immediately after a successful write, and does version 2 give the same guarantee for bucket listings?"
+  },
+  {
+    "id": "L10-06",
+    "question": "Where is the latest Quartz promotion receipt written, and for how many years is its retention guaranteed?"
+  },
+  {
+    "id": "L10-07",
+    "question": "What exact guaranteed p99 bucket-listing latency in milliseconds does Quartz version 2 provide?"
+  },
+  {
+    "id": "L10-08",
+    "question": "В Rivet какой порядок приоритета настроек CLI, окружения, rivet.toml и машины? Где должен храниться секрет подписи и допускается ли rivet.toml с доступом только владельцу?"
+  },
+  {
+    "id": "L10-09",
+    "question": "In Rivet, do artifacts from a private shared cache still need signature verification?"
+  },
+  {
+    "id": "L10-10",
+    "question": "Which Rivet build flag prevents reusing cached artifacts while still publishing successful new artifacts, and how does --no-cache differ?"
+  }
+]

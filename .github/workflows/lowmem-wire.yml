@@ -1,0 +1,69 @@
+name: Main stock-text versus managed model-view under shared 1.5 GB
+on:
+  push:
+    branches: [experiment/lowmem-selection-20261028]
+    paths:
+      - 'eval/lowmem_selection/make_wire_harness.py'
+      - '.github/workflows/lowmem-wire.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: lowmem-wire-${{ github.sha }}
+  cancel-in-progress: false
+jobs:
+  installed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [v40, pilot, fresh]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Same installed main product, different public delivery configuration
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git fetch -q origin 3904aa5a04ee984d065d267f0daa279eece52ea9 --depth=1
+          git diff --exit-code 3904aa5a04ee984d065d267f0daa279eece52ea9 HEAD -- \
+            docmancer pyproject.toml uv.lock eval/lowmem_selection/run.py \
+            eval/lowmem_selection/FREEZE.json eval/lowmem_selection/fresh \
+            eval/lowmem_selection/pilot eval/prepared_model_comparison40
+          mkdir -p "$RUNNER_TEMP/bundle" "$RUNNER_TEMP/results"
+          gh run download 40733498447 --repo "$GITHUB_REPOSITORY" \
+            --name lowmem-runtime-40733498447 --dir "$RUNNER_TEMP/bundle"
+          python eval/lowmem_selection/make_wire_harness.py eval/lowmem_selection/run.py \
+            "$RUNNER_TEMP/results/run-wire.py" > "$RUNNER_TEMP/results/PROFILE.json"
+          git rev-parse HEAD > "$RUNNER_TEMP/results/harness-head.txt"
+          cp "$RUNNER_TEMP/bundle/head.txt" "$RUNNER_TEMP/bundle/image.json" "$RUNNER_TEMP/results/"
+          gunzip -c "$RUNNER_TEMP/bundle/image.tar.gz" | docker load
+      - name: No generative server; original MiniLM selection and source validation
+        env:
+          POLICY: main
+          SUITE: ${{ matrix.suite }}
+          TESTED_SHA: 3904aa5a04ee984d065d267f0daa279eece52ea9
+        run: |
+          set -euo pipefail
+          set +e
+          docker run --name lowmem-run --network none --cpus=2 \
+            --memory=1500000000 --memory-swap=1500000000 \
+            -e POLICY -e SUITE -e TESTED_SHA -e HF_HUB_OFFLINE=1 \
+            -v "$RUNNER_TEMP/results/run-wire.py:/repo/eval/lowmem_selection/run.py:ro" \
+            -v "$RUNNER_TEMP/results:/evidence" docatlas-lowmem
+          rc=$?
+          set -e
+          docker inspect lowmem-run > "$RUNNER_TEMP/results/container.json"
+          printf '%s\n' "$rc" > "$RUNNER_TEMP/results/exit-code.txt"
+          exit "$rc"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: lowmem-stock-text-${{ matrix.suite }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/results/
+          retention-days: 30
+          if-no-files-found: error
