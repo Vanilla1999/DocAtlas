@@ -1,0 +1,74 @@
+{
+  "schema": "q6-source-quotes-v1",
+  "source_commit": "420e21924e486a7ebca8f4aa891cc176e07280f6",
+  "case_id": "Q6-continuity-20261109",
+  "question": "How does OpenCode compact delivery work, what size limits apply, and how is a delivery failure diagnosed?",
+  "historical_equivalence": "The question comes from the user's frozen replacement experiment, not the missing original 86-candidate Q6.",
+  "facts": [
+    {
+      "id": "budget_formula",
+      "path": "docs/opencode-compact-text.md",
+      "line_start": 66,
+      "line_end": 66,
+      "quote": "budget: `max(o200k_tokens, ceil(UTF-8 bytes / 4)) <= 12000`."
+    },
+    {
+      "id": "compact_and_canonical",
+      "path": "docs/opencode-compact-text.md",
+      "line_start": 64,
+      "line_end": 66,
+      "quote": "For ordinary successful `docs_context` in this explicitly enabled profile,\nboth compact output and a canonical fallback must fit the existing compact-text\nbudget: `max(o200k_tokens, ceil(UTF-8 bytes / 4)) <= 12000`."
+    },
+    {
+      "id": "delivery_error_contract",
+      "path": "docs/opencode-compact-text.md",
+      "line_start": 74,
+      "line_end": 76,
+      "quote": "If compact rendering fails and the complete canonical fallback also exceeds\nthe budget, the server now returns a small MCP error:\n`context_delivery_unavailable`, `isError=true`, `retryable=false`."
+    },
+    {
+      "id": "delivery_failure_recovery",
+      "path": "docs/opencode-compact-text.md",
+      "line_start": 77,
+      "line_end": 80,
+      "quote": "The agent must not\ninterpret this as missing documentation, repeat the unchanged call, broaden the\nscope or treat a grep recovery from the saved dump as successful MCP delivery.\nHost configuration or the delivery defect must be addressed before retrying."
+    }
+  ],
+  "regressions": {
+    "T01-en": {
+      "case_id": "T01-en-current19",
+      "question": "What is expected of me when I submit a pull request to DocAtlas?",
+      "question_source": "eval/blind_project_context/questions.json, T01-en",
+      "historical_equivalence": "Original published development question replayed on current 19 catalogued files. No equivalence to complete-scope minimal-context runs is assumed.",
+      "facts": [
+        {"id": "branch_name", "path": "CONTRIBUTING.md", "line_start": 61, "line_end": 61, "quote": "Branch name: `feat/<topic>` or `fix/<description>`"},
+        {"id": "full_suite_before_pr", "path": "CONTRIBUTING.md", "line_start": 62, "line_end": 62, "quote": "Run the full test suite before opening the PR"},
+        {"id": "new_connector_tests", "path": "CONTRIBUTING.md", "line_start": 63, "line_end": 63, "quote": "New connectors or fetchers should include tests where practical"}
+      ]
+    },
+    "main-flow-Q1": {
+      "case_id": "main-flow-Q1-current19",
+      "question": "Как включить и выключить подробные логи основного потока DocAtlas через CLI?",
+      "question_source": "eval/main_flow_comparison/questions.json, numeric id 1",
+      "historical_equivalence": "Original main-flow question replayed on current 19 catalogued files. The original experiment used a combined README corpus; identity with the unpublished Q1 is not established.",
+      "facts": [
+        {"id": "logging_default_off", "path": "docs/main-flow-logging.md", "line_start": 3, "line_end": 3, "quote": "Подробная диагностика по умолчанию выключена."},
+        {"id": "trace_before_subcommand", "path": "docs/main-flow-logging.md", "line_start": 12, "line_end": 12, "quote": "Глобальные `--trace` / `--no-trace` указываются **перед подкомандой**."}
+      ]
+    },
+    "main-flow-Q9": {
+      "case_id": "main-flow-Q9-current19",
+      "question": "Какие новые тесты разрешены в DocAtlas и чем нужно проверять корректность результата помимо логов?",
+      "question_source": "eval/main_flow_comparison/questions.json, numeric id 9",
+      "historical_equivalence": "Original main-flow question replayed on current 19 catalogued files. The original experiment used a combined README corpus; identity with the unpublished Q9 is not established.",
+      "facts": [
+        {"id": "integration_level", "path": "docs/main-flow-evaluation.md", "line_start": 15, "line_end": 15, "quote": "новые проверки только интеграционного уровня и выше"},
+        {"id": "independent_oracle", "path": "docs/main-flow-evaluation.md", "line_start": 21, "line_end": 21, "quote": "Получить эталон из исходных документов и требований, не из выдачи проверяемого кода."},
+        {"id": "facts_sources_scope_state", "path": "docs/main-flow-evaluation.md", "line_start": 21, "line_end": 21, "quote": "обязательные факты, дословные опорные фрагменты, допустимые источники/hash/span, scope и ожидаемые изменения состояния."},
+        {"id": "evaluation_quality", "path": "docs/main-flow-evaluation.md", "line_start": 12, "line_end": 12, "quote": "Оценка исследовательского результата включает фактическую точность, корректность цитат, полноту и качество источников;"},
+        {"id": "final_state", "path": "docs/main-flow-evaluation.md", "line_start": 12, "line_end": 12, "quote": "приложение рекомендует проверять конечное состояние."},
+        {"id": "logs_not_result", "path": "docs/main-flow-evaluation.md", "line_start": 24, "line_end": 24, "quote": "Наличие события, внутреннего флага или exit 0 не заменяет проверку результата и состояния."}
+      ]
+    }
+  }
+}

@@ -1,0 +1,381 @@
+{
+  "answer_quality": "NOT_TESTED",
+  "boundary": "installed_public_stdio_mcp",
+  "budget": {
+    "max_tokens_or_bytes_over_four": 11895,
+    "o200k_tokens": 11895,
+    "utf8_bytes": 40067
+  },
+  "calls": {
+    "answer_model_calls": 0,
+    "get_docs_context": 1,
+    "initializations": 1,
+    "list_tools": 1,
+    "prepare_docs": 0,
+    "read_docs_source": 0,
+    "server_processes": 1
+  },
+  "case": "Q6",
+  "catalog_sha256": "8fd86610d8a1fcd6ce67cb4cab4978d2f9ac2a0f0ed9862dd0e4592779c7951c",
+  "delivered_facts": 2,
+  "delivered_rows_sha256": "d749c99be9d929671c2519f889aa0ac72afe10ed7d48d7ac680ccebba5f66763",
+  "documents": 19,
+  "evaluator_sha256": "22789e3bbdab825268eafbd8f17bcfd9937d377e11185d4b343aa24cfc27d97b",
+  "exact_wire_parity": true,
+  "facts": [
+    {
+      "delivered": false,
+      "id": "budget_formula"
+    },
+    {
+      "delivered": false,
+      "id": "compact_and_canonical"
+    },
+    {
+      "delivered": true,
+      "id": "delivery_error_contract"
+    },
+    {
+      "delivered": true,
+      "id": "delivery_failure_recovery"
+    }
+  ],
+  "mode": "lexical",
+  "observation": {
+    "acquisitions": [],
+    "all_delivered_bindings_checked": null,
+    "selections": []
+  },
+  "observed": false,
+  "oracle_sha256": "aba6d104eb2ddcff8f171084ea5f20f8e85fda839e8246d69e1a04b143b1d0da",
+  "profile": "canonical",
+  "provider_usage": null,
+  "question": "How does OpenCode compact delivery work, what size limits apply, and how is a delivery failure diagnosed?",
+  "raw_wire_sha256": "2483429ce67229702193e815a1dacaea3383c704f6908044102ba03b9b88cd58",
+  "reason_code": null,
+  "recorded_configuration": {
+    "case": "Q6",
+    "contextual_relevance_sha256": "71b5c88ddf5f22ad18a7c51d96cc0c672e04a7650ef5dd450f7ad67fc9f270c7",
+    "harness_sha256": "22789e3bbdab825268eafbd8f17bcfd9937d377e11185d4b343aa24cfc27d97b",
+    "mode": "lexical",
+    "observe": false,
+    "oracle_sha256": "aba6d104eb2ddcff8f171084ea5f20f8e85fda839e8246d69e1a04b143b1d0da",
+    "profile": "canonical",
+    "question": "How does OpenCode compact delivery work, what size limits apply, and how is a delivery failure diagnosed?"
+  },
+  "recorded_harness_sha256": "22789e3bbdab825268eafbd8f17bcfd9937d377e11185d4b343aa24cfc27d97b",
+  "run_status": "COMPLETE",
+  "scope": "unchanged default request; original catalog",
+  "seconds": 5.737234072003048,
+  "source_and_index_unchanged": true,
+  "source_fidelity": [
+    {
+      "content_sha256": "effaaeebe385bdd775182a14226af646140917c80e631277b0925fbedfbdbc4f",
+      "line_end": 173,
+      "line_start": 166,
+      "path": "README.md",
+      "snippet_sha256": "be49f808dfc5fcc2149a73fb44fa404e524c338c9b4def66d2d182527b69f28f"
+    },
+    {
+      "content_sha256": "b71788e22bc1afaa91311b41e283f19f8d97454aeec9e43aa2a87887c92faf5a",
+      "line_end": 175,
+      "line_start": 174,
+      "path": "README.md",
+      "snippet_sha256": "1fde160df261870310c94c149b68b49769a267eab2b86ecff9cd7b8a3afa2c92"
+    },
+    {
+      "content_sha256": "c7ae11a9a7c1a7a04cf6ce49720b7248beffee31ee1431d734cd8027993d11e1",
+      "line_end": 73,
+      "line_start": 72,
+      "path": "docs/opencode-compact-text.md",
+      "snippet_sha256": "1508dfdb3039ba6dd67e602a3c080e6b846742de3291b680a6f2582c984a1caf"
+    },
+    {
+      "content_sha256": "9aaf9cfed42b3d60bbbaecaa9545137bd84a3fd5d91233165d9834dd71fbc0a1",
+      "line_end": 81,
+      "line_start": 74,
+      "path": "docs/opencode-compact-text.md",
+      "snippet_sha256": "744f22fc61b6b415f9c22a63b248124fea5da82fb32ace45f4a8892b58486ec3"
+    },
+    {
+      "content_sha256": "0f8b06073e57e505a31d2d5e88bc9e5de4941826a8f0013070fc3bf97d79efca",
+      "line_end": 89,
+      "line_start": 82,
+      "path": "docs/opencode-compact-text.md",
+      "snippet_sha256": "328eafdf8cd19be1314b1471d19836028f33fc57fb1352121016b09dda3a463b"
+    },
+    {
+      "content_sha256": "ebc5c1df970cd197ee37b9e3d132b3f8fc370495525a2d3057abc6f7f134c3a7",
+      "line_end": 94,
+      "line_start": 90,
+      "path": "docs/opencode-compact-text.md",
+      "snippet_sha256": "98ce8c05f1950cbe490070d15c6603a47978affe08a06f9aae1e5958889dbd8a"
+    },
+    {
+      "content_sha256": "cf4e88885cb15453a41f3a8cd1cd65ec2dae79965064b9f1e6b237e1cb43c29d",
+      "line_end": 67,
+      "line_start": 59,
+      "path": "wiki/Architecture.md",
+      "snippet_sha256": "a94070a082ecc65c7dafa8ecf70f79aafcba15b6bff57f2c231187db7cc63495"
+    },
+    {
+      "content_sha256": "1c4ffaf1e91ca7619a5bb62766435e3eb0b0fb2e576e551838509572291014e2",
+      "line_end": 184,
+      "line_start": 182,
+      "path": "docs/mcp-docs-server.md",
+      "snippet_sha256": "4009a329df4b80d2bb10192e53f2adeb9407985c0a153d10e2e1c99223eb9566"
+    },
+    {
+      "content_sha256": "75501e0636ccc087bbb01e97f7c0432471eb5f4c608a002e43c83b13a0782be8",
+      "line_end": 16,
+      "line_start": 13,
+      "path": "README.md",
+      "snippet_sha256": "bc80da418d0a6b6965a76059068e75e4bff43cd1c5befb035c8807694983f296"
+    },
+    {
+      "content_sha256": "872b194461c95e06cbedac8c69e2226ea041d4d2309c05299b589733762d8d58",
+      "line_end": 28,
+      "line_start": 17,
+      "path": "README.md",
+      "snippet_sha256": "e47e587d08f670651cedf80f2cde93aaf3fba3dfd1f06f8349c0f77043c3fb0c"
+    },
+    {
+      "content_sha256": "7c700e4b46befecc430db2cf9bac8189c2e5ef1230028ecce78b59ea6cd5dbbf",
+      "line_end": 35,
+      "line_start": 29,
+      "path": "README.md",
+      "snippet_sha256": "a559a15911a68b45f95d6ede9781d998b65559ea87cbb13a3544a81ba693bfd8"
+    },
+    {
+      "content_sha256": "ad5ffd2bbdb3556c47ab666662107bbe28bab81db71b29edc5d7c7a8025ec07d",
+      "line_end": 122,
+      "line_start": 121,
+      "path": "docs/mcp-docs-server.md",
+      "snippet_sha256": "04cb55f098652eb94a06b5fa29a7b8bde699631ac9784d432fa235b50f52bed9"
+    },
+    {
+      "content_sha256": "a49f22f3693914a806d188f5fdc74b44bc0fe81f76a446c2b83950b82d763257",
+      "line_end": 134,
+      "line_start": 123,
+      "path": "docs/mcp-docs-server.md",
+      "snippet_sha256": "07591c1236f581326c8ddb703673a8bb5b88d0c9edffbdb453f0ffc4d563f06f"
+    },
+    {
+      "content_sha256": "0dbf3c90d3da60aac348cfb6eb30f746c35c04cde70790f9da7dbc2efe761a1a",
+      "line_end": 142,
+      "line_start": 135,
+      "path": "docs/mcp-docs-server.md",
+      "snippet_sha256": "cbb37c2ddae3ceec185a2506f4e6d705d92b600b87b45d20110d3336dea6c2cb"
+    },
+    {
+      "content_sha256": "e6a5d339d5f7c63db542be503f7a21950538a3ca3be433e741d99887554760d5",
+      "line_end": 148,
+      "line_start": 143,
+      "path": "docs/mcp-docs-server.md",
+      "snippet_sha256": "7b4f46a1cca05c0f4a5fac2afc437afad0a40095ef5eecb952220edbdc11137e"
+    },
+    {
+      "content_sha256": "04315906e730f3e145af9d0e8c86c501273f1bc752ddbf97ed15c99c63329dc0",
+      "line_end": 75,
+      "line_start": 67,
+      "path": "wiki/Configuration.md",
+      "snippet_sha256": "acdccc42b04f6807bc04115ee66b036672a366d6d9d1e555f9bd5ea32403d5a9"
+    },
+    {
+      "content_sha256": "359f629e7c58664a35f1f244db355283bcaa43304231eeb610f60de782ea79a6",
+      "line_end": 36,
+      "line_start": 24,
+      "path": "docs/adr/0003-context-first-project-reads.md",
+      "snippet_sha256": "9a1f1bcc350774bc19a2c64effbaf71a324ac8fe424be23c7b991602c3eead91"
+    },
+    {
+      "content_sha256": "24f79884074f294282badfdd2c477c12592d36107e0dd037771a6c4727e74964",
+      "line_end": 100,
+      "line_start": 95,
+      "path": "docs/opencode-compact-text.md",
+      "snippet_sha256": "a7b030bb084716a734fd5a4836eaed63160f240786ff93c27e2b2bfdeffd6717"
+    },
+    {
+      "content_sha256": "2c352efbd2c3494c3a2cc3c1fcc86c3ebd14902d14ca1b19773f0ea8bb1c16a3",
+      "line_end": 109,
+      "line_start": 101,
+      "path": "docs/opencode-compact-text.md",
+      "snippet_sha256": "f65cfcf6160f442b2d78888dd58d5d7619c3005aa0535de3e64aa96823b8d6e0"
+    },
+    {
+      "content_sha256": "d10a3fb4554e7179c297670c757d2b2062e0407a7e3abf68f5ab788ed8186091",
+      "line_end": 114,
+      "line_start": 110,
+      "path": "docs/opencode-compact-text.md",
+      "snippet_sha256": "e6ffe11652346918221a745f58efd34b9b76881f7138630deffc61c54c719220"
+    },
+    {
+      "content_sha256": "b40cba65025da43b520c57e47ab09c374f9a7606f3edf1526175b446d98560a0",
+      "line_end": 122,
+      "line_start": 115,
+      "path": "docs/opencode-compact-text.md",
+      "snippet_sha256": "5750bdf051f3edcd26b12294106219112aecd44dcb57215c855f5d2ccff41f24"
+    },
+    {
+      "content_sha256": "6d4693c0da146b11cc542815fd7fd932b57e46e5afd6c35ff1bad82215f80896",
+      "line_end": 127,
+      "line_start": 123,
+      "path": "docs/opencode-compact-text.md",
+      "snippet_sha256": "8668a861831623e0e1c582b0677ff5b973fd1de4fca531c72e0d2683e09b0012"
+    },
+    {
+      "content_sha256": "ee70e486ef996e1f5a9ddc509d95ea84464621cc062a7c78330e4a907a3cf499",
+      "line_end": 101,
+      "line_start": 89,
+      "path": "docs/index-cleanup.md",
+      "snippet_sha256": "da14b9a5c448669c69c6b335033f1cb8e4ec3f4e8ff713a1d40b38d44bcc9926"
+    },
+    {
+      "content_sha256": "f6fbdb0e944994daecaa5a91e68f81a6e6e4dc39b81e832de2b078584fda626c",
+      "line_end": 90,
+      "line_start": 80,
+      "path": "docs/modules/project-context-retrieval.md",
+      "snippet_sha256": "22e81a10d8ab55d7f22835155916c943c6bad1d78db0e36f625cd88dd67a14c9"
+    },
+    {
+      "content_sha256": "cf98c75e33c11d037fa8f789aa111070c23e42065083ca6f497ae829a1d782dc",
+      "line_end": 95,
+      "line_start": 91,
+      "path": "docs/modules/project-context-retrieval.md",
+      "snippet_sha256": "1c3cc7b6a87a36f00963b78196eca07e5bb00e59e966882feec4cb688d86080a"
+    },
+    {
+      "content_sha256": "56e9b8881fa00b442c5ccba72363bd703b1ab961388850983d675956dc7fe577",
+      "line_end": 52,
+      "line_start": 48,
+      "path": "docs/modules/evidence-selection.md",
+      "snippet_sha256": "a5f8fd1e2a3a5f8accb8313e5f29dd3787b30f77f1162da145e9cd62bb8e1919"
+    },
+    {
+      "content_sha256": "07c63d17af9e00b0a7375fafcdb5bff1339fce798effe1f27b902954eb8793a0",
+      "line_end": 58,
+      "line_start": 53,
+      "path": "docs/modules/evidence-selection.md",
+      "snippet_sha256": "1b7919729b6d3521319712ae17eeed70e119c77ce163ee4770bb8acc84dc2903"
+    },
+    {
+      "content_sha256": "2d14254f7daae8ced27fa9bb3d6aa538ab52bef8857009ace13be1e82ee8250a",
+      "line_end": 63,
+      "line_start": 59,
+      "path": "docs/modules/evidence-selection.md",
+      "snippet_sha256": "0ae6484dd126a2659d9299d8c3df195da7f9958747b49fb27b4218b7d3422040"
+    },
+    {
+      "content_sha256": "3a71e539f1169f21a85baf35c32ac35ae3951b927bc96d9880ce5d0deed62763",
+      "line_end": 69,
+      "line_start": 64,
+      "path": "docs/modules/evidence-selection.md",
+      "snippet_sha256": "c77845df87dcb956bab9eadcf62b7cae47b86fb1a839a1087c1f556403f10997"
+    },
+    {
+      "content_sha256": "4062f9dcc584fe39ec2317c13af67f85f3a5a19786584e6f85489604278ecc55",
+      "line_end": 75,
+      "line_start": 70,
+      "path": "docs/modules/evidence-selection.md",
+      "snippet_sha256": "36cd9ea16b5e5f9ed60e842f7d8e2604e867c6ddacaade647c9fb5ddce78566f"
+    },
+    {
+      "content_sha256": "3bac515b48ee62ce47ac3e5d5edaaca25e6684d5060ca96db763afcd7f00fa2c",
+      "line_end": 80,
+      "line_start": 76,
+      "path": "docs/modules/evidence-selection.md",
+      "snippet_sha256": "cf1e822f0d5bb66137ef63bc3bf3ea3d7c3a778a7ef42422a928b6b0d767580d"
+    },
+    {
+      "content_sha256": "a8aaa51e17a3a9b3953705815d707ebdeb7139f9c6ceb79f91fc1fa3359fc697",
+      "line_end": 66,
+      "line_start": 60,
+      "path": "docs/PROJECT_BINDING.md",
+      "snippet_sha256": "de54db2dd4627c3852ae75caf5d9f5a6e0dcb85b05ae84300ed633226e052b45"
+    },
+    {
+      "content_sha256": "d1207be542010dee05e8d7744a94898f915b69f06cf59fc37fdfd737e27c21ef",
+      "line_end": 71,
+      "line_start": 67,
+      "path": "docs/PROJECT_BINDING.md",
+      "snippet_sha256": "0ebf0954c5934703be1572712010d77f298b03b3a5746053a73b63c21757f64a"
+    },
+    {
+      "content_sha256": "3a1183590c40be6f9c9874bfab953fcda99f47f7561a7b7e7b4e0951c09d7e2c",
+      "line_end": 151,
+      "line_start": 150,
+      "path": "README.md",
+      "snippet_sha256": "232813feba7cdfd759b96c1d06bc69676c3cd6d5d8934ab8ca83ed6d59cdc75b"
+    },
+    {
+      "content_sha256": "130380e99c851735f3fe92d9a340ed3e72b03bfadff0dcfa9db90291aeef4f87",
+      "line_end": 153,
+      "line_start": 152,
+      "path": "README.md",
+      "snippet_sha256": "5952d011a6b3876947f7bff1730a2847786a70127ca496dab5b604fb64fa300b"
+    },
+    {
+      "content_sha256": "d6480b4c0dc43edbb5aadf6881e0d604b932d1a605f92e2320e65776603f19c3",
+      "line_end": 155,
+      "line_start": 154,
+      "path": "README.md",
+      "snippet_sha256": "6c048fd68b772fe12feba2a06234813007646647b80e4cc766ebdaf4788b8d28"
+    },
+    {
+      "content_sha256": "1b73b03c225bd34ac52fc1d78fb0fe6fb73840040356ff35c9e4d774b9e9d38d",
+      "line_end": 157,
+      "line_start": 156,
+      "path": "README.md",
+      "snippet_sha256": "9adcd6e58b81b532c41187345abb693e2a69e186a595b5ffc680f0f98e665747"
+    },
+    {
+      "content_sha256": "2869c9ad0cfe320d857df519202be4d40262f74964b6efcb7c16b8c8d938da14",
+      "line_end": 159,
+      "line_start": 158,
+      "path": "README.md",
+      "snippet_sha256": "7b17b633ab616219202189c6a1ae732b76c89400059bd00de3e2431b94b86d75"
+    },
+    {
+      "content_sha256": "64454db6459ec2be5bb803f32587f4be88538b2496a47f99db5160dd5604d26d",
+      "line_end": 114,
+      "line_start": 112,
+      "path": "wiki/Architecture.md",
+      "snippet_sha256": "41381d9b8bbf2a5044ba68c2b93e0c1ef6916b311f49aed16b8636f6004ed5dd"
+    }
+  ],
+  "source_rows": 39,
+  "state_proof": {
+    "after_sha256": "6a1918587e1f34ceaa5a1517f8631bbd1bea587172f2863a5c9cdba24e80a36d",
+    "before_sha256": "6a1918587e1f34ceaa5a1517f8631bbd1bea587172f2863a5c9cdba24e80a36d",
+    "logical_equal": true,
+    "status": "recorded",
+    "tables": {
+      "generation_sources": {
+        "after_rows": 19,
+        "before_rows": 19
+      },
+      "index_generations": {
+        "after_rows": 1,
+        "before_rows": 1
+      },
+      "retrieval_children": {
+        "after_rows": 429,
+        "before_rows": 429
+      },
+      "retrieval_parents": {
+        "after_rows": 163,
+        "before_rows": 163
+      },
+      "sections": {
+        "after_rows": 167,
+        "before_rows": 167
+      },
+      "sources": {
+        "after_rows": 19,
+        "before_rows": 19
+      }
+    }
+  },
+  "status": "truncated",
+  "wire_sha256": "2483429ce67229702193e815a1dacaea3383c704f6908044102ba03b9b88cd58"
+}
