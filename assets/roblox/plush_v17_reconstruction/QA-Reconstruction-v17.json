@@ -1,0 +1,62 @@
+{
+  "file": "Plush-v17-Reconstruction.blend",
+  "blender_version": "4.3.2",
+  "mesh_parts": 84,
+  "bones": 30,
+  "materials": 13,
+  "actions": [
+    "AN_v17_Alert_32f",
+    "AN_v17_Idle_Breath_96f",
+    "AN_v17_Jaw_Open_Close_32f",
+    "AN_v17_Walk_InPlace_40f_24fps"
+  ],
+  "walk_contact_probe_meters": [
+    {
+      "frame": 1,
+      "left_foot_min_z": 0.024,
+      "right_foot_min_z": 0.024
+    },
+    {
+      "frame": 6,
+      "left_foot_min_z": 0.004,
+      "right_foot_min_z": 0.0749
+    },
+    {
+      "frame": 11,
+      "left_foot_min_z": -0.0005,
+      "right_foot_min_z": 0.1014
+    },
+    {
+      "frame": 16,
+      "left_foot_min_z": 0.004,
+      "right_foot_min_z": 0.0749
+    },
+    {
+      "frame": 21,
+      "left_foot_min_z": 0.024,
+      "right_foot_min_z": 0.024
+    },
+    {
+      "frame": 26,
+      "left_foot_min_z": 0.0749,
+      "right_foot_min_z": 0.004
+    },
+    {
+      "frame": 31,
+      "left_foot_min_z": 0.1014,
+      "right_foot_min_z": -0.0005
+    },
+    {
+      "frame": 36,
+      "left_foot_min_z": 0.0749,
+      "right_foot_min_z": 0.004
+    },
+    {
+      "frame": 41,
+      "left_foot_min_z": 0.024,
+      "right_foot_min_z": 0.024
+    }
+  ],
+  "jaw_opens": true,
+  "limitations": "Visual quality and Blender-to-Roblox runtime are not verified."
+}
