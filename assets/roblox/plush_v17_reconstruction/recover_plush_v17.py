@@ -65,6 +65,8 @@ def material(name, rgb, roughness=0.90, cloth=False, emission=0):
     principled.inputs["Base Color"].default_value = linear(rgb)
     principled.inputs["Roughness"].default_value = roughness
     principled.inputs["Metallic"].default_value = 0.0
+    if "Specular IOR Level" in principled.inputs:
+        principled.inputs["Specular IOR Level"].default_value = .18
     if emission:
         principled.inputs["Emission Color"].default_value = linear(rgb)
         principled.inputs["Emission Strength"].default_value = emission
@@ -78,8 +80,10 @@ def material(name, rgb, roughness=0.90, cloth=False, emission=0):
         bump.inputs["Distance"].default_value = 0.017
         links.new(noise.outputs["Fac"], bump.inputs["Height"])
         links.new(bump.outputs["Normal"], principled.inputs["Normal"])
-        principled.inputs["Sheen Weight"].default_value = 0.38
+        principled.inputs["Sheen Weight"].default_value = 0.11
         principled.inputs["Sheen Roughness"].default_value = 0.89
+        if "Sheen Tint" in principled.inputs:
+            principled.inputs["Sheen Tint"].default_value = linear(rgb)
     return mat
 
 
@@ -167,6 +171,7 @@ def skin(obj, bone, col=CHAR, weights=None):
 
 
 def sphere(name, at, scale, mat, bone, col=CHAR, segments=32, rings=20, rotate=(0, 0, 0), shape=None):
+    bpy.ops.object.select_all(action="DESELECT")
     bpy.ops.mesh.primitive_uv_sphere_add(segments=segments, ring_count=rings, radius=1)
     obj = bpy.context.object
     obj.name = name
@@ -179,6 +184,18 @@ def sphere(name, at, scale, mat, bone, col=CHAR, segments=32, rings=20, rotate=(
             shape(v)
     obj.data.materials.append(mat)
     return skin(obj, bone, col)
+
+
+def cone_tooth(name, at, width, height, bone, inverted=False):
+    bpy.ops.object.select_all(action="DESELECT")
+    bpy.ops.mesh.primitive_cone_add(vertices=16,radius1=width,radius2=0,
+                                    depth=height,location=at,
+                                    rotation=(math.pi if inverted else 0,0,0))
+    obj=bpy.context.object
+    obj.name=name
+    bpy.ops.object.transform_apply(location=True,rotation=True,scale=True)
+    obj.data.materials.append(TOOTH)
+    return skin(obj,bone,DETAIL)
 
 
 def mesh(name, vertices, faces, mat, bone, weights=None, col=CHAR):
@@ -207,6 +224,7 @@ def thread_lines(name, segments, mat=THREAD, bone="Head", thickness=.011, col=DE
             p.co = (*loc, 1)
     obj = bpy.data.objects.new(name, crv)
     col.objects.link(obj)
+    bpy.ops.object.select_all(action="DESELECT")
     bpy.context.view_layer.objects.active = obj
     obj.select_set(True)
     bpy.ops.object.convert(target="MESH")
@@ -271,7 +289,9 @@ def ear_panel(name, points, mat, bones):
         deep=tangent.cross(across).normalized()
         w=.104*math.sin(math.pi*t)**.65
         for s in (-1,1):
-            v=center + s*w*across - .117*deep
+            depth=(.113*(1-.45*t) if bones[0].endswith(".L") else .117*(1-.36*t))
+            depth*=math.sin(math.pi*t)**.48
+            v=center + s*w*across - (depth*.88+.002)*deep
             verts.append(tuple(v))
             blend=max(0,min(1,(t-.38)/.30))
             weights.append({bones[0]:1-blend,bones[1]:blend} if 0<blend<1 else
@@ -339,17 +359,17 @@ sphere("Soft stitched nose",(0,face_y(0,3.12)-.055,3.12),(.102,.060,.066),PATCH,
 
 # Mouth cavity remains on the head. Jaw and its lower teeth follow the Jaw bone.
 mouth_cavity=sphere("Mouth cavity / dark fabric",(0,face_y(0,2.86)-.055,2.84),(.600,.060,.120),MOUTH,"Head",DETAIL)
-sphere("Tongue inside mouth",(0,face_y(0,2.80)-.12,2.772),(.275,.028,.062),TONGUE,"Head",DETAIL)
+tongue=sphere("Tongue inside mouth",(0,face_y(0,2.80)-.12,2.772),(.275,.028,.062),TONGUE,"Head",DETAIL)
 sphere("Movable lower jaw / fabric",(0,face_y(0,2.72)-.010,2.68),(.61,.24,.17),FUR,"Jaw",DETAIL)
 
-teeth=[]
+teeth=[tongue]
 for i in range(7):
     x=(i-3)*.145
     z=2.897+.035*(abs(x)/.45)**1.6
     y=face_y(x,z)-.112
-    teeth.append(sphere(f"Top tooth {i+1}",(x,y+.018,z-.028),(.039,.036,.064),TOOTH,"Head",DETAIL,segments=16,rings=12))
+    teeth.append(cone_tooth(f"Top tooth {i+1}",(x,y+.007,z-.032),.040,.112,"Head",inverted=True))
     if i in (0,2,4,6):
-        teeth.append(sphere(f"Lower tooth {i+1}",(x,face_y(x,2.74)-.080,2.753),(.038,.035,.056),TOOTH,"Jaw",DETAIL,segments=16,rings=12))
+        teeth.append(cone_tooth(f"Lower tooth {i+1}",(x,face_y(x,2.74)-.080,2.753),.038,.093,"Jaw"))
 
 
 def jaw_driver(key):
