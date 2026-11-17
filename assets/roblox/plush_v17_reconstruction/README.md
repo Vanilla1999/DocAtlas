@@ -6,7 +6,7 @@ This is a **new approximation** of the plush rabbit monster based on the survivi
 
 - `Plush-v17-Reconstruction.blend`: editable Blender scene, geometry, materials, skeleton and four actions.
 - `recover_plush_v17.py`: deterministic script that recreates the scene using Blender Python; no external textures or add-ons.
-- `Plush-v17-*.png`: rendered Blender previews, not AI concept pictures.
+- `Plush-v17-*.jpg`: compact previews rendered in Blender, not AI concept pictures (lossless PNG originals remain in the local build output).
 - `QA-Reconstruction-v17.json`: structural and basic motion checks.
 
 ## In Blender
