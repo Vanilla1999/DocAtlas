@@ -1,0 +1,4761 @@
+{
+  "file": "/workspace/scratch/1e3c345e25d1/plush_v18/Plush-v18-Reference-Match.blend",
+  "sha256": "89c3557a719bbc433ca2e6c87724513bc73d51c392b34be9a932201730b34483",
+  "blender": "5.3.0",
+  "rig": "ARM_Plush_v18_ReferenceMatch",
+  "requested_core_names": [
+    "V18_Torso",
+    "V18_Head",
+    "V18_Arm.L",
+    "V18_Arm.R",
+    "V18_Hand.L",
+    "V18_Hand.R",
+    "V18_Leg.L",
+    "V18_Leg.R",
+    "V18_Foot.L",
+    "V18_Foot.R"
+  ],
+  "missing_core_names": [],
+  "mesh_parts": 53,
+  "core_parts": 10,
+  "triangle_budget": null,
+  "limitations": [
+    "Structural/selected-pose audit, not a likeness score.",
+    "Finite geometry and low edge stretch do not prove good deformation.",
+    "Only non-coplanar within-object crossings are confirmed; inter-object overlap is not tested.",
+    "UV quality, texture baking, runtime export, collision and Roblox Studio are not tested."
+  ],
+  "bones": 38,
+  "root_bones": [
+    "Root"
+  ],
+  "topology": {
+    "V18_Arm.L": {
+      "vertices": 744,
+      "edges": 1464,
+      "faces": 722,
+      "triangles": 1484,
+      "face_sides": {
+        "4": 720,
+        "24": 2
+      },
+      "quad_fraction": 0.997229916897507,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        744
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 2,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 2.9802322387695312e-08
+      },
+      "materials": [
+        "MAT_Fabric_DeepInkBoucle"
+      ]
+    },
+    "V18_Arm.R": {
+      "vertices": 744,
+      "edges": 1464,
+      "faces": 722,
+      "triangles": 1484,
+      "face_sides": {
+        "4": 720,
+        "24": 2
+      },
+      "quad_fraction": 0.997229916897507,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        744
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 2,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 2.9802322387695312e-08
+      },
+      "materials": [
+        "MAT_Fabric_DeepInkBoucle"
+      ]
+    },
+    "V18_Arm_TackSeams.L": {
+      "vertices": 288,
+      "edges": 432,
+      "faces": 144,
+      "triangles": 288,
+      "face_sides": {
+        "4": 144
+      },
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 18,
+      "component_vertex_counts": [
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "boundary_edges": 288,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 288,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Thread_WarmTan"
+      ]
+    },
+    "V18_Arm_TackSeams.R": {
+      "vertices": 288,
+      "edges": 432,
+      "faces": 144,
+      "triangles": 288,
+      "face_sides": {
+        "4": 144
+      },
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 18,
+      "component_vertex_counts": [
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "boundary_edges": 288,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 288,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Thread_WarmTan"
+      ]
+    },
+    "V18_BellyBlanketStitches": {
+      "vertices": 480,
+      "edges": 720,
+      "faces": 240,
+      "triangles": 480,
+      "face_sides": {
+        "4": 240
+      },
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 30,
+      "component_vertex_counts": [
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "boundary_edges": 480,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 480,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Thread_WarmTan"
+      ]
+    },
+    "V18_CheekStitches.L": {
+      "vertices": 64,
+      "edges": 96,
+      "faces": 32,
+      "triangles": 64,
+      "face_sides": {
+        "4": 32
+      },
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 4,
+      "component_vertex_counts": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "boundary_edges": 64,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 64,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Thread_WarmTan"
+      ]
+    },
+    "V18_CheekStitches.R": {
+      "vertices": 64,
+      "edges": 96,
+      "faces": 32,
+      "triangles": 64,
+      "face_sides": {
+        "4": 32
+      },
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 4,
+      "component_vertex_counts": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "boundary_edges": 64,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 64,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Thread_WarmTan"
+      ]
+    },
+    "V18_Claw1.L": {
+      "vertices": 108,
+      "edges": 204,
+      "faces": 98,
+      "triangles": 212,
+      "face_sides": {
+        "4": 96,
+        "12": 2
+      },
+      "quad_fraction": 0.9795918367346939,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        108
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Teeth_Ivory"
+      ]
+    },
+    "V18_Claw1.R": {
+      "vertices": 108,
+      "edges": 204,
+      "faces": 98,
+      "triangles": 212,
+      "face_sides": {
+        "4": 96,
+        "12": 2
+      },
+      "quad_fraction": 0.9795918367346939,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        108
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Teeth_Ivory"
+      ]
+    },
+    "V18_Claw2.L": {
+      "vertices": 108,
+      "edges": 204,
+      "faces": 98,
+      "triangles": 212,
+      "face_sides": {
+        "4": 96,
+        "12": 2
+      },
+      "quad_fraction": 0.9795918367346939,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        108
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Teeth_Ivory"
+      ]
+    },
+    "V18_Claw2.R": {
+      "vertices": 108,
+      "edges": 204,
+      "faces": 98,
+      "triangles": 212,
+      "face_sides": {
+        "4": 96,
+        "12": 2
+      },
+      "quad_fraction": 0.9795918367346939,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        108
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Teeth_Ivory"
+      ]
+    },
+    "V18_Claw3.L": {
+      "vertices": 108,
+      "edges": 204,
+      "faces": 98,
+      "triangles": 212,
+      "face_sides": {
+        "4": 96,
+        "12": 2
+      },
+      "quad_fraction": 0.9795918367346939,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        108
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Teeth_Ivory"
+      ]
+    },
+    "V18_Claw3.R": {
+      "vertices": 108,
+      "edges": 204,
+      "faces": 98,
+      "triangles": 212,
+      "face_sides": {
+        "4": 96,
+        "12": 2
+      },
+      "quad_fraction": 0.9795918367346939,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        108
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Teeth_Ivory"
+      ]
+    },
+    "V18_Ear.L": {
+      "vertices": 744,
+      "edges": 1464,
+      "faces": 722,
+      "triangles": 1484,
+      "face_sides": {
+        "4": 720,
+        "24": 2
+      },
+      "quad_fraction": 0.997229916897507,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        744
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 2,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 2.7939677238464355e-08
+      },
+      "materials": [
+        "MAT_Fabric_DeepInkBoucle"
+      ]
+    },
+    "V18_Ear.R": {
+      "vertices": 744,
+      "edges": 1464,
+      "faces": 722,
+      "triangles": 1484,
+      "face_sides": {
+        "4": 720,
+        "24": 2
+      },
+      "quad_fraction": 0.997229916897507,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        744
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 2,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 2.7939677238464355e-08
+      },
+      "materials": [
+        "MAT_Fabric_DeepInkBoucle"
+      ]
+    },
+    "V18_Ear_Seam.L": {
+      "vertices": 48,
+      "edges": 88,
+      "faces": 40,
+      "triangles": 80,
+      "face_sides": {
+        "4": 40
+      },
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        48
+      ],
+      "boundary_edges": 16,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 16,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Socket_IndigoShadow"
+      ]
+    },
+    "V18_Ear_Seam.R": {
+      "vertices": 48,
+      "edges": 88,
+      "faces": 40,
+      "triangles": 80,
+      "face_sides": {
+        "4": 40
+      },
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        48
+      ],
+      "boundary_edges": 16,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 16,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Socket_IndigoShadow"
+      ]
+    },
+    "V18_Ear_TanStitches": {
+      "vertices": 144,
+      "edges": 216,
+      "faces": 72,
+      "triangles": 144,
+      "face_sides": {
+        "4": 72
+      },
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 9,
+      "component_vertex_counts": [
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "boundary_edges": 144,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 144,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Thread_WarmTan"
+      ]
+    },
+    "V18_FingerPad1.L": {
+      "vertices": 222,
+      "edges": 460,
+      "faces": 240,
+      "triangles": 440,
+      "face_sides": {
+        "4": 200,
+        "3": 40
+      },
+      "quad_fraction": 0.8333333333333334,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        222
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Pads_WornCream"
+      ]
+    },
+    "V18_FingerPad1.R": {
+      "vertices": 222,
+      "edges": 460,
+      "faces": 240,
+      "triangles": 440,
+      "face_sides": {
+        "4": 200,
+        "3": 40
+      },
+      "quad_fraction": 0.8333333333333334,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        222
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Pads_WornCream"
+      ]
+    },
+    "V18_FingerPad2.L": {
+      "vertices": 222,
+      "edges": 460,
+      "faces": 240,
+      "triangles": 440,
+      "face_sides": {
+        "4": 200,
+        "3": 40
+      },
+      "quad_fraction": 0.8333333333333334,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        222
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Pads_WornCream"
+      ]
+    },
+    "V18_FingerPad2.R": {
+      "vertices": 222,
+      "edges": 460,
+      "faces": 240,
+      "triangles": 440,
+      "face_sides": {
+        "4": 200,
+        "3": 40
+      },
+      "quad_fraction": 0.8333333333333334,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        222
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Pads_WornCream"
+      ]
+    },
+    "V18_FingerPad3.L": {
+      "vertices": 222,
+      "edges": 460,
+      "faces": 240,
+      "triangles": 440,
+      "face_sides": {
+        "4": 200,
+        "3": 40
+      },
+      "quad_fraction": 0.8333333333333334,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        222
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Pads_WornCream"
+      ]
+    },
+    "V18_FingerPad3.R": {
+      "vertices": 222,
+      "edges": 460,
+      "faces": 240,
+      "triangles": 440,
+      "face_sides": {
+        "4": 200,
+        "3": 40
+      },
+      "quad_fraction": 0.8333333333333334,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        222
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Pads_WornCream"
+      ]
+    },
+    "V18_Foot.L": {
+      "vertices": 192,
+      "edges": 352,
+      "faces": 162,
+      "triangles": 380,
+      "face_sides": {
+        "4": 160,
+        "32": 2
+      },
+      "quad_fraction": 0.9876543209876543,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        192
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Fabric_DeepInkBoucle"
+      ]
+    },
+    "V18_Foot.R": {
+      "vertices": 192,
+      "edges": 352,
+      "faces": 162,
+      "triangles": 380,
+      "face_sides": {
+        "4": 160,
+        "32": 2
+      },
+      "quad_fraction": 0.9876543209876543,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        192
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Fabric_DeepInkBoucle"
+      ]
+    },
+    "V18_Hand.L": {
+      "vertices": 474,
+      "edges": 960,
+      "faces": 488,
+      "triangles": 944,
+      "face_sides": {
+        "4": 456,
+        "3": 32
+      },
+      "quad_fraction": 0.9344262295081968,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        474
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 2,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Fabric_DeepInkBoucle"
+      ]
+    },
+    "V18_Hand.R": {
+      "vertices": 474,
+      "edges": 960,
+      "faces": 488,
+      "triangles": 944,
+      "face_sides": {
+        "4": 456,
+        "3": 32
+      },
+      "quad_fraction": 0.9344262295081968,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        474
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 2,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Fabric_DeepInkBoucle"
+      ]
+    },
+    "V18_HandsewnSpine": {
+      "vertices": 192,
+      "edges": 376,
+      "faces": 184,
+      "triangles": 368,
+      "face_sides": {
+        "4": 184
+      },
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        192
+      ],
+      "boundary_edges": 16,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 16,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Socket_IndigoShadow"
+      ]
+    },
+    "V18_Head": {
+      "vertices": 2178,
+      "edges": 4416,
+      "faces": 2240,
+      "triangles": 4352,
+      "face_sides": {
+        "4": 2112,
+        "3": 128
+      },
+      "quad_fraction": 0.9428571428571428,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        2178
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Fabric_DeepInkBoucle",
+        "MAT_Mouth_DeepVelvet"
+      ]
+    },
+    "V18_InsetEyeSocket.L": {
+      "vertices": 478,
+      "edges": 980,
+      "faces": 504,
+      "triangles": 952,
+      "face_sides": {
+        "4": 448,
+        "3": 56
+      },
+      "quad_fraction": 0.8888888888888888,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        478
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Socket_IndigoShadow"
+      ]
+    },
+    "V18_InsetEyeSocket.R": {
+      "vertices": 478,
+      "edges": 980,
+      "faces": 504,
+      "triangles": 952,
+      "face_sides": {
+        "4": 448,
+        "3": 56
+      },
+      "quad_fraction": 0.8888888888888888,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        478
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Socket_IndigoShadow"
+      ]
+    },
+    "V18_IrregularUpperAndLowerFangs": {
+      "vertices": 1314,
+      "edges": 2592,
+      "faces": 1314,
+      "triangles": 2556,
+      "face_sides": {
+        "4": 1080,
+        "3": 216,
+        "12": 18
+      },
+      "quad_fraction": 0.821917808219178,
+      "ngons": 18,
+      "components": 18,
+      "component_vertex_counts": [
+        73,
+        73,
+        73,
+        73,
+        73,
+        73,
+        73,
+        73,
+        73,
+        73,
+        73,
+        73,
+        73,
+        73,
+        73,
+        73,
+        73,
+        73
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 220,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Teeth_Ivory"
+      ]
+    },
+    "V18_Knee_Tacks.L": {
+      "vertices": 112,
+      "edges": 168,
+      "faces": 56,
+      "triangles": 112,
+      "face_sides": {
+        "4": 56
+      },
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 7,
+      "component_vertex_counts": [
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "boundary_edges": 112,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 112,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Thread_WarmTan"
+      ]
+    },
+    "V18_Knee_Tacks.R": {
+      "vertices": 112,
+      "edges": 168,
+      "faces": 56,
+      "triangles": 112,
+      "face_sides": {
+        "4": 56
+      },
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 7,
+      "component_vertex_counts": [
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "boundary_edges": 112,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 112,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Thread_WarmTan"
+      ]
+    },
+    "V18_Leg.L": {
+      "vertices": 700,
+      "edges": 1372,
+      "faces": 674,
+      "triangles": 1396,
+      "face_sides": {
+        "4": 672,
+        "28": 2
+      },
+      "quad_fraction": 0.9970326409495549,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        700
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 2,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 2.9802322387695312e-08
+      },
+      "materials": [
+        "MAT_Fabric_DeepInkBoucle"
+      ]
+    },
+    "V18_Leg.R": {
+      "vertices": 700,
+      "edges": 1372,
+      "faces": 674,
+      "triangles": 1396,
+      "face_sides": {
+        "4": 672,
+        "28": 2
+      },
+      "quad_fraction": 0.9970326409495549,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        700
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 2,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 2.9802322387695312e-08
+      },
+      "materials": [
+        "MAT_Fabric_DeepInkBoucle"
+      ]
+    },
+    "V18_NeckBridge": {
+      "vertices": 512,
+      "edges": 992,
+      "faces": 482,
+      "triangles": 1020,
+      "face_sides": {
+        "4": 480,
+        "32": 2
+      },
+      "quad_fraction": 0.995850622406639,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        512
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 2,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 2.7939677238464355e-08
+      },
+      "materials": [
+        "MAT_Fabric_DeepInkBoucle"
+      ]
+    },
+    "V18_OrganicSewnBellyInlay": {
+      "vertices": 432,
+      "edges": 816,
+      "faces": 384,
+      "triangles": 768,
+      "face_sides": {
+        "4": 384
+      },
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        432
+      ],
+      "boundary_edges": 96,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 96,
+      "zero_area_faces": 0,
+      "zero_length_edges": 48,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 2,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 2.9802322387695312e-08
+      },
+      "materials": [
+        "MAT_Fabric_OatmealPatch"
+      ]
+    },
+    "V18_PalmPad.L": {
+      "vertices": 478,
+      "edges": 980,
+      "faces": 504,
+      "triangles": 952,
+      "face_sides": {
+        "4": 448,
+        "3": 56
+      },
+      "quad_fraction": 0.8888888888888888,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        478
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Pads_WornCream"
+      ]
+    },
+    "V18_PalmPad.R": {
+      "vertices": 478,
+      "edges": 980,
+      "faces": 504,
+      "triangles": 952,
+      "face_sides": {
+        "4": 448,
+        "3": 56
+      },
+      "quad_fraction": 0.8888888888888888,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        478
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Pads_WornCream"
+      ]
+    },
+    "V18_PlantarPad.L": {
+      "vertices": 478,
+      "edges": 980,
+      "faces": 504,
+      "triangles": 952,
+      "face_sides": {
+        "4": 448,
+        "3": 56
+      },
+      "quad_fraction": 0.8888888888888888,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        478
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Pads_WornCream"
+      ]
+    },
+    "V18_PlantarPad.R": {
+      "vertices": 478,
+      "edges": 980,
+      "faces": 504,
+      "triangles": 952,
+      "face_sides": {
+        "4": 448,
+        "3": 56
+      },
+      "quad_fraction": 0.8888888888888888,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        478
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Pads_WornCream"
+      ]
+    },
+    "V18_SoftWhiteEye.L": {
+      "vertices": 478,
+      "edges": 980,
+      "faces": 504,
+      "triangles": 952,
+      "face_sides": {
+        "4": 448,
+        "3": 56
+      },
+      "quad_fraction": 0.8888888888888888,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        478
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Eyes_WarmGlow"
+      ]
+    },
+    "V18_SoftWhiteEye.R": {
+      "vertices": 478,
+      "edges": 980,
+      "faces": 504,
+      "triangles": 952,
+      "face_sides": {
+        "4": 448,
+        "3": 56
+      },
+      "quad_fraction": 0.8888888888888888,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        478
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Eyes_WarmGlow"
+      ]
+    },
+    "V18_SpineTanTacks": {
+      "vertices": 192,
+      "edges": 288,
+      "faces": 96,
+      "triangles": 192,
+      "face_sides": {
+        "4": 96
+      },
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 12,
+      "component_vertex_counts": [
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "boundary_edges": 192,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 192,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Thread_WarmTan"
+      ]
+    },
+    "V18_StitchedTail": {
+      "vertices": 478,
+      "edges": 980,
+      "faces": 504,
+      "triangles": 952,
+      "face_sides": {
+        "4": 448,
+        "3": 56
+      },
+      "quad_fraction": 0.8888888888888888,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        478
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Fabric_DeepInkBoucle"
+      ]
+    },
+    "V18_TailRootSeam": {
+      "vertices": 24,
+      "edges": 40,
+      "faces": 16,
+      "triangles": 32,
+      "face_sides": {
+        "4": 16
+      },
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        24
+      ],
+      "boundary_edges": 16,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 16,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Thread_WarmTan"
+      ]
+    },
+    "V18_ThumbPad.L": {
+      "vertices": 222,
+      "edges": 460,
+      "faces": 240,
+      "triangles": 440,
+      "face_sides": {
+        "4": 200,
+        "3": 40
+      },
+      "quad_fraction": 0.8333333333333334,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        222
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Pads_WornCream"
+      ]
+    },
+    "V18_ThumbPad.R": {
+      "vertices": 222,
+      "edges": 460,
+      "faces": 240,
+      "triangles": 440,
+      "face_sides": {
+        "4": 200,
+        "3": 40
+      },
+      "quad_fraction": 0.8333333333333334,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        222
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Pads_WornCream"
+      ]
+    },
+    "V18_ToeClefts.L": {
+      "vertices": 48,
+      "edges": 80,
+      "faces": 32,
+      "triangles": 64,
+      "face_sides": {
+        "4": 32
+      },
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 2,
+      "component_vertex_counts": [
+        24,
+        24
+      ],
+      "boundary_edges": 32,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 32,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Socket_IndigoShadow"
+      ]
+    },
+    "V18_ToeClefts.R": {
+      "vertices": 48,
+      "edges": 80,
+      "faces": 32,
+      "triangles": 64,
+      "face_sides": {
+        "4": 32
+      },
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 2,
+      "component_vertex_counts": [
+        24,
+        24
+      ],
+      "boundary_edges": 32,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 32,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 1,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "materials": [
+        "MAT_Socket_IndigoShadow"
+      ]
+    },
+    "V18_Torso": {
+      "vertices": 432,
+      "edges": 816,
+      "faces": 386,
+      "triangles": 860,
+      "face_sides": {
+        "4": 384,
+        "48": 2
+      },
+      "quad_fraction": 0.9948186528497409,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        432
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "armature_modifiers": [
+        "ARM_Plush_v18_ReferenceMatch"
+      ],
+      "weights": {
+        "unweighted_vertices": 0,
+        "over_four_influences": 0,
+        "maximum_influences": 2,
+        "normalization_error_gt_1e_4": 0,
+        "max_sum_error": 1.4901161193847656e-08
+      },
+      "materials": [
+        "MAT_Fabric_DeepInkBoucle"
+      ]
+    }
+  },
+  "total_source_triangles": 36724,
+  "over_triangle_budget": null,
+  "material_names": [
+    "MAT_Eyes_WarmGlow",
+    "MAT_Fabric_DeepInkBoucle",
+    "MAT_Fabric_OatmealPatch",
+    "MAT_Mouth_DeepVelvet",
+    "MAT_Pads_WornCream",
+    "MAT_Socket_IndigoShadow",
+    "MAT_Teeth_Ivory",
+    "MAT_Thread_WarmTan"
+  ],
+  "bind_bounds": {
+    "V18_Arm.L": {
+      "min": [
+        -1.1575933694839478,
+        -0.2600833773612976,
+        1.7199877500534058
+      ],
+      "max": [
+        -0.26370349526405334,
+        0.2542942762374878,
+        3.339933395385742
+      ],
+      "size": [
+        0.8938898742198944,
+        0.5143776535987854,
+        1.6199456453323364
+      ]
+    },
+    "V18_Arm.R": {
+      "min": [
+        0.2724449932575226,
+        -0.26037704944610596,
+        1.7199444770812988
+      ],
+      "max": [
+        1.1568628549575806,
+        0.26202869415283203,
+        3.345949172973633
+      ],
+      "size": [
+        0.884417861700058,
+        0.522405743598938,
+        1.626004695892334
+      ]
+    },
+    "V18_Foot.L": {
+      "min": [
+        -0.6980425119400024,
+        -0.762627899646759,
+        0.02135865017771721
+      ],
+      "max": [
+        -0.06703080981969833,
+        0.2226838320493698,
+        0.43194133043289185
+      ],
+      "size": [
+        0.6310117021203041,
+        0.9853117316961288,
+        0.41058268025517464
+      ]
+    },
+    "V18_Foot.R": {
+      "min": [
+        0.06801881641149521,
+        -0.7641596794128418,
+        0.01992749609053135
+      ],
+      "max": [
+        0.7009783387184143,
+        0.2264333963394165,
+        0.43824633955955505
+      ],
+      "size": [
+        0.6329595223069191,
+        0.9905930757522583,
+        0.4183188434690237
+      ]
+    },
+    "V18_Hand.L": {
+      "min": [
+        -1.2491482496261597,
+        -0.2589665651321411,
+        1.0315593481063843
+      ],
+      "max": [
+        -0.48784881830215454,
+        0.14415009319782257,
+        1.8345067501068115
+      ],
+      "size": [
+        0.7612994313240051,
+        0.4031166583299637,
+        0.8029474020004272
+      ]
+    },
+    "V18_Hand.R": {
+      "min": [
+        0.4849374294281006,
+        -0.2633151412010193,
+        1.0316803455352783
+      ],
+      "max": [
+        1.2488329410552979,
+        0.1436758041381836,
+        1.834594964981079
+      ],
+      "size": [
+        0.7638955116271973,
+        0.4069909453392029,
+        0.8029146194458008
+      ]
+    },
+    "V18_Head": {
+      "min": [
+        -0.7929602861404419,
+        -0.6220183372497559,
+        3.3366897106170654
+      ],
+      "max": [
+        0.7908165454864502,
+        0.6279290914535522,
+        4.784342288970947
+      ],
+      "size": [
+        1.583776831626892,
+        1.249947428703308,
+        1.4476525783538818
+      ]
+    },
+    "V18_Leg.L": {
+      "min": [
+        -0.6129283905029297,
+        -0.24187429249286652,
+        0.337259441614151
+      ],
+      "max": [
+        -0.12495778501033783,
+        0.2529463768005371,
+        1.8720335960388184
+      ],
+      "size": [
+        0.48797060549259186,
+        0.4948206692934036,
+        1.5347741544246674
+      ]
+    },
+    "V18_Leg.R": {
+      "min": [
+        0.12706077098846436,
+        -0.24343116581439972,
+        0.340782105922699
+      ],
+      "max": [
+        0.6064649820327759,
+        0.24983301758766174,
+        1.8798327445983887
+      ],
+      "size": [
+        0.4794042110443115,
+        0.49326418340206146,
+        1.5390506386756897
+      ]
+    },
+    "V18_Torso": {
+      "min": [
+        -0.6150051355361938,
+        -0.4522772431373596,
+        1.6318457126617432
+      ],
+      "max": [
+        0.6169335842132568,
+        0.4491943418979645,
+        3.3252334594726562
+      ],
+      "size": [
+        1.2319387197494507,
+        0.9014715850353241,
+        1.693387746810913
+      ]
+    }
+  },
+  "evaluated_core_triangles": 86944,
+  "bind_intersection_probe": {
+    "V18_Arm.L": {
+      "candidate_pairs": 0,
+      "examined_pairs": 0,
+      "examined_all_candidates": true,
+      "confirmed_noncoplanar_crossings": 0,
+      "confirmed_examples": [],
+      "coplanar_candidates_not_classified": 0,
+      "degenerate_candidates_skipped": 0,
+      "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+    },
+    "V18_Arm.R": {
+      "candidate_pairs": 0,
+      "examined_pairs": 0,
+      "examined_all_candidates": true,
+      "confirmed_noncoplanar_crossings": 0,
+      "confirmed_examples": [],
+      "coplanar_candidates_not_classified": 0,
+      "degenerate_candidates_skipped": 0,
+      "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+    },
+    "V18_Foot.L": {
+      "candidate_pairs": 0,
+      "examined_pairs": 0,
+      "examined_all_candidates": true,
+      "confirmed_noncoplanar_crossings": 0,
+      "confirmed_examples": [],
+      "coplanar_candidates_not_classified": 0,
+      "degenerate_candidates_skipped": 0,
+      "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+    },
+    "V18_Foot.R": {
+      "candidate_pairs": 0,
+      "examined_pairs": 0,
+      "examined_all_candidates": true,
+      "confirmed_noncoplanar_crossings": 0,
+      "confirmed_examples": [],
+      "coplanar_candidates_not_classified": 0,
+      "degenerate_candidates_skipped": 0,
+      "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+    },
+    "V18_Hand.L": {
+      "candidate_pairs": 0,
+      "examined_pairs": 0,
+      "examined_all_candidates": true,
+      "confirmed_noncoplanar_crossings": 0,
+      "confirmed_examples": [],
+      "coplanar_candidates_not_classified": 0,
+      "degenerate_candidates_skipped": 0,
+      "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+    },
+    "V18_Hand.R": {
+      "candidate_pairs": 0,
+      "examined_pairs": 0,
+      "examined_all_candidates": true,
+      "confirmed_noncoplanar_crossings": 0,
+      "confirmed_examples": [],
+      "coplanar_candidates_not_classified": 0,
+      "degenerate_candidates_skipped": 0,
+      "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+    },
+    "V18_Head": {
+      "candidate_pairs": 0,
+      "examined_pairs": 0,
+      "examined_all_candidates": true,
+      "confirmed_noncoplanar_crossings": 0,
+      "confirmed_examples": [],
+      "coplanar_candidates_not_classified": 0,
+      "degenerate_candidates_skipped": 0,
+      "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+    },
+    "V18_Leg.L": {
+      "candidate_pairs": 0,
+      "examined_pairs": 0,
+      "examined_all_candidates": true,
+      "confirmed_noncoplanar_crossings": 0,
+      "confirmed_examples": [],
+      "coplanar_candidates_not_classified": 0,
+      "degenerate_candidates_skipped": 0,
+      "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+    },
+    "V18_Leg.R": {
+      "candidate_pairs": 0,
+      "examined_pairs": 0,
+      "examined_all_candidates": true,
+      "confirmed_noncoplanar_crossings": 0,
+      "confirmed_examples": [],
+      "coplanar_candidates_not_classified": 0,
+      "degenerate_candidates_skipped": 0,
+      "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+    },
+    "V18_Torso": {
+      "candidate_pairs": 0,
+      "examined_pairs": 0,
+      "examined_all_candidates": true,
+      "confirmed_noncoplanar_crossings": 0,
+      "confirmed_examples": [],
+      "coplanar_candidates_not_classified": 0,
+      "degenerate_candidates_skipped": 0,
+      "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+    }
+  },
+  "stress_poses": {
+    "elbows_45": {
+      "input_degrees_and_local_translation": {
+        "Forearm.L": {
+          "r": [
+            -45,
+            0,
+            0
+          ]
+        },
+        "Forearm.R": {
+          "r": [
+            -45,
+            0,
+            0
+          ]
+        }
+      },
+      "missing_bones": [],
+      "meshes": {
+        "V18_Arm.L": {
+          "comparable": true,
+          "max_displacement": 0.6228728215682648,
+          "rms_displacement": 0.291780415281727,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.04004559377563053,
+            "p01": 0.3921671808608255,
+            "median": 1.0,
+            "p99": 1.7099314567837096,
+            "maximum": 2.2618558020992,
+            "fraction_below_0_25": 0.004098360655737705,
+            "fraction_above_2": 0.0006830601092896175
+          }
+        },
+        "V18_Arm.R": {
+          "comparable": true,
+          "max_displacement": 0.6220824092245765,
+          "rms_displacement": 0.291979456134466,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.0552137074633669,
+            "p01": 0.41276364535161375,
+            "median": 1.0,
+            "p99": 1.7241805607750949,
+            "maximum": 2.8567725121611516,
+            "fraction_below_0_25": 0.0030737704918032786,
+            "fraction_above_2": 0.0006830601092896175
+          }
+        },
+        "V18_Foot.L": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Foot.R": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Hand.L": {
+          "comparable": true,
+          "max_displacement": 1.1600260741801558,
+          "rms_displacement": 0.8272994100456373,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.2946172662839202,
+            "p01": 0.9063850224502994,
+            "median": 0.9998635144922219,
+            "p99": 1.119911504732856,
+            "maximum": 1.6173435634103965,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Hand.R": {
+          "comparable": true,
+          "max_displacement": 1.1619813992854884,
+          "rms_displacement": 0.8271638005981136,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.5899679057230837,
+            "p01": 0.8965317210286151,
+            "median": 0.999836147005762,
+            "p99": 1.095887683409891,
+            "maximum": 1.5935329203944935,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Head": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Leg.L": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Leg.R": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Torso": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        }
+      }
+    },
+    "elbows_90": {
+      "input_degrees_and_local_translation": {
+        "Forearm.L": {
+          "r": [
+            -90,
+            0,
+            0
+          ]
+        },
+        "Forearm.R": {
+          "r": [
+            -90,
+            0,
+            0
+          ]
+        }
+      },
+      "missing_bones": [],
+      "meshes": {
+        "V18_Arm.L": {
+          "comparable": true,
+          "max_displacement": 1.1518370209268138,
+          "rms_displacement": 0.5392846619289435,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.04807010742464084,
+            "p01": 0.507500787697174,
+            "median": 1.0,
+            "p99": 2.353467083675798,
+            "maximum": 2.869525573185782,
+            "fraction_below_0_25": 0.0023907103825136613,
+            "fraction_above_2": 0.0194672131147541
+          }
+        },
+        "V18_Arm.R": {
+          "comparable": true,
+          "max_displacement": 1.1492632148693236,
+          "rms_displacement": 0.5393914955574151,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.026800382946892465,
+            "p01": 0.4698904488486103,
+            "median": 1.0,
+            "p99": 2.376848119512015,
+            "maximum": 3.3609004992323763,
+            "fraction_below_0_25": 0.004439890710382513,
+            "fraction_above_2": 0.01980874316939891
+          }
+        },
+        "V18_Foot.L": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Foot.R": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Hand.L": {
+          "comparable": true,
+          "max_displacement": 2.1424507096272656,
+          "rms_displacement": 1.5285087694032309,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.5138592630525339,
+            "p01": 0.9046558781291707,
+            "median": 0.9999652744205771,
+            "p99": 1.123508185188201,
+            "maximum": 1.577193662286511,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Hand.R": {
+          "comparable": true,
+          "max_displacement": 2.1466560191009876,
+          "rms_displacement": 1.5283929735353032,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.5999971118504639,
+            "p01": 0.9062683927848229,
+            "median": 0.9998518957407332,
+            "p99": 1.1056863420922676,
+            "maximum": 1.8817003785883866,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Head": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Leg.L": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Leg.R": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Torso": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        }
+      }
+    },
+    "elbows_120": {
+      "input_degrees_and_local_translation": {
+        "Forearm.L": {
+          "r": [
+            -120,
+            0,
+            0
+          ]
+        },
+        "Forearm.R": {
+          "r": [
+            -120,
+            0,
+            0
+          ]
+        }
+      },
+      "missing_bones": [],
+      "meshes": {
+        "V18_Arm.L": {
+          "comparable": true,
+          "max_displacement": 1.405315565547437,
+          "rms_displacement": 0.6608706772765842,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.13900158075403485,
+            "p01": 0.5827974450752713,
+            "median": 1.0,
+            "p99": 2.794870084167994,
+            "maximum": 3.476482676692958,
+            "fraction_below_0_25": 0.0017076502732240437,
+            "fraction_above_2": 0.027834699453551912
+          },
+          "intersection_probe": {
+            "candidate_pairs": 191,
+            "examined_pairs": 191,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 191,
+            "confirmed_examples": [
+              [
+                1572,
+                4071
+              ],
+              [
+                1573,
+                4060
+              ],
+              [
+                1573,
+                4071
+              ],
+              [
+                1581,
+                4068
+              ],
+              [
+                1581,
+                4079
+              ],
+              [
+                1582,
+                4068
+              ],
+              [
+                1583,
+                4068
+              ],
+              [
+                1583,
+                4069
+              ],
+              [
+                1583,
+                4070
+              ],
+              [
+                1583,
+                4071
+              ],
+              [
+                1748,
+                3853
+              ],
+              [
+                1749,
+                3853
+              ]
+            ],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Arm.R": {
+          "comparable": true,
+          "max_displacement": 1.4039324418874193,
+          "rms_displacement": 0.6608732896650656,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.08667242124982459,
+            "p01": 0.5676843048948546,
+            "median": 1.0,
+            "p99": 2.7875665523315263,
+            "maximum": 3.5329088230213803,
+            "fraction_below_0_25": 0.003586065573770492,
+            "fraction_above_2": 0.028005464480874317
+          },
+          "intersection_probe": {
+            "candidate_pairs": 205,
+            "examined_pairs": 205,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 205,
+            "confirmed_examples": [
+              [
+                1588,
+                4092
+              ],
+              [
+                1588,
+                4093
+              ],
+              [
+                1589,
+                4093
+              ],
+              [
+                1597,
+                4101
+              ],
+              [
+                1597,
+                4102
+              ],
+              [
+                1598,
+                4102
+              ],
+              [
+                1599,
+                4092
+              ],
+              [
+                1599,
+                4102
+              ],
+              [
+                1599,
+                4103
+              ],
+              [
+                1764,
+                3887
+              ],
+              [
+                1764,
+                4072
+              ],
+              [
+                1765,
+                3876
+              ]
+            ],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Foot.L": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Foot.R": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Hand.L": {
+          "comparable": true,
+          "max_displacement": 2.6291770398821486,
+          "rms_displacement": 1.8720784766673826,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.5332068253032893,
+            "p01": 0.9153800679815767,
+            "median": 1.0004760620925577,
+            "p99": 1.1231688409194789,
+            "maximum": 1.6144282424707956,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Hand.R": {
+          "comparable": true,
+          "max_displacement": 2.628074525763476,
+          "rms_displacement": 1.8719331586831915,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.5667978082180964,
+            "p01": 0.8929856699183376,
+            "median": 1.000075920363972,
+            "p99": 1.0969176421015567,
+            "maximum": 2.076064998916921,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 6.510416666666667e-05
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Head": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Leg.L": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Leg.R": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Torso": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        }
+      }
+    },
+    "arms_forward": {
+      "input_degrees_and_local_translation": {
+        "UpperArm.L": {
+          "r": [
+            -85,
+            0,
+            0
+          ]
+        },
+        "UpperArm.R": {
+          "r": [
+            -85,
+            0,
+            0
+          ]
+        },
+        "Forearm.L": {
+          "r": [
+            -15,
+            0,
+            0
+          ]
+        },
+        "Forearm.R": {
+          "r": [
+            -15,
+            0,
+            0
+          ]
+        }
+      },
+      "missing_bones": [],
+      "meshes": {
+        "V18_Arm.L": {
+          "comparable": true,
+          "max_displacement": 2.257634165759664,
+          "rms_displacement": 1.2899408876380172,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.3575621200132079,
+            "p01": 0.7280370046532633,
+            "median": 1.000487067715829,
+            "p99": 1.2760258222423704,
+            "maximum": 2.1934180847900473,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.00017076502732240437
+          }
+        },
+        "V18_Arm.R": {
+          "comparable": true,
+          "max_displacement": 2.2539290719554477,
+          "rms_displacement": 1.290134381511564,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.3748870443364763,
+            "p01": 0.7464483963844684,
+            "median": 0.9992802282301566,
+            "p99": 1.2823720154402973,
+            "maximum": 3.3108398765088083,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.00017076502732240437
+          }
+        },
+        "V18_Foot.L": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Foot.R": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Hand.L": {
+          "comparable": true,
+          "max_displacement": 3.3042321579076175,
+          "rms_displacement": 2.620868982949896,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.493254672033124,
+            "p01": 0.9029112468254682,
+            "median": 0.9999644753022627,
+            "p99": 1.1154504153909641,
+            "maximum": 1.6181077317611186,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Hand.R": {
+          "comparable": true,
+          "max_displacement": 3.305521541887058,
+          "rms_displacement": 2.620809041519202,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.519388843742287,
+            "p01": 0.8862772005500335,
+            "median": 1.0001129201701984,
+            "p99": 1.0974257127004463,
+            "maximum": 1.9963216065422305,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Head": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Leg.L": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Leg.R": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Torso": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        }
+      }
+    },
+    "arms_raised": {
+      "input_degrees_and_local_translation": {
+        "UpperArm.L": {
+          "r": [
+            0,
+            0,
+            -130
+          ]
+        },
+        "UpperArm.R": {
+          "r": [
+            0,
+            0,
+            130
+          ]
+        }
+      },
+      "missing_bones": [],
+      "meshes": {
+        "V18_Arm.L": {
+          "comparable": true,
+          "max_displacement": 2.8479069022551,
+          "rms_displacement": 1.6535861341690021,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.48171967619499056,
+            "p01": 0.8595335905817278,
+            "median": 1.0005383320358197,
+            "p99": 1.2055950208402608,
+            "maximum": 2.2305415784388827,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.00034153005464480874
+          }
+        },
+        "V18_Arm.R": {
+          "comparable": true,
+          "max_displacement": 2.846520195970264,
+          "rms_displacement": 1.6535716074885458,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.4054349831919711,
+            "p01": 0.8181648389728693,
+            "median": 0.9994261393380522,
+            "p99": 1.2025281924471947,
+            "maximum": 2.2182791226005563,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0005122950819672131
+          }
+        },
+        "V18_Foot.L": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Foot.R": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Hand.L": {
+          "comparable": true,
+          "max_displacement": 4.07551185517546,
+          "rms_displacement": 3.2829488262394997,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.47600630852223813,
+            "p01": 0.9059856276845293,
+            "median": 1.0000317965915109,
+            "p99": 1.1251970265451938,
+            "maximum": 1.6939430719543764,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Hand.R": {
+          "comparable": true,
+          "max_displacement": 4.077673539936546,
+          "rms_displacement": 3.2828210988084376,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.5204635641221727,
+            "p01": 0.8987143517283815,
+            "median": 0.999646708604253,
+            "p99": 1.097740324293453,
+            "maximum": 1.9884247011782945,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Head": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Leg.L": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Leg.R": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Torso": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        }
+      }
+    },
+    "fingers_curl": {
+      "input_degrees_and_local_translation": {
+        "Finger1.L": {
+          "r": [
+            55,
+            0,
+            0
+          ]
+        },
+        "FingerTip1.L": {
+          "r": [
+            55,
+            0,
+            0
+          ]
+        },
+        "Finger2.L": {
+          "r": [
+            55,
+            0,
+            0
+          ]
+        },
+        "FingerTip2.L": {
+          "r": [
+            55,
+            0,
+            0
+          ]
+        },
+        "Finger3.L": {
+          "r": [
+            55,
+            0,
+            0
+          ]
+        },
+        "FingerTip3.L": {
+          "r": [
+            55,
+            0,
+            0
+          ]
+        },
+        "Thumb.L": {
+          "r": [
+            55,
+            0,
+            0
+          ]
+        },
+        "ThumbTip.L": {
+          "r": [
+            55,
+            0,
+            0
+          ]
+        },
+        "Finger1.R": {
+          "r": [
+            55,
+            0,
+            0
+          ]
+        },
+        "FingerTip1.R": {
+          "r": [
+            55,
+            0,
+            0
+          ]
+        },
+        "Finger2.R": {
+          "r": [
+            55,
+            0,
+            0
+          ]
+        },
+        "FingerTip2.R": {
+          "r": [
+            55,
+            0,
+            0
+          ]
+        },
+        "Finger3.R": {
+          "r": [
+            55,
+            0,
+            0
+          ]
+        },
+        "FingerTip3.R": {
+          "r": [
+            55,
+            0,
+            0
+          ]
+        },
+        "Thumb.R": {
+          "r": [
+            55,
+            0,
+            0
+          ]
+        },
+        "ThumbTip.R": {
+          "r": [
+            55,
+            0,
+            0
+          ]
+        }
+      },
+      "missing_bones": [],
+      "meshes": {
+        "V18_Arm.L": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Arm.R": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Foot.L": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Foot.R": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Hand.L": {
+          "comparable": true,
+          "max_displacement": 0.5574230615105098,
+          "rms_displacement": 0.19058684015650756,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.11887925990300492,
+            "p01": 0.5678510587081855,
+            "median": 1.0,
+            "p99": 1.8563975683091734,
+            "maximum": 4.285720428550787,
+            "fraction_below_0_25": 0.0013020833333333333,
+            "fraction_above_2": 0.007682291666666666
+          },
+          "intersection_probe": {
+            "candidate_pairs": 426,
+            "examined_pairs": 426,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 426,
+            "confirmed_examples": [
+              [
+                132,
+                8920
+              ],
+              [
+                132,
+                8921
+              ],
+              [
+                133,
+                8921
+              ],
+              [
+                133,
+                8922
+              ],
+              [
+                133,
+                8925
+              ],
+              [
+                134,
+                8900
+              ],
+              [
+                134,
+                8901
+              ],
+              [
+                135,
+                8901
+              ],
+              [
+                135,
+                8920
+              ],
+              [
+                144,
+                8899
+              ],
+              [
+                145,
+                8899
+              ],
+              [
+                145,
+                8902
+              ]
+            ],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Hand.R": {
+          "comparable": true,
+          "max_displacement": 0.5595136938150851,
+          "rms_displacement": 0.19076709311852058,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.055345711267208386,
+            "p01": 0.5733514750425364,
+            "median": 1.0,
+            "p99": 1.8173930007315497,
+            "maximum": 4.098569639382416,
+            "fraction_below_0_25": 0.0014322916666666666,
+            "fraction_above_2": 0.007682291666666666
+          },
+          "intersection_probe": {
+            "candidate_pairs": 442,
+            "examined_pairs": 442,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 442,
+            "confirmed_examples": [
+              [
+                130,
+                8903
+              ],
+              [
+                131,
+                8903
+              ],
+              [
+                132,
+                8901
+              ],
+              [
+                133,
+                8901
+              ],
+              [
+                133,
+                8920
+              ],
+              [
+                133,
+                8921
+              ],
+              [
+                134,
+                8900
+              ],
+              [
+                134,
+                8901
+              ],
+              [
+                134,
+                8903
+              ],
+              [
+                135,
+                8901
+              ],
+              [
+                142,
+                8898
+              ],
+              [
+                143,
+                8898
+              ]
+            ],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Head": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Leg.L": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Leg.R": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Torso": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        }
+      }
+    },
+    "crouch": {
+      "input_degrees_and_local_translation": {
+        "Spine": {
+          "r": [
+            20,
+            0,
+            0
+          ]
+        },
+        "Thigh.L": {
+          "r": [
+            -60,
+            0,
+            0
+          ]
+        },
+        "Shin.L": {
+          "r": [
+            100,
+            0,
+            0
+          ]
+        },
+        "Foot.L": {
+          "r": [
+            -35,
+            0,
+            0
+          ]
+        },
+        "Thigh.R": {
+          "r": [
+            -60,
+            0,
+            0
+          ]
+        },
+        "Shin.R": {
+          "r": [
+            100,
+            0,
+            0
+          ]
+        },
+        "Foot.R": {
+          "r": [
+            -35,
+            0,
+            0
+          ]
+        }
+      },
+      "missing_bones": [],
+      "meshes": {
+        "V18_Arm.L": {
+          "comparable": true,
+          "max_displacement": 0.4314677817075959,
+          "rms_displacement": 0.2277689867474663,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.45816550447534843,
+            "p01": 0.8543760086109005,
+            "median": 1.0005492329962486,
+            "p99": 1.1751955122167477,
+            "maximum": 2.507871383314405,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.00034153005464480874
+          }
+        },
+        "V18_Arm.R": {
+          "comparable": true,
+          "max_displacement": 0.4288404041233168,
+          "rms_displacement": 0.22773628813012134,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.40492633644993714,
+            "p01": 0.8455232468685625,
+            "median": 0.9989514303964538,
+            "p99": 1.1946837789113958,
+            "maximum": 2.6491444177242536,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.00017076502732240437
+          }
+        },
+        "V18_Foot.L": {
+          "comparable": true,
+          "max_displacement": 0.6537975482349523,
+          "rms_displacement": 0.6124961762172577,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.6508078038494406,
+            "p01": 0.907894746619137,
+            "median": 1.0011592643042477,
+            "p99": 1.13202094473282,
+            "maximum": 1.4320239204468068,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Foot.R": {
+          "comparable": true,
+          "max_displacement": 0.650727459296883,
+          "rms_displacement": 0.6121234363162614,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.8085713346268872,
+            "p01": 0.8879772481982443,
+            "median": 0.9993401440144214,
+            "p99": 1.1151920399692135,
+            "maximum": 1.5995281317801247,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Hand.L": {
+          "comparable": true,
+          "max_displacement": 0.3822349116171621,
+          "rms_displacement": 0.24968423956158187,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.586403243944093,
+            "p01": 0.908620129347661,
+            "median": 1.0003234270983734,
+            "p99": 1.1157076327762963,
+            "maximum": 1.6867262501570244,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Hand.R": {
+          "comparable": true,
+          "max_displacement": 0.3836293648025105,
+          "rms_displacement": 0.24971861412695143,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.5997397618094454,
+            "p01": 0.898659608522276,
+            "median": 1.0000590609150461,
+            "p99": 1.1037793272574767,
+            "maximum": 2.091892683427257,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 6.510416666666667e-05
+          }
+        },
+        "V18_Head": {
+          "comparable": true,
+          "max_displacement": 0.9272005876572895,
+          "rms_displacement": 0.6640724605536719,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.7013043291833958,
+            "p01": 0.9106481967628081,
+            "median": 1.0000003937682376,
+            "p99": 1.0939295659551465,
+            "maximum": 1.3919982362437995,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Leg.L": {
+          "comparable": true,
+          "max_displacement": 0.9220028811038958,
+          "rms_displacement": 0.598802199403805,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.025893291459594577,
+            "p01": 0.46197428142650876,
+            "median": 1.0015904214079792,
+            "p99": 2.0592104274586274,
+            "maximum": 2.3604484779735313,
+            "fraction_below_0_25": 0.004008746355685131,
+            "fraction_above_2": 0.013301749271137026
+          }
+        },
+        "V18_Leg.R": {
+          "comparable": true,
+          "max_displacement": 0.9238327000547037,
+          "rms_displacement": 0.5990270300011652,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.04166627636329973,
+            "p01": 0.492524494306933,
+            "median": 1.0012937610811963,
+            "p99": 2.0571403940474617,
+            "maximum": 2.3479200908190396,
+            "fraction_below_0_25": 0.0023688046647230322,
+            "fraction_above_2": 0.011661807580174927
+          }
+        },
+        "V18_Torso": {
+          "comparable": true,
+          "max_displacement": 0.4250824946173832,
+          "rms_displacement": 0.2141031593178556,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 0.6212495312851781,
+            "p01": 0.7183593294342722,
+            "median": 1.0,
+            "p99": 1.2763936356247334,
+            "maximum": 1.7729336806878426,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        }
+      }
+    },
+    "ears_flex": {
+      "input_degrees_and_local_translation": {
+        "EarTip.L": {
+          "r": [
+            30,
+            0,
+            20
+          ]
+        },
+        "EarTip.R": {
+          "r": [
+            30,
+            0,
+            -20
+          ]
+        }
+      },
+      "missing_bones": [],
+      "meshes": {
+        "V18_Arm.L": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Arm.R": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Foot.L": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Foot.R": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Hand.L": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Hand.R": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Head": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Leg.L": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Leg.R": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        },
+        "V18_Torso": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          }
+        }
+      }
+    },
+    "jaw_open": {
+      "input_degrees_and_local_translation": {
+        "Jaw": {
+          "l": [
+            0,
+            -0.015,
+            -0.29
+          ],
+          "r": [
+            -4,
+            0,
+            0
+          ]
+        }
+      },
+      "missing_bones": [],
+      "meshes": {
+        "V18_Arm.L": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Arm.R": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Foot.L": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Foot.R": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Hand.L": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Hand.R": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Head": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Leg.L": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Leg.R": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        },
+        "V18_Torso": {
+          "comparable": true,
+          "max_displacement": 0.0,
+          "rms_displacement": 0.0,
+          "nonfinite_vertices": 0,
+          "edge_length_ratio": {
+            "minimum": 1.0,
+            "p01": 1.0,
+            "median": 1.0,
+            "p99": 1.0,
+            "maximum": 1.0,
+            "fraction_below_0_25": 0.0,
+            "fraction_above_2": 0.0
+          },
+          "intersection_probe": {
+            "candidate_pairs": 0,
+            "examined_pairs": 0,
+            "examined_all_candidates": true,
+            "confirmed_noncoplanar_crossings": 0,
+            "confirmed_examples": [],
+            "coplanar_candidates_not_classified": 0,
+            "degenerate_candidates_skipped": 0,
+            "scope": "Within one evaluated object. Shared-vertex triangles excluded; coplanar overlap and contacts not certified. No inter-object test."
+          }
+        }
+      }
+    }
+  },
+  "rig_transform_follow": {
+    "V18_Arm.L": {
+      "max_error": 3.03925246810483e-07,
+      "rms_error": 6.830165055653502e-08
+    },
+    "V18_Arm.R": {
+      "max_error": 3.6286698764222625e-07,
+      "rms_error": 7.575891849751436e-08
+    },
+    "V18_Arm_TackSeams.L": {
+      "max_error": 2.457562461863554e-07,
+      "rms_error": 9.278391223759772e-08
+    },
+    "V18_Arm_TackSeams.R": {
+      "max_error": 2.4027400458748785e-07,
+      "rms_error": 8.988482542848427e-08
+    },
+    "V18_BellyBlanketStitches": {
+      "max_error": 8.429369702178807e-08,
+      "rms_error": 4.7616001334653114e-08
+    },
+    "V18_CheekStitches.L": {
+      "max_error": 1.0745380149674383e-07,
+      "rms_error": 7.66179107174394e-08
+    },
+    "V18_CheekStitches.R": {
+      "max_error": 1.3328003749250113e-07,
+      "rms_error": 7.20436856367205e-08
+    },
+    "V18_Claw1.L": {
+      "max_error": 1.884864366154897e-07,
+      "rms_error": 1.0415745030151587e-07
+    },
+    "V18_Claw1.R": {
+      "max_error": 1.2731557704981462e-07,
+      "rms_error": 8.05021019826184e-08
+    },
+    "V18_Claw2.L": {
+      "max_error": 1.3328003749250113e-07,
+      "rms_error": 7.516436166711065e-08
+    },
+    "V18_Claw2.R": {
+      "max_error": 1.2731557704981462e-07,
+      "rms_error": 9.016396398390999e-08
+    },
+    "V18_Claw3.L": {
+      "max_error": 1.3328003749250113e-07,
+      "rms_error": 7.052516678690452e-08
+    },
+    "V18_Claw3.R": {
+      "max_error": 2.4027400458748785e-07,
+      "rms_error": 1.0119244981441105e-07
+    },
+    "V18_Ear.L": {
+      "max_error": 1.812804499357408e-07,
+      "rms_error": 4.653190196723658e-08
+    },
+    "V18_Ear.R": {
+      "max_error": 2.4027400458748785e-07,
+      "rms_error": 6.432771366891784e-08
+    },
+    "V18_Ear_Seam.L": {
+      "max_error": 8.940696716308594e-08,
+      "rms_error": 4.5941051676089384e-08
+    },
+    "V18_Ear_Seam.R": {
+      "max_error": 1.4057727354849284e-07,
+      "rms_error": 7.061693672395215e-08
+    },
+    "V18_Ear_TanStitches": {
+      "max_error": 9.541398640621973e-08,
+      "rms_error": 4.86471819876356e-08
+    },
+    "V18_FingerPad1.L": {
+      "max_error": 1.884864366154897e-07,
+      "rms_error": 1.0331575025701974e-07
+    },
+    "V18_FingerPad1.R": {
+      "max_error": 1.2731557704981462e-07,
+      "rms_error": 8.082890837810422e-08
+    },
+    "V18_FingerPad2.L": {
+      "max_error": 1.3328003749250113e-07,
+      "rms_error": 7.726059221217255e-08
+    },
+    "V18_FingerPad2.R": {
+      "max_error": 1.4057727354849284e-07,
+      "rms_error": 9.18569267238524e-08
+    },
+    "V18_FingerPad3.L": {
+      "max_error": 1.0745380149674383e-07,
+      "rms_error": 6.777110474833398e-08
+    },
+    "V18_FingerPad3.R": {
+      "max_error": 1.4057727354849284e-07,
+      "rms_error": 1.0394792240393794e-07
+    },
+    "V18_Foot.L": {
+      "max_error": 1.475139697881291e-07,
+      "rms_error": 4.872065762951903e-08
+    },
+    "V18_Foot.R": {
+      "max_error": 1.6858739404357614e-07,
+      "rms_error": 4.880561313003551e-08
+    },
+    "V18_Hand.L": {
+      "max_error": 5.057621821307283e-07,
+      "rms_error": 1.0169483151481481e-07
+    },
+    "V18_Hand.R": {
+      "max_error": 4.915124923727108e-07,
+      "rms_error": 1.0653264338055543e-07
+    },
+    "V18_HandsewnSpine": {
+      "max_error": 3.725290298461914e-08,
+      "rms_error": 3.088613526321445e-08
+    },
+    "V18_Head": {
+      "max_error": 1.3328003749250113e-07,
+      "rms_error": 4.7542716917422695e-08
+    },
+    "V18_InsetEyeSocket.L": {
+      "max_error": 1.2731557704981462e-07,
+      "rms_error": 5.196891839504555e-08
+    },
+    "V18_InsetEyeSocket.R": {
+      "max_error": 1.1920928955078125e-07,
+      "rms_error": 5.687685127242102e-08
+    },
+    "V18_IrregularUpperAndLowerFangs": {
+      "max_error": 1.3328003749250113e-07,
+      "rms_error": 4.7968196264356196e-08
+    },
+    "V18_Knee_Tacks.L": {
+      "max_error": 1.0745380149674383e-07,
+      "rms_error": 4.327537291736116e-08
+    },
+    "V18_Knee_Tacks.R": {
+      "max_error": 1.228781230931777e-07,
+      "rms_error": 5.721546174241543e-08
+    },
+    "V18_Leg.L": {
+      "max_error": 3.11145380404906e-07,
+      "rms_error": 4.866308891736854e-08
+    },
+    "V18_Leg.R": {
+      "max_error": 2.5211161845458495e-07,
+      "rms_error": 5.073998116992962e-08
+    },
+    "V18_NeckBridge": {
+      "max_error": 6.664001874625056e-08,
+      "rms_error": 2.448413244336291e-08
+    },
+    "V18_OrganicSewnBellyInlay": {
+      "max_error": 8.429369702178807e-08,
+      "rms_error": 4.47145150450453e-08
+    },
+    "V18_PalmPad.L": {
+      "max_error": 3.03925246810483e-07,
+      "rms_error": 1.1256321927962248e-07
+    },
+    "V18_PalmPad.R": {
+      "max_error": 2.425733297482089e-07,
+      "rms_error": 1.1779219259798732e-07
+    },
+    "V18_PlantarPad.L": {
+      "max_error": 1.0745380149674383e-07,
+      "rms_error": 4.472880526661136e-08
+    },
+    "V18_PlantarPad.R": {
+      "max_error": 1.3328003749250113e-07,
+      "rms_error": 4.982537079707303e-08
+    },
+    "V18_SoftWhiteEye.L": {
+      "max_error": 1.228781230931777e-07,
+      "rms_error": 5.632286274924203e-08
+    },
+    "V18_SoftWhiteEye.R": {
+      "max_error": 1.3328003749250113e-07,
+      "rms_error": 6.180843043646866e-08
+    },
+    "V18_SpineTanTacks": {
+      "max_error": 4.2146848510894035e-08,
+      "rms_error": 3.0972602122120354e-08
+    },
+    "V18_StitchedTail": {
+      "max_error": 9.313225746154785e-08,
+      "rms_error": 4.496445335604465e-08
+    },
+    "V18_TailRootSeam": {
+      "max_error": 7.450580596923828e-08,
+      "rms_error": 5.730977038152181e-08
+    },
+    "V18_ThumbPad.L": {
+      "max_error": 7.450580596923828e-08,
+      "rms_error": 3.6769846311633276e-08
+    },
+    "V18_ThumbPad.R": {
+      "max_error": 6.664001874625056e-08,
+      "rms_error": 4.33979070713142e-08
+    },
+    "V18_ToeClefts.L": {
+      "max_error": 8.429369702178807e-08,
+      "rms_error": 6.906035821380383e-08
+    },
+    "V18_ToeClefts.R": {
+      "max_error": 1.1920928955078125e-07,
+      "rms_error": 6.551993865903674e-08
+    },
+    "V18_Torso": {
+      "max_error": 1.228781230931777e-07,
+      "rms_error": 3.8340199992034484e-08
+    }
+  },
+  "loop_endpoints": {
+    "LEGACY_AN_v17_Idle_Breath_96f": {
+      "start": 1.0,
+      "end": 97.0,
+      "max_bone_matrix_delta": 8.993805760113512e-18,
+      "bones_above_1e_4": {},
+      "mesh_endpoint_max_displacement": {
+        "V18_Arm.L": 0.0,
+        "V18_Arm.R": 0.0,
+        "V18_Foot.L": 0.0,
+        "V18_Foot.R": 0.0,
+        "V18_Hand.L": 0.0,
+        "V18_Hand.R": 0.0,
+        "V18_Head": 0.0,
+        "V18_Leg.L": 0.0,
+        "V18_Leg.R": 0.0,
+        "V18_Torso": 0.0
+      },
+      "note": "Endpoint closure does not prove velocity continuity or correct foot planting."
+    },
+    "LEGACY_AN_v17_Walk_InPlace_40f_24fps": {
+      "start": 1.0,
+      "end": 41.0,
+      "max_bone_matrix_delta": 4.378108163565565e-17,
+      "bones_above_1e_4": {},
+      "mesh_endpoint_max_displacement": {
+        "V18_Arm.L": 0.0,
+        "V18_Arm.R": 0.0,
+        "V18_Foot.L": 0.0,
+        "V18_Foot.R": 0.0,
+        "V18_Hand.L": 0.0,
+        "V18_Hand.R": 0.0,
+        "V18_Head": 0.0,
+        "V18_Leg.L": 0.0,
+        "V18_Leg.R": 0.0,
+        "V18_Torso": 0.0
+      },
+      "note": "Endpoint closure does not prove velocity continuity or correct foot planting."
+    }
+  },
+  "elapsed_seconds": 2.76
+}
