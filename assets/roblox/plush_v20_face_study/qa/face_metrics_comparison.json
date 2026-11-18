@@ -1,0 +1,735 @@
+{
+  "purpose": "Direct geometric form comparison, explicitly not a likeness score or percentage.",
+  "coordinate_space": "Rig-local Blender units; canonical bone pose, legacy actions disabled in memory.",
+  "definitions": {
+    "head": "Evaluated qa_role=head mesh only; no ears, eyes, decorative fleece or body.",
+    "aperture": "Evaluated vertices whose QA_MouthAperture weight exceeds 0.5.",
+    "upper_lip_center": "Highest aperture vertex within abs(x)<=2.5% of evaluated head width.",
+    "eye_center": "Arithmetic centroid of each evaluated luminous eye-inset mesh.",
+    "crown": "Maximum Z of evaluated head mesh, excluding ears.",
+    "rear_underside": "First head-BVH hit from below at fixed rig-local x=0, y=0.43.",
+    "teeth": "Connected components calculated from mesh edges, not object names or intended tooth count."
+  },
+  "limitations": [
+    "Not a reference-image similarity metric; camera perspective and artistic likeness are not scored.",
+    "Closed-aperture total height includes smile curvature and must not be interpreted as the lip-contact gap.",
+    "Rear underside is one fixed probe, not a complete rear-head silhouette analysis.",
+    "Endpoint measurements do not certify all intermediate states, collisions, animation or game export."
+  ],
+  "v19": {
+    "file": "/workspace/scratch/1e3c345e25d1/plush_v19/Plush-v19-Mouth-Refinement.blend",
+    "sha256_before": "b0501650b048ac5dde37cfb5e1e9bb864e7dd46c6d0407e6000a0c3ceb731ca5",
+    "runtime_blender": "5.3.0",
+    "saved_file_version": [
+      5,
+      3,
+      31
+    ],
+    "head_object": "V19_HeadShell",
+    "rig": "ARM_Plush_v19",
+    "states": {
+      "closed": {
+        "mouth_open": 0.0,
+        "head_bounds": {
+          "min": [
+            -0.7965238690376282,
+            -0.7260503172874451,
+            3.3433070182800293
+          ],
+          "max": [
+            0.7965239882469177,
+            0.6498517990112305,
+            4.77582311630249
+          ],
+          "dimensions_xyz": [
+            1.593047857284546,
+            1.3759021162986755,
+            1.432516098022461
+          ]
+        },
+        "aperture_bounds": {
+          "min": [
+            -0.6562775373458862,
+            -0.6719844341278076,
+            3.7982335090637207
+          ],
+          "max": [
+            0.6562775373458862,
+            -0.3320819139480591,
+            3.914287805557251
+          ],
+          "dimensions_xyz": [
+            1.3125550746917725,
+            0.33990252017974854,
+            0.11605429649353027
+          ]
+        },
+        "aperture_selected_vertices": 192,
+        "aperture_height_over_width": 0.08841861094536038,
+        "crown_z": 4.77582311630249,
+        "upper_lip_center_z": 3.8584136962890625,
+        "upper_lip_center_band_abs_x_max": 0.03982619643211365,
+        "upper_lip_aperture_max_z": 3.914287805557251,
+        "crown_to_upper_lip_over_head_width": 0.5758831511673553,
+        "eye_centers": {
+          "V19_InsetGlowEye.L": [
+            -0.28533047437667847,
+            -0.5472521781921387,
+            4.375441551208496
+          ],
+          "V19_InsetGlowEye.R": [
+            0.28533026576042175,
+            -0.5472410321235657,
+            4.375439167022705
+          ]
+        },
+        "mean_eye_center_z": 4.375440359115601,
+        "eye_center_to_upper_lip_over_head_width": 0.32455187109560146,
+        "teeth_components": {
+          "lower_teeth": {
+            "object": "V19_LowerTeeth",
+            "base": {
+              "count": 10,
+              "vertex_counts": [
+                100,
+                100,
+                100,
+                100,
+                100,
+                100,
+                100,
+                100,
+                100,
+                100
+              ]
+            },
+            "evaluated": {
+              "count": 10,
+              "vertex_counts": [
+                422,
+                422,
+                422,
+                422,
+                422,
+                422,
+                422,
+                422,
+                422,
+                422
+              ]
+            }
+          },
+          "upper_teeth": {
+            "object": "V19_UpperTeeth",
+            "base": {
+              "count": 9,
+              "vertex_counts": [
+                100,
+                100,
+                100,
+                100,
+                100,
+                100,
+                100,
+                100,
+                100
+              ]
+            },
+            "evaluated": {
+              "count": 9,
+              "vertex_counts": [
+                422,
+                422,
+                422,
+                422,
+                422,
+                422,
+                422,
+                422,
+                422
+              ]
+            }
+          }
+        },
+        "rear_skull_underside_probe": {
+          "ray_origin": [
+            0.0,
+            0.4300000071525574,
+            1.3433070182800293
+          ],
+          "ray_direction": [
+            0,
+            0,
+            1
+          ],
+          "fixed_xy": [
+            0,
+            0.43
+          ],
+          "hit": true,
+          "underside_z": 3.5222020149230957,
+          "point": [
+            0.0,
+            0.4300000071525574,
+            3.5222020149230957
+          ],
+          "normal": [
+            0.011405999772250652,
+            0.6905341744422913,
+            -0.7232098579406738
+          ],
+          "triangle_index": 15936
+        }
+      },
+      "open": {
+        "mouth_open": 1.0,
+        "head_bounds": {
+          "min": [
+            -0.7971907258033752,
+            -0.7256076335906982,
+            2.962639093399048
+          ],
+          "max": [
+            0.7971907258033752,
+            0.6498517990112305,
+            4.776216506958008
+          ],
+          "dimensions_xyz": [
+            1.5943814516067505,
+            1.3754594326019287,
+            1.81357741355896
+          ]
+        },
+        "aperture_bounds": {
+          "min": [
+            -0.6589143872261047,
+            -0.6719844341278076,
+            3.0966479778289795
+          ],
+          "max": [
+            0.6589143872261047,
+            -0.33003494143486023,
+            4.084072589874268
+          ],
+          "dimensions_xyz": [
+            1.3178287744522095,
+            0.3419494926929474,
+            0.9874246120452881
+          ]
+        },
+        "aperture_selected_vertices": 192,
+        "aperture_height_over_width": 0.749281417425217,
+        "crown_z": 4.776216506958008,
+        "upper_lip_center_z": 4.084072589874268,
+        "upper_lip_center_band_abs_x_max": 0.039859536290168765,
+        "upper_lip_aperture_max_z": 4.084072589874268,
+        "crown_to_upper_lip_over_head_width": 0.4341143810888083,
+        "eye_centers": {
+          "V19_InsetGlowEye.L": [
+            -0.2853395640850067,
+            -0.5563760995864868,
+            4.375472068786621
+          ],
+          "V19_InsetGlowEye.R": [
+            0.2853394150733948,
+            -0.5563570857048035,
+            4.375468730926514
+          ]
+        },
+        "mean_eye_center_z": 4.375470399856567,
+        "eye_center_to_upper_lip_over_head_width": 0.18276542899357073,
+        "teeth_components": {
+          "lower_teeth": {
+            "object": "V19_LowerTeeth",
+            "base": {
+              "count": 10,
+              "vertex_counts": [
+                100,
+                100,
+                100,
+                100,
+                100,
+                100,
+                100,
+                100,
+                100,
+                100
+              ]
+            },
+            "evaluated": {
+              "count": 10,
+              "vertex_counts": [
+                422,
+                422,
+                422,
+                422,
+                422,
+                422,
+                422,
+                422,
+                422,
+                422
+              ]
+            }
+          },
+          "upper_teeth": {
+            "object": "V19_UpperTeeth",
+            "base": {
+              "count": 9,
+              "vertex_counts": [
+                100,
+                100,
+                100,
+                100,
+                100,
+                100,
+                100,
+                100,
+                100
+              ]
+            },
+            "evaluated": {
+              "count": 9,
+              "vertex_counts": [
+                422,
+                422,
+                422,
+                422,
+                422,
+                422,
+                422,
+                422,
+                422
+              ]
+            }
+          }
+        },
+        "rear_skull_underside_probe": {
+          "ray_origin": [
+            0.0,
+            0.4300000071525574,
+            0.9626390933990479
+          ],
+          "ray_direction": [
+            0,
+            0,
+            1
+          ],
+          "fixed_xy": [
+            0,
+            0.43
+          ],
+          "hit": true,
+          "underside_z": 3.2257378101348877,
+          "point": [
+            0.0,
+            0.4300000071525574,
+            3.2257378101348877
+          ],
+          "normal": [
+            0.014025118201971054,
+            0.8121581673622131,
+            -0.5832688212394714
+          ],
+          "triangle_index": 15936
+        }
+      }
+    },
+    "open_minus_closed": {
+      "crown_z": 0.0003933906555175781,
+      "upper_lip_center_z": 0.22565889358520508,
+      "rear_skull_underside_z": -0.296464204788208,
+      "outer_chin_z": -0.38066792488098145
+    },
+    "sha256_after": "b0501650b048ac5dde37cfb5e1e9bb864e7dd46c6d0407e6000a0c3ceb731ca5",
+    "input_blend_unchanged": true
+  },
+  "v20": {
+    "file": "/workspace/scratch/1e3c345e25d1/plush_v20/Plush-v20-Face-Study.blend",
+    "sha256_before": "4ca344d47d4c44ec8944bfed6c0667894cfae4ae6c5da774d88b4051fd9f5674",
+    "runtime_blender": "5.3.0",
+    "saved_file_version": [
+      5,
+      3,
+      31
+    ],
+    "head_object": "V20_HeadShell",
+    "rig": "ARM_Plush_v20",
+    "states": {
+      "closed": {
+        "mouth_open": 0.0,
+        "head_bounds": {
+          "min": [
+            -0.7976769804954529,
+            -0.72600919008255,
+            3.382171869277954
+          ],
+          "max": [
+            0.7976769804954529,
+            0.5599346160888672,
+            4.667402744293213
+          ],
+          "dimensions_xyz": [
+            1.5953539609909058,
+            1.2859438061714172,
+            1.2852308750152588
+          ]
+        },
+        "aperture_bounds": {
+          "min": [
+            -0.6559349298477173,
+            -0.6829532384872437,
+            3.8102669715881348
+          ],
+          "max": [
+            0.6559349894523621,
+            -0.3376697897911072,
+            3.9123613834381104
+          ],
+          "dimensions_xyz": [
+            1.3118699193000793,
+            0.3452834486961365,
+            0.10209441184997559
+          ]
+        },
+        "aperture_selected_vertices": 256,
+        "aperture_height_over_width": 0.07782357865515044,
+        "crown_z": 4.667402744293213,
+        "upper_lip_center_z": 3.8478853702545166,
+        "upper_lip_center_band_abs_x_max": 0.03988384902477265,
+        "upper_lip_aperture_max_z": 3.9123613834381104,
+        "crown_to_upper_lip_over_head_width": 0.5136899986318259,
+        "eye_centers": {
+          "V20_InsetGlowEye.L": [
+            -0.2853091061115265,
+            -0.5867106318473816,
+            4.315483570098877
+          ],
+          "V20_InsetGlowEye.R": [
+            0.2853138744831085,
+            -0.5866847634315491,
+            4.315479755401611
+          ]
+        },
+        "mean_eye_center_z": 4.315481662750244,
+        "eye_center_to_upper_lip_over_head_width": 0.29309877552520963,
+        "teeth_components": {
+          "lower_teeth": {
+            "object": "V20_LowerTeeth",
+            "base": {
+              "count": 13,
+              "vertex_counts": [
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142
+              ]
+            },
+            "evaluated": {
+              "count": 13,
+              "vertex_counts": [
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602
+              ]
+            }
+          },
+          "upper_teeth": {
+            "object": "V20_UpperTeeth",
+            "base": {
+              "count": 11,
+              "vertex_counts": [
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142
+              ]
+            },
+            "evaluated": {
+              "count": 11,
+              "vertex_counts": [
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602
+              ]
+            }
+          }
+        },
+        "rear_skull_underside_probe": {
+          "ray_origin": [
+            0.0,
+            0.4300000071525574,
+            1.382171869277954
+          ],
+          "ray_direction": [
+            0,
+            0,
+            1
+          ],
+          "fixed_xy": [
+            0,
+            0.43
+          ],
+          "hit": true,
+          "underside_z": 3.625916004180908,
+          "point": [
+            0.0,
+            0.4300000071525574,
+            3.625916004180908
+          ],
+          "normal": [
+            -0.006069875322282314,
+            0.8311265707015991,
+            -0.556050181388855
+          ],
+          "triangle_index": 29437
+        }
+      },
+      "open": {
+        "mouth_open": 1.0,
+        "head_bounds": {
+          "min": [
+            -0.7983705997467041,
+            -0.7440565824508667,
+            2.9407873153686523
+          ],
+          "max": [
+            0.7983706593513489,
+            0.5599346160888672,
+            4.667829990386963
+          ],
+          "dimensions_xyz": [
+            1.596741259098053,
+            1.3039911985397339,
+            1.7270426750183105
+          ]
+        },
+        "aperture_bounds": {
+          "min": [
+            -0.6585816740989685,
+            -0.6853102445602417,
+            3.0958588123321533
+          ],
+          "max": [
+            0.6585816740989685,
+            -0.33790189027786255,
+            4.083296298980713
+          ],
+          "dimensions_xyz": [
+            1.317163348197937,
+            0.34740835428237915,
+            0.9874374866485596
+          ]
+        },
+        "aperture_selected_vertices": 256,
+        "aperture_height_over_width": 0.7496697262336609,
+        "crown_z": 4.667829990386963,
+        "upper_lip_center_z": 4.083296298980713,
+        "upper_lip_center_band_abs_x_max": 0.03991853147745133,
+        "upper_lip_aperture_max_z": 4.083296298980713,
+        "crown_to_upper_lip_over_head_width": 0.36607915532691504,
+        "eye_centers": {
+          "V20_InsetGlowEye.L": [
+            -0.28532496094703674,
+            -0.590241014957428,
+            4.315457344055176
+          ],
+          "V20_InsetGlowEye.R": [
+            0.285319447517395,
+            -0.590211808681488,
+            4.315459251403809
+          ]
+        },
+        "mean_eye_center_z": 4.315458297729492,
+        "eye_center_to_upper_lip_over_head_width": 0.14539738196526594,
+        "teeth_components": {
+          "lower_teeth": {
+            "object": "V20_LowerTeeth",
+            "base": {
+              "count": 13,
+              "vertex_counts": [
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142
+              ]
+            },
+            "evaluated": {
+              "count": 13,
+              "vertex_counts": [
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602
+              ]
+            }
+          },
+          "upper_teeth": {
+            "object": "V20_UpperTeeth",
+            "base": {
+              "count": 11,
+              "vertex_counts": [
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142,
+                142
+              ]
+            },
+            "evaluated": {
+              "count": 11,
+              "vertex_counts": [
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602,
+                602
+              ]
+            }
+          }
+        },
+        "rear_skull_underside_probe": {
+          "ray_origin": [
+            0.0,
+            0.4300000071525574,
+            0.9407873153686523
+          ],
+          "ray_direction": [
+            0,
+            0,
+            1
+          ],
+          "fixed_xy": [
+            0,
+            0.43
+          ],
+          "hit": true,
+          "underside_z": 3.6182010173797607,
+          "point": [
+            0.0,
+            0.4300000071525574,
+            3.6182010173797607
+          ],
+          "normal": [
+            -0.005758117418736219,
+            0.855830729007721,
+            -0.5172238945960999
+          ],
+          "triangle_index": 29437
+        }
+      }
+    },
+    "open_minus_closed": {
+      "crown_z": 0.00042724609375,
+      "upper_lip_center_z": 0.2354109287261963,
+      "rear_skull_underside_z": -0.007714986801147461,
+      "outer_chin_z": -0.44138455390930176
+    },
+    "sha256_after": "4ca344d47d4c44ec8944bfed6c0667894cfae4ae6c5da774d88b4051fd9f5674",
+    "input_blend_unchanged": true
+  },
+  "v20_minus_v19": {
+    "closed": {
+      "crown_z": -0.10842037200927734,
+      "upper_lip_center_z": -0.010528326034545898,
+      "mean_eye_center_z": -0.059958696365356445,
+      "crown_to_upper_lip_over_head_width": -0.06219315253552948,
+      "eye_center_to_upper_lip_over_head_width": -0.03145309557039183,
+      "aperture_height_over_width": -0.010595032290209944,
+      "head_bounds_dimensions_xyz": [
+        0.0023061037063598633,
+        -0.0899583101272583,
+        -0.14728522300720215
+      ],
+      "aperture_bounds_dimensions_xyz": [
+        -0.0006851553916931152,
+        0.0053809285163879395,
+        -0.013959884643554688
+      ],
+      "rear_skull_underside_z": 0.1037139892578125
+    },
+    "open": {
+      "crown_z": -0.10838651657104492,
+      "upper_lip_center_z": -0.0007762908935546875,
+      "mean_eye_center_z": -0.060012102127075195,
+      "crown_to_upper_lip_over_head_width": -0.06803522576189325,
+      "eye_center_to_upper_lip_over_head_width": -0.03736804702830479,
+      "aperture_height_over_width": 0.0003883088084438713,
+      "head_bounds_dimensions_xyz": [
+        0.0023598074913024902,
+        -0.07146823406219482,
+        -0.08653473854064941
+      ],
+      "aperture_bounds_dimensions_xyz": [
+        -0.0006654262542724609,
+        0.005458861589431763,
+        1.2874603271484375e-05
+      ],
+      "rear_skull_underside_z": 0.39246320724487305
+    }
+  }
+}
