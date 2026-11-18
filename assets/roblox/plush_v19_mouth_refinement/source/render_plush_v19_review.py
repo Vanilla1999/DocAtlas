@@ -16,9 +16,16 @@ shots=[('front',1,'front_open'),('hero',1,'hero_open'),('profile',1,'profile_ope
        ('front',0,'front_closed'),('front',.5,'front_half'),('full',1,'full_open')]
 if quick:shots=[('front',1,'front_open'),('profile',1,'profile_open'),('front',0,'front_closed')]
 if '--single-front' in sys.argv:shots=[('front',1,'front_open')]
+if '--presentation' in sys.argv:shots=[('hero',1,'hero_open'),('full',1,'full_open')]
 for camera,value,label in shots:
     rig['MouthOpen']=value;rig.update_tag();bpy.context.view_layer.update()
     scene.camera=bpy.data.objects['CAM_V19_'+camera]
+    # Preview-only studio adjustment: remove the distant finite-plane horizon
+    # from closeups; keep a larger shadow-receiving floor in the full-body shot.
+    # No character geometry, material or saved .blend bytes are modified.
+    ground=bpy.data.objects['Studio_Ground_NotAsset']
+    ground.visible_camera=(camera=='full')
+    ground.scale=(10,10,10)
     scene.render.filepath=str(OUT/f'v19_{label}.png')
     bpy.ops.render.render(write_still=True)
 print('V19_REVIEW_RENDER_DONE')

@@ -1,0 +1,2781 @@
+{
+  "file": "/workspace/scratch/1e3c345e25d1/plush_v19/Plush-v19-Mouth-Refinement.blend",
+  "runtime_blender": "5.3.0",
+  "saved_file_version": [
+    5,
+    3,
+    31
+  ],
+  "sha256": "b0501650b048ac5dde37cfb5e1e9bb864e7dd46c6d0407e6000a0c3ceb731ca5",
+  "input_blend_unchanged": true,
+  "asset_mesh_objects": 54,
+  "armature_bones": 38,
+  "root_bones": [
+    "Root"
+  ],
+  "base_mesh_totals": {
+    "vertices": 23950,
+    "faces": 23828,
+    "triangles": 45936,
+    "nonmanifold_edges": 1664,
+    "zero_area_faces": 0,
+    "zero_length_edges": 48,
+    "nonfinite_vertices": 0
+  },
+  "weight_totals": {
+    "unweighted_vertices": 0,
+    "over_four_influences": 0,
+    "normalization_errors_gt_1e_4": 0,
+    "maximum_influences": 2
+  },
+  "objects_without_rig_parent": [],
+  "objects_without_target_armature_modifier": [],
+  "external_unpacked_image_dependencies": [],
+  "procedural_fleece_hosts": [
+    "V19_Fleece_HeadShell",
+    "V19_Fleece_SoftNeckBridge",
+    "V19_Fleece_PillowEar.L",
+    "V19_Fleece_PillowEar.R",
+    "V19_Fleece_Torso",
+    "V19_Fleece_Arm.L",
+    "V19_Fleece_Arm.R",
+    "V19_Fleece_Hand.L",
+    "V19_Fleece_Hand.R",
+    "V19_Fleece_Leg.L",
+    "V19_Fleece_Leg.R",
+    "V19_Fleece_Foot.L",
+    "V19_Fleece_Foot.R",
+    "V19_Fleece_StitchedTail"
+  ],
+  "actions": [
+    "LEGACY_AN_v17_Alert_32f",
+    "LEGACY_AN_v17_Idle_Breath_96f",
+    "LEGACY_AN_v17_Jaw_Open_Close_32f",
+    "LEGACY_AN_v17_Walk_InPlace_40f_24fps"
+  ],
+  "meshes": {
+    "V19_Torso": {
+      "role": null,
+      "vertices": 432,
+      "faces": 386,
+      "triangles": 860,
+      "quad_fraction": 0.9948186528497409,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        432
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 2,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 1.4901161193847656e-08
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Pelvis": [
+          "Pelvis",
+          "Root"
+        ],
+        "Spine": [
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [
+        "Basis",
+        "MouthOpen"
+      ],
+      "shape_key_drivers": [
+        "key_blocks[\"MouthOpen\"].value"
+      ],
+      "qa_groups_present": []
+    },
+    "V19_Arm.L": {
+      "role": null,
+      "vertices": 744,
+      "faces": 722,
+      "triangles": 1484,
+      "quad_fraction": 0.997229916897507,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        744
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 2,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 2.9802322387695312e-08
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Forearm.L": [
+          "Forearm.L",
+          "UpperArm.L",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "Hand.L": [
+          "Hand.L",
+          "Forearm.L",
+          "UpperArm.L",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "UpperArm.L": [
+          "UpperArm.L",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_Arm.R": {
+      "role": null,
+      "vertices": 744,
+      "faces": 722,
+      "triangles": 1484,
+      "quad_fraction": 0.997229916897507,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        744
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 2,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 2.9802322387695312e-08
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Forearm.R": [
+          "Forearm.R",
+          "UpperArm.R",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "Hand.R": [
+          "Hand.R",
+          "Forearm.R",
+          "UpperArm.R",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "UpperArm.R": [
+          "UpperArm.R",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_Hand.L": {
+      "role": null,
+      "vertices": 474,
+      "faces": 488,
+      "triangles": 944,
+      "quad_fraction": 0.9344262295081968,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        474
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 2,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Finger1.L": [
+          "Finger1.L",
+          "Hand.L",
+          "Forearm.L",
+          "UpperArm.L",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "Finger2.L": [
+          "Finger2.L",
+          "Hand.L",
+          "Forearm.L",
+          "UpperArm.L",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "Finger3.L": [
+          "Finger3.L",
+          "Hand.L",
+          "Forearm.L",
+          "UpperArm.L",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "FingerTip1.L": [
+          "FingerTip1.L",
+          "Finger1.L",
+          "Hand.L",
+          "Forearm.L",
+          "UpperArm.L",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "FingerTip2.L": [
+          "FingerTip2.L",
+          "Finger2.L",
+          "Hand.L",
+          "Forearm.L",
+          "UpperArm.L",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "FingerTip3.L": [
+          "FingerTip3.L",
+          "Finger3.L",
+          "Hand.L",
+          "Forearm.L",
+          "UpperArm.L",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "Hand.L": [
+          "Hand.L",
+          "Forearm.L",
+          "UpperArm.L",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "Thumb.L": [
+          "Thumb.L",
+          "Hand.L",
+          "Forearm.L",
+          "UpperArm.L",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "ThumbTip.L": [
+          "ThumbTip.L",
+          "Thumb.L",
+          "Hand.L",
+          "Forearm.L",
+          "UpperArm.L",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_Hand.R": {
+      "role": null,
+      "vertices": 474,
+      "faces": 488,
+      "triangles": 944,
+      "quad_fraction": 0.9344262295081968,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        474
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 2,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Finger1.R": [
+          "Finger1.R",
+          "Hand.R",
+          "Forearm.R",
+          "UpperArm.R",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "Finger2.R": [
+          "Finger2.R",
+          "Hand.R",
+          "Forearm.R",
+          "UpperArm.R",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "Finger3.R": [
+          "Finger3.R",
+          "Hand.R",
+          "Forearm.R",
+          "UpperArm.R",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "FingerTip1.R": [
+          "FingerTip1.R",
+          "Finger1.R",
+          "Hand.R",
+          "Forearm.R",
+          "UpperArm.R",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "FingerTip2.R": [
+          "FingerTip2.R",
+          "Finger2.R",
+          "Hand.R",
+          "Forearm.R",
+          "UpperArm.R",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "FingerTip3.R": [
+          "FingerTip3.R",
+          "Finger3.R",
+          "Hand.R",
+          "Forearm.R",
+          "UpperArm.R",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "Hand.R": [
+          "Hand.R",
+          "Forearm.R",
+          "UpperArm.R",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "Thumb.R": [
+          "Thumb.R",
+          "Hand.R",
+          "Forearm.R",
+          "UpperArm.R",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "ThumbTip.R": [
+          "ThumbTip.R",
+          "Thumb.R",
+          "Hand.R",
+          "Forearm.R",
+          "UpperArm.R",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_Leg.L": {
+      "role": null,
+      "vertices": 700,
+      "faces": 674,
+      "triangles": 1396,
+      "quad_fraction": 0.9970326409495549,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        700
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 2,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 2.9802322387695312e-08
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Shin.L": [
+          "Shin.L",
+          "Thigh.L",
+          "Pelvis",
+          "Root"
+        ],
+        "Thigh.L": [
+          "Thigh.L",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_Foot.L": {
+      "role": null,
+      "vertices": 192,
+      "faces": 162,
+      "triangles": 380,
+      "quad_fraction": 0.9876543209876543,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        192
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Foot.L": [
+          "Foot.L",
+          "Shin.L",
+          "Thigh.L",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_Leg.R": {
+      "role": null,
+      "vertices": 700,
+      "faces": 674,
+      "triangles": 1396,
+      "quad_fraction": 0.9970326409495549,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        700
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 2,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 2.9802322387695312e-08
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Shin.R": [
+          "Shin.R",
+          "Thigh.R",
+          "Pelvis",
+          "Root"
+        ],
+        "Thigh.R": [
+          "Thigh.R",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_Foot.R": {
+      "role": null,
+      "vertices": 192,
+      "faces": 162,
+      "triangles": 380,
+      "quad_fraction": 0.9876543209876543,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        192
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Foot.R": [
+          "Foot.R",
+          "Shin.R",
+          "Thigh.R",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_Claw1.L": {
+      "role": null,
+      "vertices": 108,
+      "faces": 98,
+      "triangles": 212,
+      "quad_fraction": 0.9795918367346939,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        108
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "FingerTip1.L": [
+          "FingerTip1.L",
+          "Finger1.L",
+          "Hand.L",
+          "Forearm.L",
+          "UpperArm.L",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_Claw2.L": {
+      "role": null,
+      "vertices": 108,
+      "faces": 98,
+      "triangles": 212,
+      "quad_fraction": 0.9795918367346939,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        108
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "FingerTip2.L": [
+          "FingerTip2.L",
+          "Finger2.L",
+          "Hand.L",
+          "Forearm.L",
+          "UpperArm.L",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_Claw3.L": {
+      "role": null,
+      "vertices": 108,
+      "faces": 98,
+      "triangles": 212,
+      "quad_fraction": 0.9795918367346939,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        108
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "FingerTip3.L": [
+          "FingerTip3.L",
+          "Finger3.L",
+          "Hand.L",
+          "Forearm.L",
+          "UpperArm.L",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_Claw1.R": {
+      "role": null,
+      "vertices": 108,
+      "faces": 98,
+      "triangles": 212,
+      "quad_fraction": 0.9795918367346939,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        108
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "FingerTip1.R": [
+          "FingerTip1.R",
+          "Finger1.R",
+          "Hand.R",
+          "Forearm.R",
+          "UpperArm.R",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_Claw2.R": {
+      "role": null,
+      "vertices": 108,
+      "faces": 98,
+      "triangles": 212,
+      "quad_fraction": 0.9795918367346939,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        108
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "FingerTip2.R": [
+          "FingerTip2.R",
+          "Finger2.R",
+          "Hand.R",
+          "Forearm.R",
+          "UpperArm.R",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_Claw3.R": {
+      "role": null,
+      "vertices": 108,
+      "faces": 98,
+      "triangles": 212,
+      "quad_fraction": 0.9795918367346939,
+      "ngons": 2,
+      "components": 1,
+      "component_vertex_counts": [
+        108
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "FingerTip3.R": [
+          "FingerTip3.R",
+          "Finger3.R",
+          "Hand.R",
+          "Forearm.R",
+          "UpperArm.R",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_Arm_TackSeams.L": {
+      "role": null,
+      "vertices": 288,
+      "faces": 144,
+      "triangles": 288,
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 18,
+      "component_vertex_counts": [
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "boundary_edges": 288,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 288,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Forearm.L": [
+          "Forearm.L",
+          "UpperArm.L",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_Arm_TackSeams.R": {
+      "role": null,
+      "vertices": 288,
+      "faces": 144,
+      "triangles": 288,
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 18,
+      "component_vertex_counts": [
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "boundary_edges": 288,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 288,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Forearm.R": [
+          "Forearm.R",
+          "UpperArm.R",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_PalmPad.L": {
+      "role": null,
+      "vertices": 478,
+      "faces": 504,
+      "triangles": 952,
+      "quad_fraction": 0.8888888888888888,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        478
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Hand.L": [
+          "Hand.L",
+          "Forearm.L",
+          "UpperArm.L",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_FingerPad1.L": {
+      "role": null,
+      "vertices": 222,
+      "faces": 240,
+      "triangles": 440,
+      "quad_fraction": 0.8333333333333334,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        222
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "FingerTip1.L": [
+          "FingerTip1.L",
+          "Finger1.L",
+          "Hand.L",
+          "Forearm.L",
+          "UpperArm.L",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_FingerPad2.L": {
+      "role": null,
+      "vertices": 222,
+      "faces": 240,
+      "triangles": 440,
+      "quad_fraction": 0.8333333333333334,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        222
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "FingerTip2.L": [
+          "FingerTip2.L",
+          "Finger2.L",
+          "Hand.L",
+          "Forearm.L",
+          "UpperArm.L",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_FingerPad3.L": {
+      "role": null,
+      "vertices": 222,
+      "faces": 240,
+      "triangles": 440,
+      "quad_fraction": 0.8333333333333334,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        222
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "FingerTip3.L": [
+          "FingerTip3.L",
+          "Finger3.L",
+          "Hand.L",
+          "Forearm.L",
+          "UpperArm.L",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_ThumbPad.L": {
+      "role": null,
+      "vertices": 222,
+      "faces": 240,
+      "triangles": 440,
+      "quad_fraction": 0.8333333333333334,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        222
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "ThumbTip.L": [
+          "ThumbTip.L",
+          "Thumb.L",
+          "Hand.L",
+          "Forearm.L",
+          "UpperArm.L",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_PalmPad.R": {
+      "role": null,
+      "vertices": 478,
+      "faces": 504,
+      "triangles": 952,
+      "quad_fraction": 0.8888888888888888,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        478
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Hand.R": [
+          "Hand.R",
+          "Forearm.R",
+          "UpperArm.R",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_FingerPad1.R": {
+      "role": null,
+      "vertices": 222,
+      "faces": 240,
+      "triangles": 440,
+      "quad_fraction": 0.8333333333333334,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        222
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "FingerTip1.R": [
+          "FingerTip1.R",
+          "Finger1.R",
+          "Hand.R",
+          "Forearm.R",
+          "UpperArm.R",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_FingerPad2.R": {
+      "role": null,
+      "vertices": 222,
+      "faces": 240,
+      "triangles": 440,
+      "quad_fraction": 0.8333333333333334,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        222
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "FingerTip2.R": [
+          "FingerTip2.R",
+          "Finger2.R",
+          "Hand.R",
+          "Forearm.R",
+          "UpperArm.R",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_FingerPad3.R": {
+      "role": null,
+      "vertices": 222,
+      "faces": 240,
+      "triangles": 440,
+      "quad_fraction": 0.8333333333333334,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        222
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "FingerTip3.R": [
+          "FingerTip3.R",
+          "Finger3.R",
+          "Hand.R",
+          "Forearm.R",
+          "UpperArm.R",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_ThumbPad.R": {
+      "role": null,
+      "vertices": 222,
+      "faces": 240,
+      "triangles": 440,
+      "quad_fraction": 0.8333333333333334,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        222
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "ThumbTip.R": [
+          "ThumbTip.R",
+          "Thumb.R",
+          "Hand.R",
+          "Forearm.R",
+          "UpperArm.R",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_ToeClefts.L": {
+      "role": null,
+      "vertices": 48,
+      "faces": 32,
+      "triangles": 64,
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 2,
+      "component_vertex_counts": [
+        24,
+        24
+      ],
+      "boundary_edges": 32,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 32,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Foot.L": [
+          "Foot.L",
+          "Shin.L",
+          "Thigh.L",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_Knee_Tacks.L": {
+      "role": null,
+      "vertices": 112,
+      "faces": 56,
+      "triangles": 112,
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 7,
+      "component_vertex_counts": [
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "boundary_edges": 112,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 112,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Shin.L": [
+          "Shin.L",
+          "Thigh.L",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_ToeClefts.R": {
+      "role": null,
+      "vertices": 48,
+      "faces": 32,
+      "triangles": 64,
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 2,
+      "component_vertex_counts": [
+        24,
+        24
+      ],
+      "boundary_edges": 32,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 32,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Foot.R": [
+          "Foot.R",
+          "Shin.R",
+          "Thigh.R",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_Knee_Tacks.R": {
+      "role": null,
+      "vertices": 112,
+      "faces": 56,
+      "triangles": 112,
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 7,
+      "component_vertex_counts": [
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "boundary_edges": 112,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 112,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Shin.R": [
+          "Shin.R",
+          "Thigh.R",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_OrganicSewnBellyInlay": {
+      "role": null,
+      "vertices": 432,
+      "faces": 384,
+      "triangles": 768,
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        432
+      ],
+      "boundary_edges": 96,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 96,
+      "zero_area_faces": 0,
+      "zero_length_edges": 48,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 2,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 2.9802322387695312e-08
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Pelvis": [
+          "Pelvis",
+          "Root"
+        ],
+        "Spine": [
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_BellyBlanketStitches": {
+      "role": null,
+      "vertices": 480,
+      "faces": 240,
+      "triangles": 480,
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 30,
+      "component_vertex_counts": [
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "boundary_edges": 480,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 480,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Spine": [
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_HandsewnSpine": {
+      "role": null,
+      "vertices": 192,
+      "faces": 184,
+      "triangles": 368,
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        192
+      ],
+      "boundary_edges": 16,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 16,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Spine": [
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_SpineTanTacks": {
+      "role": null,
+      "vertices": 192,
+      "faces": 96,
+      "triangles": 192,
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 12,
+      "component_vertex_counts": [
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "boundary_edges": 192,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 192,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Spine": [
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_StitchedTail": {
+      "role": null,
+      "vertices": 478,
+      "faces": 504,
+      "triangles": 952,
+      "quad_fraction": 0.8888888888888888,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        478
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Pelvis": [
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_TailRootSeam": {
+      "role": null,
+      "vertices": 24,
+      "faces": 16,
+      "triangles": 32,
+      "quad_fraction": 1.0,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        24
+      ],
+      "boundary_edges": 16,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 16,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Pelvis": [
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_PlantarPad.L": {
+      "role": null,
+      "vertices": 478,
+      "faces": 504,
+      "triangles": 952,
+      "quad_fraction": 0.8888888888888888,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        478
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Foot.L": [
+          "Foot.L",
+          "Shin.L",
+          "Thigh.L",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_PlantarPad.R": {
+      "role": null,
+      "vertices": 478,
+      "faces": 504,
+      "triangles": 952,
+      "quad_fraction": 0.8888888888888888,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        478
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Foot.R": [
+          "Foot.R",
+          "Shin.R",
+          "Thigh.R",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_HeadShell": {
+      "role": "head",
+      "vertices": 3746,
+      "faces": 3840,
+      "triangles": 7488,
+      "quad_fraction": 0.95,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        3746
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Head": [
+          "Head",
+          "Neck",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [
+        "Basis",
+        "MouthOpen"
+      ],
+      "shape_key_drivers": [
+        "key_blocks[\"MouthOpen\"].value"
+      ],
+      "qa_groups_present": [
+        "QA_MouthAperture"
+      ]
+    },
+    "V19_UpperTeeth": {
+      "role": "upper_teeth",
+      "vertices": 900,
+      "faces": 1008,
+      "triangles": 1764,
+      "quad_fraction": 0.75,
+      "ngons": 0,
+      "components": 9,
+      "component_vertex_counts": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Head": [
+          "Head",
+          "Neck",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [
+        "Basis",
+        "MouthOpen"
+      ],
+      "shape_key_drivers": [
+        "key_blocks[\"MouthOpen\"].value"
+      ],
+      "qa_groups_present": [
+        "QA_FreeToothTips"
+      ]
+    },
+    "V19_LowerTeeth": {
+      "role": "lower_teeth",
+      "vertices": 1000,
+      "faces": 1120,
+      "triangles": 1960,
+      "quad_fraction": 0.75,
+      "ngons": 0,
+      "components": 10,
+      "component_vertex_counts": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Head": [
+          "Head",
+          "Neck",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [
+        "Basis",
+        "MouthOpen"
+      ],
+      "shape_key_drivers": [
+        "key_blocks[\"MouthOpen\"].value"
+      ],
+      "qa_groups_present": [
+        "QA_FreeToothTips"
+      ]
+    },
+    "V19_InnerLipSeal": {
+      "role": "interior",
+      "vertices": 1042,
+      "faces": 1056,
+      "triangles": 2080,
+      "quad_fraction": 0.9696969696969697,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        1042
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Head": [
+          "Head",
+          "Neck",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [
+        "Basis",
+        "MouthOpen"
+      ],
+      "shape_key_drivers": [
+        "key_blocks[\"MouthOpen\"].value"
+      ],
+      "qa_groups_present": []
+    },
+    "V19_PillowEar.L": {
+      "role": null,
+      "vertices": 1362,
+      "faces": 1400,
+      "triangles": 2720,
+      "quad_fraction": 0.9428571428571428,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        1362
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 2,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 2.9802322387695312e-08
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "EarBase.L": [
+          "EarBase.L",
+          "Head",
+          "Neck",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "EarTip.L": [
+          "EarTip.L",
+          "EarBase.L",
+          "Head",
+          "Neck",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_PillowEar.R": {
+      "role": null,
+      "vertices": 1362,
+      "faces": 1400,
+      "triangles": 2720,
+      "quad_fraction": 0.9428571428571428,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        1362
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 2,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 2.9802322387695312e-08
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "EarBase.R": [
+          "EarBase.R",
+          "Head",
+          "Neck",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "EarTip.R": [
+          "EarTip.R",
+          "EarBase.R",
+          "Head",
+          "Neck",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_SoftNeckBridge": {
+      "role": null,
+      "vertices": 130,
+      "faces": 160,
+      "triangles": 256,
+      "quad_fraction": 0.6,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        130
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Neck": [
+          "Neck",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [
+        "Basis",
+        "MouthOpen"
+      ],
+      "shape_key_drivers": [
+        "key_blocks[\"MouthOpen\"].value"
+      ],
+      "qa_groups_present": []
+    },
+    "V19_EyeSocket.L": {
+      "role": null,
+      "vertices": 522,
+      "faces": 560,
+      "triangles": 1040,
+      "quad_fraction": 0.8571428571428571,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        522
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Head": [
+          "Head",
+          "Neck",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [
+        "Basis",
+        "MouthOpen"
+      ],
+      "shape_key_drivers": [
+        "key_blocks[\"MouthOpen\"].value"
+      ],
+      "qa_groups_present": []
+    },
+    "V19_InsetGlowEye.L": {
+      "role": null,
+      "vertices": 522,
+      "faces": 560,
+      "triangles": 1040,
+      "quad_fraction": 0.8571428571428571,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        522
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Head": [
+          "Head",
+          "Neck",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [
+        "Basis",
+        "MouthOpen"
+      ],
+      "shape_key_drivers": [
+        "key_blocks[\"MouthOpen\"].value"
+      ],
+      "qa_groups_present": []
+    },
+    "V19_EyeSocket.R": {
+      "role": null,
+      "vertices": 522,
+      "faces": 560,
+      "triangles": 1040,
+      "quad_fraction": 0.8571428571428571,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        522
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Head": [
+          "Head",
+          "Neck",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [
+        "Basis",
+        "MouthOpen"
+      ],
+      "shape_key_drivers": [
+        "key_blocks[\"MouthOpen\"].value"
+      ],
+      "qa_groups_present": []
+    },
+    "V19_InsetGlowEye.R": {
+      "role": null,
+      "vertices": 522,
+      "faces": 560,
+      "triangles": 1040,
+      "quad_fraction": 0.8571428571428571,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        522
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Head": [
+          "Head",
+          "Neck",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [
+        "Basis",
+        "MouthOpen"
+      ],
+      "shape_key_drivers": [
+        "key_blocks[\"MouthOpen\"].value"
+      ],
+      "qa_groups_present": []
+    },
+    "V19_CheekBlanketStitch.L": {
+      "role": null,
+      "vertices": 128,
+      "faces": 144,
+      "triangles": 240,
+      "quad_fraction": 0.6666666666666666,
+      "ngons": 0,
+      "components": 4,
+      "component_vertex_counts": [
+        32,
+        32,
+        32,
+        32
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Head": [
+          "Head",
+          "Neck",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [
+        "Basis",
+        "MouthOpen"
+      ],
+      "shape_key_drivers": [
+        "key_blocks[\"MouthOpen\"].value"
+      ],
+      "qa_groups_present": []
+    },
+    "V19_CheekBlanketStitch.R": {
+      "role": null,
+      "vertices": 128,
+      "faces": 144,
+      "triangles": 240,
+      "quad_fraction": 0.6666666666666666,
+      "ngons": 0,
+      "components": 4,
+      "component_vertex_counts": [
+        32,
+        32,
+        32,
+        32
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 1,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 0.0
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "Head": [
+          "Head",
+          "Neck",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [
+        "Basis",
+        "MouthOpen"
+      ],
+      "shape_key_drivers": [
+        "key_blocks[\"MouthOpen\"].value"
+      ],
+      "qa_groups_present": []
+    },
+    "V19_UprightEar_SewnSpine": {
+      "role": null,
+      "vertices": 62,
+      "faces": 66,
+      "triangles": 120,
+      "quad_fraction": 0.8181818181818182,
+      "ngons": 0,
+      "components": 1,
+      "component_vertex_counts": [
+        62
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 2,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 2.9802322387695312e-08
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "EarBase.L": [
+          "EarBase.L",
+          "Head",
+          "Neck",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "EarTip.L": [
+          "EarTip.L",
+          "EarBase.L",
+          "Head",
+          "Neck",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    },
+    "V19_UprightEar_CrossTacks": {
+      "role": null,
+      "vertices": 320,
+      "faces": 360,
+      "triangles": 600,
+      "quad_fraction": 0.6666666666666666,
+      "ngons": 0,
+      "components": 10,
+      "component_vertex_counts": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "boundary_edges": 0,
+      "wire_edges": 0,
+      "overconnected_edges": 0,
+      "nonmanifold_edges": 0,
+      "zero_area_faces": 0,
+      "zero_length_edges": 0,
+      "nonfinite_vertices": 0,
+      "weights": {
+        "unweighted_vertices": 0,
+        "maximum_influences": 2,
+        "over_four_influences": 0,
+        "normalization_errors_gt_1e_4": 0,
+        "max_sum_error": 2.9802322387695312e-08
+      },
+      "armature_modifiers": [
+        "ARM_Plush_v19"
+      ],
+      "parent_chain_reaches_rig": true,
+      "bone_parent_chains": {
+        "EarBase.L": [
+          "EarBase.L",
+          "Head",
+          "Neck",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ],
+        "EarTip.L": [
+          "EarTip.L",
+          "EarBase.L",
+          "Head",
+          "Neck",
+          "Spine",
+          "Pelvis",
+          "Root"
+        ]
+      },
+      "shape_keys": [],
+      "shape_key_drivers": [],
+      "qa_groups_present": []
+    }
+  },
+  "limitations": [
+    "Base/control mesh counts, not evaluated subdivision or instanced-fleece polygon budgets.",
+    "Decorative fleece hosts/seed and studio geometry excluded from topology and weights.",
+    "No collision or stress-pose certificate for the full body.",
+    "Does not certify UVs, baked maps, Roblox import, animation quality or artistic likeness."
+  ]
+}
