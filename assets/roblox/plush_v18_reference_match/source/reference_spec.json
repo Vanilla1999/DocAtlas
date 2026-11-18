@@ -1,0 +1,76 @@
+{
+  "purpose": "Art-direction reference notes for refinement of v17, not a claim of 3D reconstruction accuracy",
+  "source": "Four user-attached AI-generated movement videos, inspected at selected frames",
+  "videos": [
+    {"file": "gemini_generated_video_e740afbe.mp4", "duration_s": 10.026667, "fps": 24, "resolution": [1280,720], "role": "Idle open-mouth front/side/back triptych; best stable proportion reference"},
+    {"file": "gemini_generated_video_fd51914d(1).mp4", "duration_s": 10.026667, "fps": 24, "resolution": [1280,720], "role": "Slow walk triptych, nearly closed-mouth neutral face"},
+    {"file": "gemini_generated_video_ebf52fc0.mp4", "duration_s": 10.026667, "fps": 24, "resolution": [1280,720], "role": "Run triptych; shoulder/hip range and soles"},
+    {"file": "gemini_generated_video_22b3d18b(1).mp4", "duration_s": 10.026667, "fps": 24, "resolution": [1280,720], "role": "Walk, crouch/crawl, climb, grab close-up; strongest face and hand detail evidence"}
+  ],
+  "best_frames": {
+    "idle_triptych": "idle_t050.png",
+    "idle_front_crop": "idle_front_crop.png",
+    "neutral_walk_triptych": "walk_t050.png",
+    "hand_and_teeth_closeup": "grab_t900.png",
+    "grab_pose": "grab_t860.png",
+    "crouch_transition": "crawl_t260.png"
+  },
+  "measurement_note": "Approximate hand-picked screen-space measurements from the front figure of idle_t050.png. Intended as broad ratio bands, not precise orthographic dimensions. AI clips vary in proportions and finger/teeth configuration over time.",
+  "landmarks_front_idle_px_approx": {
+    "head_crown_y": 155,
+    "chin_y": 315,
+    "floor_y": 682,
+    "head_left_x": 545,
+    "head_right_x": 715,
+    "crotch_y": 493,
+    "shoulder_y": 328,
+    "wrist_y": 474,
+    "finger_bottom_y": 564,
+    "eye_centers_x": [603,664],
+    "eye_center_y": 201
+  },
+  "ratio_targets": {
+    "head_width_over_crown_to_floor": [0.31,0.34],
+    "head_height_over_crown_to_floor": [0.29,0.32],
+    "torso_neck_to_crotch_over_crown_to_floor": [0.32,0.36],
+    "crotch_to_floor_over_crown_to_floor": [0.35,0.38],
+    "torso_only_width_over_head_width": [0.74,0.82],
+    "shoulder_to_fingertip_over_crown_to_floor": [0.43,0.47],
+    "hand_length_over_head_width": [0.48,0.57],
+    "eye_diameter_over_head_width": [0.12,0.15],
+    "eye_center_spacing_over_head_width": [0.34,0.38],
+    "upright_ear_length_over_head_height": [0.65,0.82],
+    "neutral_mouth_width_over_head_width": [0.80,0.92],
+    "open_mouth_height_over_head_height": [0.44,0.65]
+  },
+  "high_priority_morphology_changes_from_v17": [
+    "Narrower, longer torso and longer legs; reduce toddler-like giant-head/short-leg proportion",
+    "Remove separate nose, oval cheek plates, bulging sausage muzzle, eye pupil/highlight objects and visible shoulder balls",
+    "Embed smaller warm ivory luminous eyes in cloth surface instead of protruding cyan-white eyeballs",
+    "Create a broad real mouth aperture within the head, dark internal cavity and lower jaw integrated into head silhouette",
+    "Use asymmetric tapered curved tooth lengths, including larger side canines, in two rows; avoid uniform bead/cone row",
+    "Continuous soft sleeves with integrated wrist/palm transitions; no mechanical cuffs or floating sewing rings",
+    "Three substantial curved fingers plus thumb, large round tan palm pad, individual pad patches and small ivory claw tips",
+    "Feet as a coherent plush paw with three toe lobes/creases; tan underside sole, not white front toe dots or a separate sole disc",
+    "Rounded thick plush ears: one upright stitched down its face, one smoothly bent over; no planar slabs or angular triangular tip",
+    "Oatmeal/tan oval belly inset with an irregular sewn edge; tan stitches at upper arms, wrists, knees, ears, cheeks and back",
+    "Dark indigo short boucle/fleece texture with medium-scale curly breakup; no glossy plastic look or long fur disguising bad forms"
+  ],
+  "rig_and_deformation_requirements": [
+    "Shoulder and elbow need volume-preserving bend paths for four-limb crawl and forward ledge reach",
+    "At least two useful flexion controls per long finger for open palm, ground support and curled ledge grip",
+    "Soft ear-base bend plus tip lag rather than rigid segment pivots",
+    "Mouth opening must not reveal neck/torso; cheek stitches should not stretch across the opening",
+    "Feet need explicit contact/roll testing; short toes and broad plantar support",
+    "Body root must move skin, patches, thread, teeth and eyes together"
+  ],
+  "recommended_non_visual_checks": [
+    "Measure neutral-pose model landmarks normalized to crown-to-floor height and compare against the broad ratio bands",
+    "Count connected components and boundary/nonmanifold edges of intended continuous skins; treat cloth overlays separately",
+    "Check weight normalization, unweighted vertices, bone-dependent evaluated mesh motion and transform propagation",
+    "Stress-test elbow 90/120 degrees, forward shoulder reach, finger curl and crouch; track degenerate faces, extreme stretch and prohibited intersections",
+    "Probe mouth opening rays and internal cavity occlusion",
+    "Evaluate support-foot minimum Z and endpoint equality of walk loop; do not equate this with foot-lock approval",
+    "Use neutral clay orthographic front/side/back views and material views as a final necessary art-direction check"
+  ]
+}
