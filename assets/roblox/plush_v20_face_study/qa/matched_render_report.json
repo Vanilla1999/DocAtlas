@@ -1,0 +1,162 @@
+{
+  "runtime_blender": "5.3.0",
+  "description": "Matched camera and render settings; native materials and geometry; compositor bypassed equally.",
+  "camera_location": [
+    -0.9,
+    -9.0,
+    4.1
+  ],
+  "camera_target": [
+    0,
+    0,
+    4.1
+  ],
+  "orthographic_scale": 2.25,
+  "models": {
+    "v19": {
+      "file": "/workspace/scratch/1e3c345e25d1/plush_v19/Plush-v19-Mouth-Refinement.blend",
+      "sha256_before": "b0501650b048ac5dde37cfb5e1e9bb864e7dd46c6d0407e6000a0c3ceb731ca5",
+      "sha256_after": "b0501650b048ac5dde37cfb5e1e9bb864e7dd46c6d0407e6000a0c3ceb731ca5",
+      "unchanged": true,
+      "render": "v19_matched_face.png",
+      "lights": [
+        {
+          "name": "Studio_Fill",
+          "type": "AREA",
+          "location": [
+            4.0,
+            -3.0,
+            5.199999809265137
+          ],
+          "rotation": [
+            1.2977876663208008,
+            -0.0,
+            0.9272951483726501
+          ],
+          "energy": 630.0,
+          "color": [
+            0.8199999928474426,
+            0.8600000143051147,
+            1.0
+          ],
+          "size": 4.0
+        },
+        {
+          "name": "Studio_Key",
+          "type": "AREA",
+          "location": [
+            -3.4000000953674316,
+            -4.5,
+            7.400000095367432
+          ],
+          "rotation": [
+            1.0026944875717163,
+            5.515625645102773e-08,
+            -0.6470471620559692
+          ],
+          "energy": 1050.0,
+          "color": [
+            1.0,
+            0.9100000262260437,
+            0.8399999737739563
+          ],
+          "size": 4.5
+        },
+        {
+          "name": "Studio_Rim",
+          "type": "AREA",
+          "location": [
+            -1.2000000476837158,
+            3.0,
+            6.599999904632568
+          ],
+          "rotation": [
+            0.8567562699317932,
+            -1.0319775611833393e-07,
+            -2.7610862255096436
+          ],
+          "energy": 1250.0,
+          "color": [
+            0.6899999976158142,
+            0.7599999904632568,
+            1.0
+          ],
+          "size": 3.0
+        }
+      ]
+    },
+    "v20": {
+      "file": "/workspace/scratch/1e3c345e25d1/plush_v20/Plush-v20-Face-Study.blend",
+      "sha256_before": "4ca344d47d4c44ec8944bfed6c0667894cfae4ae6c5da774d88b4051fd9f5674",
+      "sha256_after": "4ca344d47d4c44ec8944bfed6c0667894cfae4ae6c5da774d88b4051fd9f5674",
+      "unchanged": true,
+      "render": "v20_matched_face.png",
+      "lights": [
+        {
+          "name": "Studio_Fill",
+          "type": "AREA",
+          "location": [
+            4.0,
+            -3.0,
+            5.199999809265137
+          ],
+          "rotation": [
+            1.2977876663208008,
+            -0.0,
+            0.9272951483726501
+          ],
+          "energy": 630.0,
+          "color": [
+            0.8199999928474426,
+            0.8600000143051147,
+            1.0
+          ],
+          "size": 4.0
+        },
+        {
+          "name": "Studio_Key",
+          "type": "AREA",
+          "location": [
+            -3.4000000953674316,
+            -4.5,
+            7.400000095367432
+          ],
+          "rotation": [
+            1.0026944875717163,
+            5.515625645102773e-08,
+            -0.6470471620559692
+          ],
+          "energy": 1050.0,
+          "color": [
+            1.0,
+            0.9100000262260437,
+            0.8399999737739563
+          ],
+          "size": 4.5
+        },
+        {
+          "name": "Studio_Rim",
+          "type": "AREA",
+          "location": [
+            -1.2000000476837158,
+            3.0,
+            6.599999904632568
+          ],
+          "rotation": [
+            0.8567562699317932,
+            -1.0319775611833393e-07,
+            -2.7610862255096436
+          ],
+          "energy": 1250.0,
+          "color": [
+            0.6899999976158142,
+            0.7599999904632568,
+            1.0
+          ],
+          "size": 3.0
+        }
+      ]
+    }
+  },
+  "identical_studio_lights": true
+}
