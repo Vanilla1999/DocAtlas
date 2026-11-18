@@ -1,0 +1,53 @@
+{
+  "purpose": "Independent art-direction review of the new mouth reference against v18; approximate image measurements, not calibrated 3D reconstruction",
+  "reference": "User-provided three-view mouth reference sheet (original image not redistributed)",
+  "reviewed_v18": [
+    "plush_v18/v18_front_open.png",
+    "plush_v18/v18_side_open.png",
+    "plush_v18/v18_front_closed.png"
+  ],
+  "central_finding": "v18 expands a horizontal ellipse inside an almost fixed circular skull. The reference drops the entire lower jaw/chin, while keeping the upper skull and upper lip relatively stable, producing a tall U-shaped aperture and a much taller open-head silhouette.",
+  "approximate_ratio_targets": {
+    "open_aperture_height_over_width": {"reference": [0.65, 0.75], "v18_observed": [0.38, 0.43]},
+    "open_head_height_over_width_excluding_ears": {"reference": [1.03, 1.12], "v18_observed": [0.85, 0.91]},
+    "closed_head_height_over_width_excluding_ears": {"reference": [0.84, 0.92]},
+    "upper_lip_center_rise_over_mouth_width_open": {"reference": [0.06, 0.09], "v18_observed": [0.14, 0.18]},
+    "dominant_upper_canine_length_over_central_incisor_length": {"reference": [1.8, 2.4]},
+    "dominant_upper_canine_abs_x_over_mouth_halfwidth": {"reference": [0.56, 0.67]},
+    "eye_diameter_over_head_width": {"reference": [0.12, 0.15]},
+    "eye_center_spacing_over_head_width": {"reference": [0.33, 0.37]},
+    "upright_ear_width_over_length": {"reference": [0.57, 0.70], "v18_observed": [0.32, 0.40]},
+    "visible_fleece_clump_diameter_over_head_width": {"reference": [0.005, 0.015]}
+  },
+  "mouth_contour": {
+    "upper": "Flatter central arch with a mild center rise, rounded corners, and a thick rounded textile edge; do not use the upper half of a regular ellipse.",
+    "lower": "Deep U shape / rounded trapezoid, slightly narrower at the bottom. The outer chin must travel downward along with the inner aperture.",
+    "closed": "Single continuous upturned smile seam: center slightly lower than corners. No enamel flecks or internal cavity should show.",
+    "side": "C-shaped silhouette with a visible upper muzzle lip overhang and a lower fabric jaw rim rotated/dropped forward/down. Preserve substantial cranium volume behind the cavity.",
+    "suggested_outer_chin_drop_at_v18_scale_m": [0.30, 0.50],
+    "interior": "Deep concave charcoal-purple velvet lining, visible side walls and lower floor/fold; not a featureless black plane and not wet red gums. Teeth roots are partly buried behind lining and cloth rim."
+  },
+  "teeth": [
+    "Two dominant upper canines near the outer thirds; approximately twice the length of central teeth, thicker roots and curved inward tips.",
+    "Central upper teeth shorter and uneven; avoid a symmetric row of nearly identical cones.",
+    "Lower teeth follow a curved U in three dimensions, not a straight horizontal picket fence. Larger lower fangs are offset from the center.",
+    "Use enamel gradient, subtle longitudinal grooves and round roots, with sharp but not needle-thin tips.",
+    "Retraction in the closed pose must hide every tooth behind the closed fabric surface."
+  ],
+  "secondary_shape_corrections": [
+    "Upright ear should be much wider and pillow-like, with a rounded top rather than a narrow plank.",
+    "Bent ear needs a broad drooping distal lobe and a dark warm inner felt surface; v18 currently has a small angular hooked tip.",
+    "The tan ear seam consists of a longitudinal thread plus transverse stitches; in v18 side view threads visibly float away from the ear and must be projected/weighted to its surface.",
+    "Eyes are flush luminous fabric apertures, not visibly protruding tablets. Existing diameter is near target; slightly closer spacing and soft warm bloom help.",
+    "Head should sit into broad shoulders; avoid the current visible cylindrical neck and separated capsule-like shoulders in portrait view.",
+    "Shift royal-blue fleece toward dark blue-violet. Replace uniform fine roughness with visible clustered curl/boucle breakup while keeping lip displacement restrained."
+  ],
+  "recommended_numeric_checks": [
+    "Sample MouthOpen at 0, 0.25, 0.5, 0.75 and 1; measure aperture height/width and outer chin displacement separately.",
+    "Compare left/right lip-loop vertices across X reflection before applying intentional tooth variation.",
+    "Track the upper lip and eye displacement while jaw opens; they should not rise substantially with the lower jaw.",
+    "Probe self-intersections and upper/lower tooth collisions in every sampled mouth state, not only the neutral saved pose.",
+    "At MouthOpen=0, raycast from several frontal directions to ensure no visible teeth or mouth interior escape the closed seam.",
+    "Render matched head closeups: closed front, half-open front, wide-open front and wide-open profile. Full-body thumbnails are too small for this correction."
+  ]
+}
