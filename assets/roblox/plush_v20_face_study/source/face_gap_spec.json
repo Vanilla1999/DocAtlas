@@ -1,0 +1,77 @@
+{
+  "purpose": "Fresh critical reference comparison after user rejected v19 facial likeness. These are artistic hypotheses, not a likeness certificate.",
+  "references_reviewed": [
+    "user three-view mouth sheet",
+    "v18_reference_analysis/grab_t900.png",
+    "v18_reference_analysis/grab_t860.png",
+    "v18_reference_analysis/idle_front_crop.png",
+    "v18_reference_analysis/walk_t050.png"
+  ],
+  "v19_reviewed": ["front_open", "front_closed", "hero_open", "profile_open"],
+  "central_finding": "V19 fixes the gross mouth opening but still reads as a uniformly domed sphere, a smooth dark funnel and orderly cone teeth. The reference is a sewn padded face with orbital/cheek volumes, a thick cloth jaw, folded oral lining and a much less regular dental arch. Geometry correctness did not establish those secondary forms.",
+  "camera_normalization": {
+    "hero": "Reference's image-left eye is the larger/more circular near eye. Match the negative-X three-quarter side before judging eye symmetry or ear occlusion.",
+    "profile": "Reference faces image-right and shows a small amount of far dental arch; v19 profile faces image-left and is nearly exact side-on. Use matched side and comparable slight three-quarter yaw.",
+    "measurement_warning": "Sheet panels are not calibrated orthographic views. Ratios below are approximate visual guides. Do not change geometry solely to satisfy a pixel ratio."
+  },
+  "priorities": [
+    {
+      "priority": 1,
+      "area": "Upper face and cheeks",
+      "mismatch": "V19 has too much vertical upper-face height and a smooth uninterrupted dome. Crown-to-eye and eye-to-upper-lip gaps both read long; the reference has padded orbital/cheek masses and a compressed, helmet-like upper muzzle.",
+      "action": "Reduce crown-to-upper-lip span roughly 10-20 percent while keeping mouth scale initially fixed. Add broad, subtle paired orbital pillows and cheek fullness, blended continuously into the head, not separate spherical eyebags. Keep a slight central sewn bridge/ridge.",
+      "approximate_guides": {
+        "crown_to_upper_lip_over_head_width_reference": [0.34, 0.38],
+        "v19_geometry_corresponding_ratio": 0.44,
+        "eye_to_upper_lip_over_head_width_reference": [0.13, 0.16],
+        "v19_geometry_corresponding_ratio": 0.18,
+        "example_at_v19_scale": "A crown reduction of about .10-.12 and eye-center reduction of about .05-.07, with W about1.6, is a plausible starting point; adapt ears and silhouette, and judge matched views."
+      }
+    },
+    {
+      "priority": 2,
+      "area": "Side silhouette / posterior cranium",
+      "mismatch": "Opening stretches v19's entire posterior lower skull into a long vertical capsule. The reference retains a rounded upper cranium and higher rear head/neck junction while the front cloth jaw drops forward/down into a distinct C-shaped profile.",
+      "action": "Decouple rear back-hull lower silhouette from the front chin drop. Fade jaw displacement out with depth towards the rear cranium rather than using the same tall lower ellipse for every back ring. Preserve actual space for the cavity and closed teeth."
+    },
+    {
+      "priority": 3,
+      "area": "Lips and jaw cushion",
+      "mismatch": "V19 has a narrow smooth dark inner strip and a relatively thin rim that reads rubber/plastic. The reference lip is a plush padded fabric roll, with a substantial rounded lower-jaw cushion and slight compression around corners.",
+      "action": "Give the visible rim a rounded, soft cross-section and a fuller lower cushion; add denser soft fleece on the open outer roll while keeping only the actual contact edge clean at rest. Add modest corner creases rather than making the opening mathematically perfectly uniform.",
+      "approximate_visible_roll_thickness_over_head_width": [0.035, 0.055]
+    },
+    {
+      "priority": 4,
+      "area": "Oral lining and tongue/floor",
+      "mismatch": "V19's cavity is deep geometrically but reads as an almost featureless black bowl. The reference and grab_t900 visibly contain dark plum cloth side folds, a recessed throat and a rounded tongue-like floor form with a central groove.",
+      "action": "Add actual broad soft side folds, a floor/tongue form and a recessed throat behind them. Use muted dark plum/charcoal cloth with enough value separation for the forms to read; reserve near-black for the deepest throat. Avoid red gums, wet slime or arbitrary spikes.",
+      "approximate_visible_tongue_width_over_head_width": [0.22, 0.28],
+      "approximate_visible_tongue_height_over_head_width": [0.18, 0.24]
+    },
+    {
+      "priority": 5,
+      "area": "Dental arch and tooth anatomy",
+      "mismatch": "V19 teeth are widely spaced, exactly mirrored, smooth cone-like forms. The reference has a more crowded arch, irregular lengths and twists, softer asymmetric roots, elliptical/fluted sections and varying depth. Long side-canine lengths are already broadly appropriate; simply making all teeth larger is not the fix.",
+      "action": "Try roughly11 upper and12-13 lower teeth; vary lengths10-20 percent and tilt/depth modestly, retain two dominant upper canines. Push some small teeth farther behind the canines, use elliptical/flattened curved bodies and subtle longitudinal enamel striations. Preserve clear visible gaps and test the closing path.",
+      "current_v19_counts": {"upper": 9, "lower": 10},
+      "approximate_side_canine_length_over_head_width": [0.23, 0.27]
+    },
+    {
+      "priority": 6,
+      "area": "Fleece scale and softness",
+      "mismatch": "V19's repeated nearly closed tiny loops look porous/coral-like or like many identical doughnuts. Reference fibre detail reads as irregular wavy yarn clumps with softer overlapping strands and less exposed bare base material.",
+      "action": "Replace the single near-closed loop seed with several irregular C/S/wavy tuft variants or multi-strand clumps; remove obvious ring holes, introduce two scales of variation, and soften the base bump/contrast. Do not just increase the same ring density or add more random displacement to the lip."
+    },
+    {
+      "priority": 7,
+      "area": "Sewn face panels, eye integration and mouth scars",
+      "mismatch": "Reference has a central crown-to-muzzle sewn panel seam and subtle face-panel relief; v19 omits it. V19 cheek marks are four parallel tacks above the mouth rather than tacks crossing a connected scar/seam. Eyes look like flat cream disks with a black rim rather than warm inset glowing apertures.",
+      "action": "Add a subtle central fabric seam/groove and neighboring panel fullness. Place cheek tacks across the continuing mouth seam and include the thin longitudinal thread. Keep eye size/spacing broadly unchanged, integrate them into padded fabric sockets and add restrained warm spill/bloom instead of large black outlines.",
+      "eye_spacing_over_head_width_reference_and_v19_already_close": [0.34, 0.36],
+      "eye_diameter_over_head_width_already_reasonable": [0.12, 0.15]
+    }
+  ],
+  "secondary_observation": "The folded ear is still a smooth inverted-U arch with a broad flat inner-felt window; reference has a localized bent root and a distinct drooping padded distal lobe. Worth adjusting if the head-crown change requires re-seating the ears, but face/mouth priorities above should come first.",
+  "acceptance_guidance": "First compare clay/low-fleece matched three-quarter and side views for the face, lip roll and posterior cranium. Then compare the mouth closeup with readable folds/tongue and irregular teeth. Retain collision/closure tests, but do not call a clean numeric audit a likeness pass."
+}
